@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\AlertMessage;
+use App\Entity\SiteConfig;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,14 +40,14 @@ class AlertMessageRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCurrentMessage(): ?AlertMessage
+    public function getActiveMessages(): ?array
     {
         return $this->createQueryBuilder('am')
             ->select('am.subject', 'am.message')
             ->orderBy('am.dateCreated', 'DESC')
             ->andWhere('am.active = 1')
             ->getQuery()
-            ->getOneOrNullResult()
+            ->getResult()
         ;
     }
 
@@ -74,5 +75,10 @@ class AlertMessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function alertsEnabled(): bool
+    {
+        return $this->getEntityManager()->getRepository(SiteConfig::class)->findOneByName('site_alertMessageEnabled')->getConfigValue() == "1" ? true : false;
     }
 }

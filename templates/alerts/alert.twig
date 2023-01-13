@@ -1,0 +1,15 @@
+{# alert/alert.twig #}
+    {% if areAlerts is defined and areAlerts == true %}
+        {% if alertMessages is defined %}
+            <div class="container">
+                {% for message in alertMessages %}
+                    <div class="alert alert-danger">
+                        <span class="title">
+                            {{ message.subject }}
+                        </span>
+                        {{ message.message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}

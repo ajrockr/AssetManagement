@@ -19,6 +19,7 @@ security:
             custom_authenticator:
                 - App\Security\AppAuthenticator
                 - App\Security\GoogleAuthenticator
+                - App\Security\MicrosoftAuthenticator
             logout:
                 path: app_logout
                 # where to redirect after logout

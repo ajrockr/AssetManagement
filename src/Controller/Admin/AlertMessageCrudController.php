@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 
 class AlertMessageCrudController extends AbstractCrudController
 {
@@ -28,7 +29,15 @@ class AlertMessageCrudController extends AbstractCrudController
     {
         return [
             TextField::new('subject'),
-            TextEditorField::new('message'),
+            // TextEditorField::new('message')->setTrixEditorConfig([
+            //     'blockAttributes' => [
+            //         'default' => ['tagName' => 'p'],
+            //         'code' => ['text' => [
+            //             'plaintext' => false
+            //         ]]
+            //     ]
+            // ]),
+            TextareaField::new('message'),
             BooleanField::new('active'),
             TextField::new('source')->onlyOnIndex(),
             DateTimeField::new('dateCreated')->onlyOnIndex()
