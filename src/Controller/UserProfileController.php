@@ -69,7 +69,6 @@ class UserProfileController extends AbstractController
         $user = $this->getUser();
         $message = null;
         $form = $this->createForm(ChangePasswordFormType::class);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

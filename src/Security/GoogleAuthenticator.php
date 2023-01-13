@@ -2,7 +2,9 @@
 
 namespace App\Security;
 
+use Exception;
 use App\Entity\User;
+use App\Entity\SiteConfig;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +39,11 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
 
     public function authenticate(Request $request): Passport
     {
+        // Check if Google authentication was disabled
+        if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('auth_useGoogle')->getConfigValue() !== "1") {
+            throw new Exception('Use of Google authentication is disabled.');
+        }
+
         $client = $this->clientRegistry->getClient('google');
         $accessToken = $this->fetchAccessToken($client);
 

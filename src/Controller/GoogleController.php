@@ -28,11 +28,9 @@ class GoogleController extends AbstractController
         try {
             $accessToken = $client->getAccessToken();
             $user = $client->fetchUserFromToken($accessToken);
-
             $provider = $client->getOAuth2Provider();
 
-            dd($provider);
-            
+            // @todo 1) Check if user exists in database
         } catch (IdentityProviderException $e) {
             dd($e->getMessage());
         }

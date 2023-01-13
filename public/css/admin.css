@@ -1,0 +1,126 @@
+/*
+ *   Copyright (c) 2023 Anthony Rizzo
+
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+:root {
+    --sidebar-bg: #2f4a5f;
+    --body-bg: #f3f3f3;
+    --sidebar-border-color: var(--gray-200);
+    --sidebar-logo-color: #ffffff;
+    --sidebar-padding-left: 10px;
+    --sidebar-padding-right: 10px;
+    --sidebar-menu-items-padding-left: 6px;
+    --sidebar-menu-items-padding-right: 10px;
+    --sidebar-menu-color: #c4c4c4;
+    --sidebar-menu-badge-bg: var(--indigo-100);
+    --sidebar-menu-badge-color: var(--gray-500);
+    --sidebar-menu-badge-active-bg: var(--color-primary);
+    --sidebar-menu-badge-active-color: var(--indigo-50);
+    --sidebar-menu-submenu-color: var(--sidebar-menu-color);
+    --sidebar-menu-header-color: var(--gray-400);
+    --sidebar-menu-icon-color: #c4c4c4;
+    --sidebar-menu-active-item-bg: none;
+    --sidebar-menu-active-item-color: #f5a56f;
+    --sidebar-menu-compact-hover-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --form-switch-checked-bg: #f5a56f;
+    /* --bs-nav-tabs-link-active-color: #f5a56f; */
+    --bs-nav-link-color: #2f4a5f;
+    --bs-nav-link-font-weight: 900;
+    --my-btn-gradient-orange: linear-gradient(to left, #f5a56f, #f58d47);
+}
+
+/* .nav-item .active {
+    background-color: #000;
+} */
+
+.nav-link {
+    /* Using a variable does not seem to work */
+    font-weight: 600;
+}
+
+.my-btn-gradient-orange {
+    background: var(--my-btn-gradient-orange);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+#statistics .col {
+    max-height: 150px;
+}
+
+#statistics .card {
+    min-height: 150px;
+    height: 100%;
+    border: none;
+}
+
+#statistics .card-body {
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 1px 20px 0 rgb(69 90 100 / 35%); /* origional 8% */
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+#statistics .card-body .card-footer {
+    border: none;
+    background: none;
+    width: 100%;
+}
+
+#statistics .card-title {
+    color: #fff;
+    font-weight: bold;
+    /* display: inline; */
+    font-size: calc(100% + 1vw + 1vh);
+}
+
+#statistics .card-title > i {
+    float: top;
+}
+
+#statistics .card-visitors-total .card-body {
+    color: #ffffff;
+    background: linear-gradient(to right, #2cb100, #8bfe66);
+}
+
+#statistics .card-users-total .card-body {
+    color: #ffffff;
+    background: linear-gradient(to right, #1d5994, #7fb2e5);
+}
+
+#statistics .card-newest-user .card-body {
+    color: #ffffff;
+    background: linear-gradient(to right, #848e23, #d7e084);
+}
+
+#statistics .card-pages-total .card-body {
+    color: #ffffff;
+    background: linear-gradient(to right, #b20000, #f66);
+}
+
+.menu-item {
+    font-size: 1rem;
+}
+
+.menu-item:hover .menu-item-label {
+    transition: all .3s ease-in-out;
+    color: #ffffff;
+}
+
+.active .menu-item-label {
+    padding-left: 5px;
+}
