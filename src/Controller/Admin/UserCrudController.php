@@ -44,7 +44,6 @@ class UserCrudController extends AbstractCrudController
         $roles = ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_USER'];
         return [
             FormField::addPanel('User Data')->setIcon('fa fa-user'),
-            BooleanField::new('pending'),
             TextField::new('username'),
             EmailField::new('email')->onlyWhenUpdating()->setDisabled(),
             EmailField::new('email')->onlyWhenCreating(),
@@ -53,6 +52,7 @@ class UserCrudController extends AbstractCrudController
                 ->setChoices(array_combine($roles, $roles))
                 ->allowMultipleChoices()
                 ->renderAsBadges(),
+            BooleanField::new('pending'),
             BooleanField::new('enabled'),
             TextField::new('surname')->setRequired(true),
             TextField::new('firstname')->setRequired(true),
