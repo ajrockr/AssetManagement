@@ -23,6 +23,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -175,13 +176,4 @@ class UserCrudController extends AbstractCrudController
         }
         return parent::delete($adminContext);
     }
-
-    // public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
-    // {
-    //     $qb = $this->get(UserRepository::class)->createQueryBuilder($searchDto, $entityDto, $fields, $filters);
-    //     $qb->andWhere('user.pending = :pending');
-    //     $qb->setParameter('pending', true);
-
-    //     return $qb;
-    // }
 }
