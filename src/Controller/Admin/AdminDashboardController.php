@@ -3,8 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\SiteView;
 use App\Entity\SiteConfig;
 use App\Entity\AlertMessage;
+use App\Entity\CustomUserField;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,14 +29,17 @@ class AdminDashboardController extends AbstractDashboardController
     {
         $userCount = $this->entityManager->getRepository(User::class)->getUserCount();
 
+        // @todo This is a very basic subscriber counting user hits. Production should probably be a little more robust
+        $visitorCount = $this->entityManager->getRepository(SiteView::class)->getCount();
+
         $lastCreatedUser = $this->entityManager->getRepository(User::class)->getLastCreatedUser();
         $lastCreatedUser = $lastCreatedUser['firstname'] . ' ' . $lastCreatedUser['surname'];
 
         return $this->render('admin/index.html.twig', [
             'userCount' => $userCount,
+            'visitorCount' => $visitorCount,
             'lastCreatedUser' => $lastCreatedUser
         ]);
-        // return parent::index();
     }
 
     public function configureDashboard(): Dashboard
@@ -61,11 +66,12 @@ class AdminDashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Configuration', 'fa fa-gear', 'app_admin_site_config'),
             MenuItem::linkToRoute('Plugins', 'fa fa-plug', 'admin'),
             MenuItem::linkToCrud('Alert Message', 'fa fa-solid fa-message', AlertMessage::class),
-            MenuItem::linkToCrud('Site Config', 'fa fa-home', SiteConfig::class),
+            MenuItem::linkToCrud('Site Config (dev)', 'fa fa-home', SiteConfig::class),
             
             MenuItem::section('People'),
             MenuItem::subMenu('Users', 'fa fa-user')->setSubItems([
-                MenuItem::linkToCrud('List Users', 'fa fa-home', User::class)
+                MenuItem::linkToCrud('List Users', 'fa fa-home', User::class),
+                MenuItem::linkToCrud('Custom Fields', 'fa fa-solid fa-address-card', CustomUserField::class)
             ])
         ];
     }

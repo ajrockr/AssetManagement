@@ -59,7 +59,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getUserCount(): int
     {
         return $this->createQueryBuilder('u')
-            ->select('SUM(u.id)')
+            ->select('COUNT(u.id)')
             ->getQuery()
             ->getSingleScalarResult()
         ;
@@ -67,12 +67,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function getLastCreatedUser(): array
     {
-        return $this->createQueryBuilder('u')
+        $result = $this->createQueryBuilder('u')
             ->select('u.surname', 'u.firstname')
             ->orderBy('u.dateCreated', 'DESC')
             ->getQuery()
-            ->getSingleResult()
+            ->setMaxResults(1)
+            ->getOneOrNullResult()
         ;
+        // dd($result);
+        return $result;
     }
 
     public function adminImportUsers(array $users)
@@ -80,28 +83,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         
     }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function getUsers()
+    {
+        return $this->createQueryBuilder('u')
+            ->select()
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

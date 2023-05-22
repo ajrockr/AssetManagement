@@ -22,6 +22,9 @@ class CustomUserField
     #[ORM\Column]
     private ?bool $fillable = null;
 
+    #[ORM\Column]
+    private ?bool $display = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class CustomUserField
     public function setFillable(bool $fillable): self
     {
         $this->fillable = $fillable;
+
+        return $this;
+    }
+
+    public function isDisplay(): ?bool
+    {
+        return $this->display;
+    }
+
+    public function setDisplay(bool $display): self
+    {
+        $this->display = $display;
 
         return $this;
     }

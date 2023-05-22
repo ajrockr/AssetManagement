@@ -64,20 +64,4 @@ class SiteConfigRepository extends ServiceEntityRepository
 
         return $return;
     }
-
-//    /**
-//     * @return SiteConfig[] Returns an array of SiteConfig objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
 }

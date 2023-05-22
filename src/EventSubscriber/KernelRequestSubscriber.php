@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class KernelRequestSubscriber implements EventSubscriberInterface
 {
     private EntityManagerInterface $entityManager;
-    private $security;
+    private Security $security;
     private UrlGeneratorInterface $urlGenerator;
 
     public function __construct(EntityManagerInterface $entityManager, Security $security, UrlGeneratorInterface $urlGenerator)
@@ -37,7 +37,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         $route = $event->getRequest()->attributes->get('_route');
     
         // If maintenance mode & notCli & not app_login route & not ROLE_ADMIN, we are in maintenance mode. Redirect to login
-        if( ($isMaintenance == "1" && !$isCli && $route != "app_login") && !$this->security->isGranted('ROLE_USER')) {
+        if( ($isMaintenance == "1" && !$isCli && ($route != "app_login" || $route != "admin")) && !$this->security->isGranted('ROLE_USER')) {
             $event->setResponse(new RedirectResponse(
                 $this->urlGenerator->generate('app_login')
             ));
