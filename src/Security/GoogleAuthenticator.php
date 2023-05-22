@@ -116,12 +116,19 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
 
         // User is pending, deny
         if (null !== $user) {
-            if (($user->isPending()) || !($user->isEnabled())) {
+            if (($user->isPending())) {
                 // Destroy user session
                 $this->tokenStorage->setToken(null);
                 $request->getSession()->invalidate();
 
                 $this->session->getFlashBag()->add('warning', 'Your user account is now pending administrative approval.');
+                return new RedirectResponse('/');
+            } elseif (!($user->isEnabled())) {
+                // Destroy user session
+                $this->tokenStorage->setToken(null);
+                $request->getSession()->invalidate();
+
+                $this->session->getFlashBag()->add('warning', 'Your user account is disabled or pending administrative approval.');
                 return new RedirectResponse('/');
             }
         }
