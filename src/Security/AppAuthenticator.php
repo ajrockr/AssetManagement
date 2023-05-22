@@ -2,13 +2,15 @@
 
 namespace App\Security;
 
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -22,7 +24,7 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    public function __construct(private UrlGeneratorInterface $urlGenerator, private Session $session, private TokenStorageInterface $tokenStorage)
     {
     }
 
@@ -47,14 +49,21 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         // Check if user is enabled/pending in database
         // @todo These flash messages will not display as we are redirecting to /logout and /logout is redirecting to /
         if (!($token->getUser()->isEnabled()) || ($token->getUser()->isPending())) {
-            $request->getSession()->getFlashBag()->add('warning', 'User account is either disabled or pending admin approval.');
             // destroy session
-            return new RedirectResponse('/logout');
+            $this->tokenStorage->setToken(null);
+            $request->getSession()->invalidate();
+
+            $this->session->getFlashBag()->add('warning', 'User account is either disabled or pending admin approval.');
+            return new RedirectResponse('/');
         }
 
         if (!(is_null($token->getUser()->getGoogleId()))) {
-            $request->getSession()->getFlashBag()->add('warning', 'User account is authenticated with a different method. Please login with that method.');
-            return new RedirectResponse('/logout');
+            // destroy session
+            $this->tokenStorage->setToken(null);
+            $request->getSession()->invalidate();
+
+            $this->session->getFlashBag()->add('warning', 'User account is authenticated with a different method. Please login with that method.');
+            return new RedirectResponse('/');
         }
 
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
