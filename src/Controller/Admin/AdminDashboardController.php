@@ -8,6 +8,7 @@ use App\Entity\SiteConfig;
 use App\Entity\AlertMessage;
 use App\Entity\CustomUserField;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Controller\Admin\UserCrudController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -71,7 +72,8 @@ class AdminDashboardController extends AbstractDashboardController
             
             MenuItem::section('People'),
             MenuItem::subMenu('Users', 'fa fa-user')->setSubItems([
-                MenuItem::linkToCrud('List Users', 'fa fa-home', User::class),
+                MenuItem::linkToCrud('List Users', 'fa fa-home', User::class)
+                    ->setController(UserCrudController::class),
                 MenuItem::linkToCrud('Pending Users', 'fa fa-home', User::class)
                     ->setController(UserPendingCrudController::class),
                 MenuItem::linkToCrud('Custom Fields', 'fa fa-solid fa-address-card', CustomUserField::class)

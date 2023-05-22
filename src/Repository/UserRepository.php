@@ -91,4 +91,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult()
         ;
     }
+
+    public function setPendingStatus(int $id, bool $pending = true)
+    {
+        return $this->createQueryBuilder('u')
+            ->set('u.pending', $pending)
+            ->where('u.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->execute()
+        ;
+    }
 }

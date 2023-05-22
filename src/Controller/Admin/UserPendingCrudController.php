@@ -4,16 +4,14 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
-use App\Repository\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -66,13 +64,24 @@ class UserPendingCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $approveAction)
             ->disable('edit')
             ->disable('delete')
+            ->disable('new')
         ;
     }
 
     public function approveAction(AdminContext $context)
     {
         $id = $context->getRequest()->query->get('entityId');
-        $entity = $this->doctrine->getRepository(User::class)->find(['id' => $id]);
-        dd($entity);
+        // $context->getEntity()->getInstance()->setPending($id, false);
+        $em = $this->container->get('doctrine')->getManager();
+        $ur = $em->getRepository(User::class)->find($id)
+            ->setPending(false)
+            ->setEnabled(true);
+        $this->persistEntity($em, $ur);
+
+        $url = $this->container->get(AdminUrlGenerator::class)
+                ->setController(UserPendingCrudController::class)
+                ->setAction(Action::INDEX)
+                ->generateUrl();
+        return $this->redirect($url);
     }
 }
