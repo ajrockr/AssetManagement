@@ -30,12 +30,7 @@ class UserPendingCrudController extends AbstractCrudController
             TextField::new('username')->onlyOnIndex(),
             TextField::new('email')->onlyOnIndex(),
             TextField::new('surname')->setRequired(true),
-            TextField::new('firstname')->setRequired(true),
-            TextField::new('manager')->onlyOnForms(),
-            TextField::new('department')
-                ->formatValue(function($value) {
-                    return ($value === NULL) ? '' : $value;
-                })
+            TextField::new('firstname')->setRequired(true)
         ];
     }
 

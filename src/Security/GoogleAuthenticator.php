@@ -48,7 +48,6 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
         if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('auth_useGoogle')->getConfigValue() !== "1") {
             $this->session->getFlashBag()->add('notice', 'Use of Google authentication is disabled.');
             return new RedirectResponse('/');
-            // throw new Exception('Use of Google authentication is disabled.');
         }
     }
 
@@ -65,45 +64,37 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
         return new SelfValidatingPassport(
             new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
                 $googleUser = $client->fetchUserFromToken($accessToken);
-                $userExists = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['googleId' => $googleUser->getId()]);
                 
-                if (null !== $userExists) {
-                    if (null === $userExists->getGoogleId()) {
-                        $userExists->setGoogleId($googleUser->getId());
-                        $this->entityManager->persist($userExists);
-                        $this->entityManager->flush();
-                    }
-
-                    return $userExists;
+                if ($existingUser) {
+                    return $existingUser;
                 }
                 
-                // @todo Check site config and create user if option is enabled.
-                /**
-                 * 
-                 * if (config::allowUserRegistration)
-                 * ...
-                 * else
-                 * return null;
-                 */
-                $user = new User();
-                $user->setEmail($googleUser->getEmail())
-                    ->setUsername($googleUser->getEmail())
-                    ->setEnabled(false)
-                    ->setPending(true)
-                    ->setFirstname($googleUser->getFirstName())
-                    ->setSurname($googleUser->getLastName())
-                    ->setGoogleId($googleUser->getId())
-                    // @todo Will setting the password to null cause any harm?
-                    // ->setPassword(
-                    //     $this->userPasswordHasher->hashPassword(
-                    //         $user,
-                    //         'changepassword' // @todo Generate super secret uncrackable password
-                    //     )
-                    // )
-                ;
-    
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
+                $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+
+                if ($user) {
+                    if (!($user->getGoogleId())) {
+                        $user->setGoogleId($googleUser->getId());
+                        $this->entityManager->persist($user);
+                        $this->entityManager->flush();
+                    }
+                } else {
+                    if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('user_allowRegistration')->getConfigValue() == "1") {
+                        $user = new User();
+                        $user->setEmail($googleUser->getEmail())
+                            ->setUsername($googleUser->getEmail())
+                            ->setEnabled(false)
+                            ->setPending(true)
+                            ->setFirstname($googleUser->getFirstName())
+                            ->setSurname($googleUser->getLastName())
+                            ->setGoogleId($googleUser->getId())
+                            // @todo Will setting the password to null cause any harm?
+                        ;
+
+                        $this->entityManager->persist($user);
+                        $this->entityManager->flush();
+                    }
+                }
 
                 return $user;
             })
@@ -141,8 +132,10 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $message = strtr($exception->getMessageKey(), $exception->getMessageData());
+        $this->session->getFlashBag()->add('warning', $message);
 
-        return new Response($message, Response::HTTP_FORBIDDEN);
+        // return new Response($message, Response::HTTP_FORBIDDEN);
+        return new RedirectResponse('/');
     }
 
    public function start(Request $request, AuthenticationException $authException = null): Response

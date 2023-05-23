@@ -62,7 +62,7 @@ class UserCrudController extends AbstractCrudController
                 ->setChoices(array_combine($roles, $roles))
                 ->allowMultipleChoices()
                 ->renderAsBadges(),
-            BooleanField::new('pending'),
+            BooleanField::new('pending')->hideOnIndex(),
             BooleanField::new('enabled'),
             TextField::new('surname')->setRequired(true),
             TextField::new('firstname')->setRequired(true),
@@ -140,6 +140,7 @@ class UserCrudController extends AbstractCrudController
     {
         return $actions
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
+            ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
         ;
     }
