@@ -47,6 +47,7 @@ class SiteConfigController extends AbstractController
             // Site Information
             $this->updateConfigItem($entityManager, 'site_maintenanceModeEnabled', $data['setMaintenanceModeEnabled']);
             $this->updateConfigItem($entityManager, 'site_alertMessageEnabled', $data['setAlertMessageEnabled']);
+            $this->updateConfigItem($entityManger, 'user_allowRegistration', $data['setAllowUserRegistration']);
         }
 
         return $this->render('admin/site_config/index.html.twig', [

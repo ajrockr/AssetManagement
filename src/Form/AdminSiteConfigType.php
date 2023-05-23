@@ -103,6 +103,10 @@ class AdminSiteConfigType extends AbstractType
                 'data' => $options['data']['site_alertMessageEnabled'] ? true : false,
                 'required' => false
             ])
+            ->add('setAllowUserRegistration', CheckboxType::class, [
+                'data' => $options['data']['user_allowRegistration'] ? true : false,
+                'required' => false
+            ])
 
             ->add('save', SubmitType::class, [
                 'label' => 'Save Changes',
