@@ -58,7 +58,7 @@ class UserCrudController extends AbstractCrudController
         $roles = $this->getRoles();
         
         return [
-            FormField::addPanel('User Data')->setIcon('fa fa-user'),
+            FormField::addTab('Account Data')->setIcon('fa fa-user'),
             TextField::new('username'),
             EmailField::new('email')->onlyWhenUpdating()->setDisabled(),
             EmailField::new('email')->onlyWhenCreating(),
@@ -71,6 +71,15 @@ class UserCrudController extends AbstractCrudController
                 ->renderAsSwitch(false),
             BooleanField::new('enabled')
                 ->renderAsSwitch(false),
+            TextField::new('googleId')
+                ->onlyOnForms()
+                ->setFormTypeOptions(['attr' => ['value' => '********']])
+                ->setDisabled(),
+            TextField::new('microsoftId')
+                ->onlyOnForms()
+                ->setFormTypeOptions(['attr' => ['value' => '********']])
+                ->setDisabled(),
+            FormField::addTab('User Information')->setIcon('fa fa-id-card'),
             TextField::new('surname')->setRequired(true),
             TextField::new('firstname')->setRequired(true),
             TextField::new('manager')->onlyOnForms(),
@@ -78,13 +87,12 @@ class UserCrudController extends AbstractCrudController
                 ->formatValue(function($value) {
                     return ($value === NULL) ? '' : $value;
                 }),
-            TextField::new('googleId')->onlyOnForms(),
             TextField::new('location')->onlyOnForms(),
             TextField::new('phone')->onlyOnForms(),
             TextField::new('extension')->onlyOnForms(),
             TextField::new('title')->onlyOnForms(),
             TextField::new('homepage')->onlyOnForms(),
-            FormField::addPanel('Change Password')->setIcon('fa fa-key'),
+            FormField::addTab('Change Password')->setIcon('fa fa-key'),
             Field::new('password')
                 ->setFormType(RepeatedType::class)
                 ->setFormTypeOptions([
@@ -96,7 +104,7 @@ class UserCrudController extends AbstractCrudController
                     'invalid_message' => 'Passwords do not match'
                 ])
                 ->setRequired($pageName === Crud::PAGE_NEW)
-                ->onlyOnForms(),
+                ->onlyOnForms()
         ];
     }
 
