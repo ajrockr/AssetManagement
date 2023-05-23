@@ -68,8 +68,10 @@ class UserCrudController extends AbstractCrudController
                 ->allowMultipleChoices()
                 ->renderAsBadges(),
             BooleanField::new('pending')
+                ->onlyOnIndex()
                 ->renderAsSwitch(false),
             BooleanField::new('enabled')
+                ->onlyOnIndex()
                 ->renderAsSwitch(false),
             TextField::new('googleId')
                 ->onlyOnForms()
