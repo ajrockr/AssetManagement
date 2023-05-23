@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+/* 
 :root {
     --sidebar-bg: #2f4a5f;
     --body-bg: #f3f3f3;
@@ -36,18 +36,12 @@
     --sidebar-menu-active-item-color: #f5a56f;
     --sidebar-menu-compact-hover-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     --form-switch-checked-bg: #f5a56f;
-    /* --bs-nav-tabs-link-active-color: #f5a56f; */
     --bs-nav-link-color: #2f4a5f;
     --bs-nav-link-font-weight: 900;
     --my-btn-gradient-orange: linear-gradient(to left, #f5a56f, #f58d47);
 }
 
-/* .nav-item .active {
-    background-color: #000;
-} */
-
 .nav-link {
-    /* Using a variable does not seem to work */
     font-weight: 600;
 }
 
@@ -70,7 +64,7 @@
 #statistics .card-body {
     border: none;
     border-radius: 5px;
-    box-shadow: 0 1px 20px 0 rgb(69 90 100 / 35%); /* origional 8% */
+    box-shadow: 0 1px 20px 0 rgb(69 90 100 / 35%);
     font-weight: bold;
     font-size: 0.9rem;
 }
@@ -84,7 +78,6 @@
 #statistics .card-title {
     color: #fff;
     font-weight: bold;
-    /* display: inline; */
     font-size: calc(100% + 1vw + 1vh);
 }
 
@@ -123,4 +116,4 @@
 
 .active .menu-item-label {
     padding-left: 5px;
-}
+} */

@@ -1,0 +1,51 @@
+{# templates/admin/index.html.twig #}
+{% extends '@!EasyAdmin/page/content.html.twig' %}
+
+{% block customstyles %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/admin/style.css') }}" />
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid" data-bs-theme="dark">
+        <section id="statistics">
+            <div class="row">
+                {# <div class="card-deck"> #}
+                    <div class="col-sm">
+                        <div class="card card-visitors-total">
+                            <div class="card-body">
+                                <div class="card-title">{{ visitorCount }}<i class="fa-solid fa-chart-simple float-end"></i></div>
+                                <div class="card-footer">Site Visitors</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="card card-users-total">
+                            <div class="card-body">
+                                <div class="card-title">{{ userCount }}<i class="fa-solid fa-users float-end"></i></div>
+                                <div class="card-footer">Total Users</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="card card-newest-user">
+                            <div class="card-body">
+                                <div class="card-title">
+                                    {{ lastCreatedUser }}<i class="fa-solid fa-user-plus float-end"></i>
+                                </div>
+                                <div class="card-footer">Newest User</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="card card-pages-total">
+                            <div class="card-body">
+                                <div class="card-title">256<i class="fa-regular fa-file float-end"></i></div>
+                                <div class="card-footer">Pages</div>
+                            </div>
+                        </div>
+                    </div>
+                {# </div> #}
+            </div>
+        </section>
+    </div>
+{% endblock %}

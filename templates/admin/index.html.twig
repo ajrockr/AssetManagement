@@ -1,51 +1,93 @@
 {# templates/admin/index.html.twig #}
 {% extends '@!EasyAdmin/page/content.html.twig' %}
 
-{% block customstyles %}
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/admin/style.css') }}" />
-{% endblock %}
+    {# <link rel="stylesheet" type="text/css" href="{{ asset('css/admin/style.css') }}" /> #}
 
 {% block main %}
-    <div class="container-fluid" data-bs-theme="dark">
-        <section id="statistics">
-            <div class="row">
-                {# <div class="card-deck"> #}
-                    <div class="col-sm">
-                        <div class="card card-visitors-total">
-                            <div class="card-body">
-                                <div class="card-title">{{ visitorCount }}<i class="fa-solid fa-chart-simple float-end"></i></div>
-                                <div class="card-footer">Site Visitors</div>
-                            </div>
-                        </div>
+    <link rel="stylesheet" type="text/css" href="/css/sb-admin-2.css" />
+    <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
-                    <div class="col-sm">
-                        <div class="card card-users-total">
-                            <div class="card-body">
-                                <div class="card-title">{{ userCount }}<i class="fa-solid fa-users float-end"></i></div>
-                                <div class="card-footer">Total Users</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm">
-                        <div class="card card-newest-user">
-                            <div class="card-body">
-                                <div class="card-title">
-                                    {{ lastCreatedUser }}<i class="fa-solid fa-user-plus float-end"></i>
+
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Visitor Count -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Visitor Count</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ visitorCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-chart-simple fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="card-footer">Newest User</div>
+                            </div>
+                        </div>
+
+                        <!-- Total Users -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Total Users</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ userCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Latest Users -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Newest Users</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ lastCreatedUser }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Requests Card Example -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Pending Users</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pendingUserCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-shield fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm">
-                        <div class="card card-pages-total">
-                            <div class="card-body">
-                                <div class="card-title">256<i class="fa-regular fa-file float-end"></i></div>
-                                <div class="card-footer">Pages</div>
-                            </div>
-                        </div>
-                    </div>
-                {# </div> #}
-            </div>
-        </section>
-    </div>
 {% endblock %}

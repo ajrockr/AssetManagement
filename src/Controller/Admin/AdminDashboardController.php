@@ -41,10 +41,13 @@ class AdminDashboardController extends AbstractDashboardController
         $lastCreatedUser = $this->entityManager->getRepository(User::class)->getLastCreatedUser();
         $lastCreatedUser = $lastCreatedUser['firstname'] . ' ' . $lastCreatedUser['surname'];
 
+        $pendingUsers = count($this->entityManager->getRepository(User::class)->findBy(['pending' => true]));
+
         return $this->render('admin/index.html.twig', [
             'userCount' => $userCount,
             'visitorCount' => $visitorCount,
-            'lastCreatedUser' => $lastCreatedUser
+            'lastCreatedUser' => $lastCreatedUser,
+            'pendingUserCount' => $pendingUsers
         ]);
     }
 
