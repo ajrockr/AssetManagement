@@ -138,7 +138,12 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $enableUserAction = Action::new('Enable')
+            ->linkToCrudAction('enableUserAction')
+        ;
+
         return $actions
+            ->add(Crud::PAGE_INDEX, $enableUserAction)
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
@@ -148,7 +153,7 @@ class UserCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->showEntityActionsInlined()
+            // ->showEntityActionsInlined()
             ->setPageTitle(Crud::PAGE_INDEX, 'View Users')
             ->setHelp('index', 'View the registered users.')
         ;
@@ -170,5 +175,20 @@ class UserCrudController extends AbstractCrudController
             return new RedirectResponse($url);
         }
         return parent::delete($adminContext);
+    }
+
+    public function enableUserAction(AdminContext $context)
+    {
+        $id = $context->getRequest()->query->get('entityId');
+        $em = $this->container->get('doctrine')->getManager();
+        $ur = $em->getRepository(User::class)->find($id)
+            ->setEnabled(true);
+        $this->persistEntity($em, $ur);
+
+        $url = $this->container->get(AdminUrlGenerator::class)
+                ->setController(UserCrudController::class)
+                ->setAction(Action::INDEX)
+                ->generateUrl();
+        return $this->redirect($url);
     }
 }
