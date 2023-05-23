@@ -20,7 +20,7 @@
             padding: 50px;
         }
 
-        .login_wrapper a.btn {
+        .login_wrapper button.btn, a.btn {
             color: #fff;
             width: 100%;
             height: 50px;
@@ -131,7 +131,7 @@
             border-bottom: 1px solid #e4e4e4;
         }
 
-        .login_btn_wrapper a.login_btn {
+        .login_btn_wrapper button.login_btn {
             text-align: center;
             text-transform: uppercase;
         }
@@ -148,7 +148,7 @@
             line-height: 24px;
         }
 
-        .login_wrapper a.login_btn:hover {
+        .login_wrapper button.login_btn:hover {
             background-color: #2c6ad4;
             border-color: #2c6ad4;
         }
@@ -197,12 +197,12 @@
                             <h2>or</h2>
                             <div class="formsix-pos">
                                 <div class="form-group i-email">
-                                    <input name="username" type="email" class="form-control" required="" id="email2" placeholder="Username *" value="{{ last_username }}">
+                                    <input name="username" type="text" class="form-control" required autocomplete="username" id="inputUsername" placeholder="Username *" value="{{ last_username }}" autofocus>
                                 </div>
                             </div>
                             <div class="formsix-e">
                                 <div class="form-group i-password">
-                                    <input name="password" type="password" class="form-control" required="" id="password2" placeholder="Password *">
+                                    <input name="password" type="password" class="form-control" required id="inputPassword" placeholder="Password *">
                                 </div>
                             </div>
                             <div class="login_remember_box">
@@ -215,7 +215,7 @@
                                 </a>
                             </div>
                             <div class="login_btn_wrapper">
-                                <a href="#" class="btn btn-primary login_btn"> Login </a>
+                                <button type="submit" class="btn btn-primary login_btn"> Login </button>
                             </div>
                         </div>
                         <!-- /.login_wrapper-->
@@ -223,8 +223,6 @@
                 </div>
             </div>
         </div>
-        <input type="hidden" name="_csrf_token"
-            value="{{ csrf_token('authenticate') }}"
-        >
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
     </form>
 {% endblock %}
