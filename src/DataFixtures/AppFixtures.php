@@ -17,6 +17,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // Create the configuration items that the application needs
+        // @todo Update this as needed
         $siteConfig = [
             [
                 'name' => 'auth_useGoogle',
