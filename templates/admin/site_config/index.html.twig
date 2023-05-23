@@ -8,19 +8,19 @@
                 {{ form_errors(adminSiteConfig) }}
             </div>
             <div class="row float-end">
-                {{ form_widget(adminSiteConfig.save, {'attr': {'class': 'btn btn-lg my-btn-gradient-orange'}}) }}
+                {{ form_widget(adminSiteConfig.save, {'attr': {'class': 'btn btn-lg btn-success'}}) }}
             </div><br />
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item nav-pills" role="presentation">
+            <ul class="nav nav-pills nav-justified mt-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="company-info-tab-pane" aria-selected="true">Company Information</button>
                 </li>
-                <li class="nav-item nav-pills" role="presentation">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="user-authentication-tab-pane" aria-selected="false">User Authentication</button>
                 </li>
-                <li class="nav-item nav-pills" role="presentation">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="user-profiles-tab-pane" aria-selected="false">User Profiles</button>
                 </li>
-                <li class="nav-item nav-pills" role="presentation">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="site-settings-tab-pane" aria-selected="false">Site Settings</button>
                 </li>
             </ul>
