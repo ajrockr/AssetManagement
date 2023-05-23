@@ -54,8 +54,9 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        // Get roles
         $roles = $this->getRoles();
-        // $roles = ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_USER'];
+        
         return [
             FormField::addPanel('User Data')->setIcon('fa fa-user'),
             TextField::new('username'),
@@ -66,8 +67,10 @@ class UserCrudController extends AbstractCrudController
                 ->setChoices(array_combine(array_keys($roles), array_values($roles)))
                 ->allowMultipleChoices()
                 ->renderAsBadges(),
-            BooleanField::new('pending')->hideOnIndex(),
-            BooleanField::new('enabled'),
+            BooleanField::new('pending')
+                ->renderAsSwitch(false),
+            BooleanField::new('enabled')
+                ->renderAsSwitch(false),
             TextField::new('surname')->setRequired(true),
             TextField::new('firstname')->setRequired(true),
             TextField::new('manager')->onlyOnForms(),
@@ -95,6 +98,15 @@ class UserCrudController extends AbstractCrudController
                 ->setRequired($pageName === Crud::PAGE_NEW)
                 ->onlyOnForms(),
         ];
+    }
+
+    public function getPendingField(AdminContext $context)
+    {
+        $id = $context->getRequest()->query->get('entityId');
+        $em = $this->container->get('doctrine')->getManager();
+        $ur = $em->getRepository(User::class)->find($id)
+            ->isPending();
+        dd($ur);
     }
 
     public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
@@ -145,9 +157,14 @@ class UserCrudController extends AbstractCrudController
         $disableUserAction = Action::new('Disable')
             ->linkToCrudAction('disableUserAction')
         ;
+        
+        $enableUserAction = Action::new('Enable')
+            ->linkToCrudAction('enableUserAction')
+        ;
 
         return $actions
             ->add(Crud::PAGE_INDEX, $disableUserAction)
+            ->add(Crud::PAGE_INDEX, $enableUserAction)
             ->setPermission($disableUserAction, 'ROLE_SUPER_ADMIN')
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
@@ -189,6 +206,21 @@ class UserCrudController extends AbstractCrudController
         $em = $this->container->get('doctrine')->getManager();
         $ur = $em->getRepository(User::class)->find($id)
             ->setEnabled(false);
+        $this->persistEntity($em, $ur);
+
+        $url = $this->container->get(AdminUrlGenerator::class)
+                ->setController(UserCrudController::class)
+                ->setAction(Action::INDEX)
+                ->generateUrl();
+        return $this->redirect($url);
+    }
+    
+    public function enableUserAction(AdminContext $context)
+    {
+        $id = $context->getRequest()->query->get('entityId');
+        $em = $this->container->get('doctrine')->getManager();
+        $ur = $em->getRepository(User::class)->find($id)
+            ->setEnabled(true);
         $this->persistEntity($em, $ur);
 
         $url = $this->container->get(AdminUrlGenerator::class)
