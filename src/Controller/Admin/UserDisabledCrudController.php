@@ -40,8 +40,8 @@ class UserDisabledCrudController extends AbstractCrudController
     {
         return $crud
             ->showEntityActionsInlined()
-            ->setPageTitle(Crud::PAGE_INDEX, 'View Pending Users')
-            ->setHelp('index', 'View users pending admin approval.')
+            ->setPageTitle(Crud::PAGE_INDEX, 'View Disabled Users')
+            ->setHelp('index', 'View users that have been administratively disabled.')
         ;
     }
 
