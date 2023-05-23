@@ -17,8 +17,10 @@ use App\Controller\Admin\UserPendingCrudController;
 use App\Controller\Admin\UserDisabledCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
+#[Security("is_granted('ROLE_ADMIN')")]
 class AdminDashboardController extends AbstractDashboardController
 {
     private EntityManagerInterface $entityManager;
