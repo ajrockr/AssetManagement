@@ -53,12 +53,13 @@ class UserPendingCrudController extends AbstractCrudController
     {
         $approveAction = Action::new('Approve', null, 'fa fa-check')
             ->linkToCrudAction('approveAction')
+            ->addCssClass('btn btn-success')
         ;
 
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $approveAction)
             ->disable(Action::EDIT, Action::NEW)
-            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel('Deny')->setIcon('fa fa-ban'))
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel('Deny')->setIcon('fa fa-ban')->addCssClass('btn btn-secondary'))
         ;
     }
 

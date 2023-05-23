@@ -56,6 +56,7 @@ class UserDisabledCrudController extends AbstractCrudController
     {
         $enableUserAction = Action::new('Enable', null, 'fa fa-check')
             ->linkToCrudAction('enableUserAction')
+            ->addCssClass('btn btn-primary')
         ;
 
         return $actions

@@ -14,10 +14,18 @@ class ImportUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('fileCsv', FileType::class, [
+        ->add('fileCsv', FileType::class, [
+                'attr' => [
+                    'class' => 'form-control m-2',
+                ],
                 'label' => 'Import Users (csv)',
                 'label_attr' => [
-                    'class' => 'form-label'
+                    'class' => 'form-label display-6'
+                ],
+                'help' => 
+                    'Get-ADUser -SearchBase "OU=Students,OU=Accounts,DC=WESTEX,DC=ORG" -Filter {Mail -Like \'*\'} -Properties Description,SamAccountName,Mail,GivenName,Surname | Select Description,SamAccountName,Mail,GivenName,Surname | Export-Csv C:/choose/a/path/file.csv -NoTypeInformation -NoClobber',
+                'help_attr' => [
+                    'class' => 'form-text text-muted',
                 ],
                 'required' => true,
                 'constraints' => [
@@ -27,9 +35,6 @@ class ImportUserType extends AbstractType
                         ]
                     ])
                 ],
-                'attr' => [
-                    'class' => 'form-control m-2'
-                ]
             ])
             ->add('upload', SubmitType::class, [
                 'attr' => [
