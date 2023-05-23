@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Entity\SiteConfig;
+use App\Entity\UserRoles;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -135,7 +136,40 @@ class AppFixtures extends Fixture
         $user->setRoles(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN']);
         $user->setPassword($this->userPasswordHasher->hashPassword($user, 'changeme'));
         $manager->persist($user);
+
+        // User roles
+        $userRoles = [
+            [
+                'name' => 'User',
+                'value' => 'ROLE_USER',
+                'description' => 'Basic authenticated user.'
+            ],
+            [
+                'name' => 'Admin',
+                'value' => 'ROLE_ADMIN',
+                'description' => '	Allow access to the admin dashboard.'
+            ],
+            [
+                'name' => 'Super Admin',
+                'value' => 'ROLE_SUPER_ADMIN',
+                'description' => 'Allow access to every administrative option.'
+            ],
+            [
+                'name' => 'User Admin',
+                'value' => 'ROLE_USER_ADMIN',
+                'description' => '	Allow ability to manage users.'
+            ],
+        ];
+
+        foreach ($userRoles as $role) {
+            $r = new UserRoles();
+            $r->setRoleName($role['name']);
+            $r->setRoleValue($role['value']);
+            $r->setRoleDescription($role['description']);
+            $manager->persist($r);
+        }
         
+        // Flush the database
         $manager->flush();
     }
 }
