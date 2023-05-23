@@ -51,13 +51,16 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
         // Check if user is enabled/pending in database
         // @todo These flash messages will not display as we are redirecting to /logout and /logout is redirecting to /
-        if (!($token->getUser()->isEnabled()) || ($token->getUser()->isPending()) || (in_array('ROLE_DENY_LOGIN', $token->getUser()->getRoles()))) {
-            // destroy session
-            $this->tokenStorage->setToken(null);
-            $request->getSession()->invalidate();
+        if (!($token->getUser()->isEnabled()) || ($token->getUser()->isPending())) {
+            $roles = $token->getUser()->getRoles();
+            if ((in_array('ROLE_DENY_LOGIN', $roles)) && !(in_array(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'], $roles))) {
+                // destroy session
+                $this->tokenStorage->setToken(null);
+                $request->getSession()->invalidate();
 
-            $this->session->getFlashBag()->add('warning', 'User account is either disabled or pending admin approval.');
-            return new RedirectResponse('/');
+                $this->session->getFlashBag()->add('warning', 'User account is either disabled or pending admin approval.');
+                return new RedirectResponse('/');
+            }
         }
 
         if (!(is_null($token->getUser()->getGoogleId()))) {

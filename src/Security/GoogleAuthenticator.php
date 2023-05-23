@@ -121,6 +121,13 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
 
                 $this->session->getFlashBag()->add('warning', 'Your user account is disabled or pending administrative approval.');
                 return new RedirectResponse('/');
+            } elseif (in_array('ROLE_DENY_LOGIN', $user->getRoles())) {
+                // Destroy user session
+                $this->tokenStorage->setToken(null);
+                $request->getSession()->invalidate();
+
+                $this->session->getFlashBag()->add('warning', 'Your user account is not permitted to login.');
+                return new RedirectResponse('/');
             }
         }
         
