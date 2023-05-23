@@ -138,15 +138,17 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $enableUserAction = Action::new('Enable')
-            ->linkToCrudAction('enableUserAction')
+        $disableUserAction = Action::new('Disable')
+            ->linkToCrudAction('disableUserAction')
         ;
 
         return $actions
-            ->add(Crud::PAGE_INDEX, $enableUserAction)
+            ->add(Crud::PAGE_INDEX, $disableUserAction)
+            ->setPermission($disableUserAction, 'ROLE_SUPER_ADMIN')
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
         ;
     }
 
@@ -177,12 +179,12 @@ class UserCrudController extends AbstractCrudController
         return parent::delete($adminContext);
     }
 
-    public function enableUserAction(AdminContext $context)
+    public function disableUserAction(AdminContext $context)
     {
         $id = $context->getRequest()->query->get('entityId');
         $em = $this->container->get('doctrine')->getManager();
         $ur = $em->getRepository(User::class)->find($id)
-            ->setEnabled(true);
+            ->setEnabled(false);
         $this->persistEntity($em, $ur);
 
         $url = $this->container->get(AdminUrlGenerator::class)

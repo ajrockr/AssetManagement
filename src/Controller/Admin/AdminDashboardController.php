@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use App\Controller\Admin\UserPendingCrudController;
+use App\Controller\Admin\UserDisabledCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -71,12 +72,13 @@ class AdminDashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Site Config (dev)', 'fa fa-home', SiteConfig::class),
             
             MenuItem::section('People'),
-            MenuItem::subMenu('Users', 'fa fa-user')->setSubItems([
-                MenuItem::linkToCrud('List Users', 'fa fa-home', User::class)
+            MenuItem::subMenu('Users', 'fa fa-users')->setSubItems([
+                MenuItem::linkToCrud('List Users', 'fa fa-users-line', User::class)
                     ->setController(UserCrudController::class),
-                MenuItem::linkToCrud('Pending Users', 'fa fa-home', User::class)
+                MenuItem::linkToCrud('Pending Users', 'fa fa-user-shield', User::class)
                     ->setController(UserPendingCrudController::class),
-                MenuItem::linkToCrud('Custom Fields', 'fa fa-solid fa-address-card', CustomUserField::class)
+                MenuItem::linkToCrud('Disabled Users', 'fa fa-users-slash', User::class)
+                    ->setController(UserDisabledCrudController::class),
             ])
         ];
     }

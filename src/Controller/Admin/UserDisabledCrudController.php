@@ -16,7 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
-class UserPendingCrudController extends AbstractCrudController
+class UserDisabledCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
@@ -46,33 +46,33 @@ class UserPendingCrudController extends AbstractCrudController
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
         return parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters)
-            ->where('entity.pending = true');
+            ->where('entity.enabled = false')
+            ->andWhere('entity.pending = false');
     }
 
     public function configureActions(Actions $actions): Actions
     {
-        $approveAction = Action::new('Approve', null, 'fa fa-check')
-            ->linkToCrudAction('approveAction')
+        $enableUserAction = Action::new('Enable', null, 'fa fa-check')
+            ->linkToCrudAction('enableUserAction')
         ;
 
-        return parent::configureActions($actions)
-            ->add(Crud::PAGE_INDEX, $approveAction)
-            ->disable(Action::EDIT, Action::NEW)
-            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->setLabel('Deny')->setIcon('fa fa-ban'))
+        return $actions
+            ->add(Crud::PAGE_INDEX, $enableUserAction)
+            ->setPermission($enableUserAction, 'ROLE_SUPER_ADMIN')
+            ->disable(Action::EDIT, Action::NEW, Action::DELETE)
         ;
     }
 
-    public function approveAction(AdminContext $context)
+    public function enableUserAction(AdminContext $context)
     {
         $id = $context->getRequest()->query->get('entityId');
         $em = $this->container->get('doctrine')->getManager();
         $ur = $em->getRepository(User::class)->find($id)
-            ->setPending(false)
             ->setEnabled(true);
         $this->persistEntity($em, $ur);
 
         $url = $this->container->get(AdminUrlGenerator::class)
-                ->setController(UserPendingCrudController::class)
+                ->setController(UserDisabledCrudController::class)
                 ->setAction(Action::INDEX)
                 ->generateUrl();
         return $this->redirect($url);
