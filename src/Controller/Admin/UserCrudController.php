@@ -179,6 +179,7 @@ class UserCrudController extends AbstractCrudController
             // ->showEntityActionsInlined()
             ->setPageTitle(Crud::PAGE_INDEX, 'View Users')
             ->setHelp('index', 'View the registered users.')
+            ->setDefaultSort(['id' => 'ASC'])
         ;
     }
 

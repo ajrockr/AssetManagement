@@ -157,8 +157,13 @@ class AppFixtures extends Fixture
             [
                 'name' => 'User Admin',
                 'value' => 'ROLE_USER_ADMIN',
-                'description' => '	Allow ability to manage users.'
+                'description' => 'Allow ability to manage users.'
             ],
+            [
+                'name' => 'Deny Login',
+                'value' => 'ROLE_DENY_LOGIN',
+                'description' => 'Deny the user from logging into the application.'
+            ]
         ];
 
         foreach ($userRoles as $role) {

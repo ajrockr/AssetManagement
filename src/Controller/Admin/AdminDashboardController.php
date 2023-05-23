@@ -85,6 +85,7 @@ class AdminDashboardController extends AbstractDashboardController
                     ->setController(UserPendingCrudController::class),
                 MenuItem::linkToCrud('Disabled Users', 'fa fa-users-slash', User::class)
                     ->setController(UserDisabledCrudController::class),
+                MenuItem::linkToRoute('Import Users', 'fa fa-user-plus', 'app_admin_import_user')
             ]),
             MenuItem::linkToCrud('User Roles (dev)', 'fa fa-home', UserRoles::class),
         ];

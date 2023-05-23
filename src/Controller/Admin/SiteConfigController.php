@@ -23,7 +23,6 @@ class SiteConfigController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            // dd($data);
             
             // Company Information
             $this->updateConfigItem($entityManager, 'company_name', $data['companyName']);
