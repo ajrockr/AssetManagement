@@ -7,10 +7,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
+#[Security("is_granted('ROLE_SUPER_ADMIN')")]
 class AlertMessageCrudController extends AbstractCrudController
 {
     private EntityManagerInterface $entityManager;

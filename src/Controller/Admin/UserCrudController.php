@@ -24,9 +24,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+#[Security("is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_USER_ADMIN')")]
 class UserCrudController extends AbstractCrudController
 {
     private UserPasswordHasherInterface $userPasswordHasher;
