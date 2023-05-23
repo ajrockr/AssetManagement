@@ -15,6 +15,10 @@ class ImportUserType extends AbstractType
     {
         $builder
             ->add('fileCsv', FileType::class, [
+                'label' => 'Import Users (csv)',
+                'label_attr' => [
+                    'class' => 'form-label'
+                ],
                 'required' => true,
                 'constraints' => [
                     new File([
@@ -22,9 +26,16 @@ class ImportUserType extends AbstractType
                             'text/csv'
                         ]
                     ])
+                ],
+                'attr' => [
+                    'class' => 'form-control m-2'
                 ]
             ])
-            ->add('upload', SubmitType::class)
+            ->add('upload', SubmitType::class, [
+                'attr' => [
+                    'class' => 'form-control btn btn-primary m-2'
+                ]
+            ])
         ;
     }
 
