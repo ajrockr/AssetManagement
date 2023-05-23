@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\SiteView;
+use App\Entity\UserRoles;
 use App\Entity\SiteConfig;
 use App\Entity\AlertMessage;
 use App\Entity\CustomUserField;
@@ -79,7 +80,8 @@ class AdminDashboardController extends AbstractDashboardController
                     ->setController(UserPendingCrudController::class),
                 MenuItem::linkToCrud('Disabled Users', 'fa fa-users-slash', User::class)
                     ->setController(UserDisabledCrudController::class),
-            ])
+            ]),
+            MenuItem::linkToCrud('User Roles (dev)', 'fa fa-home', UserRoles::class),
         ];
     }
 }

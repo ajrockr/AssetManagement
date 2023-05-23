@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\UserRoles;
 use Symfony\Component\Form\FormEvents;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
@@ -51,7 +52,8 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $roles = ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_USER'];
+        $roles = $this->getRoles();
+        // $roles = ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_USER'];
         return [
             FormField::addPanel('User Data')->setIcon('fa fa-user'),
             TextField::new('username'),
@@ -59,7 +61,7 @@ class UserCrudController extends AbstractCrudController
             EmailField::new('email')->onlyWhenCreating(),
             TextField::new('email')->onlyOnIndex(),
             ChoiceField::new('roles')
-                ->setChoices(array_combine($roles, $roles))
+                ->setChoices(array_combine(array_keys($roles), array_values($roles)))
                 ->allowMultipleChoices()
                 ->renderAsBadges(),
             BooleanField::new('pending')->hideOnIndex(),
@@ -192,5 +194,17 @@ class UserCrudController extends AbstractCrudController
                 ->setAction(Action::INDEX)
                 ->generateUrl();
         return $this->redirect($url);
+    }
+
+    public function getRoles(): array
+    {
+        $return = [];
+        $em = $this->container->get('doctrine')->getManager();
+        $roles = $em->getRepository(UserRoles::class)->findAll();
+        foreach($roles as $role) {
+            $return[$role->getRoleName()] = $role->getRoleValue();
+        }
+
+        return $return;
     }
 }
