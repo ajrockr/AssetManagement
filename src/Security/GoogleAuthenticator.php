@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use Exception;
 use App\Entity\User;
 use App\Entity\SiteConfig;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,15 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
-use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
+use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -28,6 +25,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
+    use BearerAuthorizationTrait;
+
     private $clientRegistry;
     private $entityManager;
     private $router;
@@ -65,29 +64,36 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
             new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
                 $googleUser = $client->fetchUserFromToken($accessToken);
                 $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['googleId' => $googleUser->getId()]);
-                
-                if ($existingUser) {
-                    return $existingUser;
-                }
-                
-                $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
 
+                $email = $googleUser->toArray()['email'];
+                $picture = $googleUser->toArray()['picture'];
+
+                if ($existingUser) {
+                    // return $existingUser;
+                }
+
+                
+                $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
                 if ($user) {
+                    $user->setAvatar($picture);
+
                     if (!($user->getGoogleId())) {
                         $user->setGoogleId($googleUser->getId());
-                        $this->entityManager->persist($user);
-                        $this->entityManager->flush();
                     }
+
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
                 } else {
                     if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('user_allowRegistration')->getConfigValue() == "1") {
                         $user = new User();
-                        $user->setEmail($googleUser->getEmail())
-                            ->setUsername($googleUser->getEmail())
+                        $user->setEmail($email)
+                            ->setUsername($email)
                             ->setEnabled(false)
                             ->setPending(true)
                             ->setFirstname($googleUser->getFirstName())
                             ->setSurname($googleUser->getLastName())
                             ->setGoogleId($googleUser->getId())
+                            ->setAvatar($picture)
                             // @todo Will setting the password to null cause any harm?
                         ;
 

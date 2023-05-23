@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -27,6 +28,11 @@ class UserPendingCrudController extends AbstractCrudController
     {
 
         return [
+            AvatarField::new('avatar')
+            ->onlyOnIndex()
+            ->formatValue(function($value, $entity) {
+                return ($entity->getAvatar()) ? $value : 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
+            }),
             TextField::new('username')->onlyOnIndex(),
             TextField::new('email')->onlyOnIndex(),
             TextField::new('surname')->setRequired(true),

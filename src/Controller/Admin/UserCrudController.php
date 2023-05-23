@@ -26,6 +26,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Security("is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_USER_ADMIN')")]
@@ -59,6 +60,11 @@ class UserCrudController extends AbstractCrudController
         
         return [
             FormField::addTab('Account Data')->setIcon('fa fa-user'),
+            AvatarField::new('avatar')
+                ->onlyOnIndex()
+                ->formatValue(function($value, $entity) {
+                    return ($entity->getAvatar()) ? $value : 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
+                }),
             TextField::new('username'),
             EmailField::new('email')->onlyWhenUpdating()->setDisabled(),
             EmailField::new('email')->onlyWhenCreating(),
