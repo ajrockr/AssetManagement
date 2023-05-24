@@ -18,6 +18,7 @@ class UserProfileController extends AbstractController
     #[Route('/user/profile', name: 'app_user_profile')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
+        // TODO: More styling is needed, add Change Password
         $user = $this->getUser();
         $message = null;
         $form = $this->createForm(UserProfileType::class, $user);
