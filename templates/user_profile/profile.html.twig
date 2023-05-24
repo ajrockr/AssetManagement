@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
-
-{% block body %}
+{% block title %}User Profile{% endblock %}
+{% block header_title %}{{ app.user.firstname }} {{ app.user.surname }} Profile{% endblock %}
+{% block header_breadcrumb %}User Profile{% endblock %}
+{% block body_content %}
     {% if app.user %}
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">
@@ -22,3 +23,4 @@
         {{ form(userProfileForm) }}
     {% endif %}
 {% endblock %}
+{% block optional_javascript %}{% endblock %}
