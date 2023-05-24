@@ -10,7 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
+#[Security("is_granted('ROLE_USER')")]
 class UserProfileController extends AbstractController
 {
     #[Route('/user/profile', name: 'app_user_profile')]
@@ -28,8 +30,6 @@ class UserProfileController extends AbstractController
             'extension' => $user->getExtension(),
             'title' => $user->getTitle(),
             'homepage' => $user->getHomepage(),
-            'manager' => $user->getManager(),
-            'username' => $user->getUsername(),
         ];
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -43,9 +43,6 @@ class UserProfileController extends AbstractController
                 $user->setExtension($item['extension']);
                 $user->setTitle($item['title']);
                 $user->setHomepage($item['homepage']);
-                $user->setManager($item['manager']);
-                $user->setEmail('arizzo@westex.org');
-                $user->setUsername('arizzo');
             }
 
             $entityManager->persist($user);
