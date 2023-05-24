@@ -39,6 +39,12 @@ class ImportUserController extends AbstractController
             $userRepository = $entityManager->getRepository(User::class);
             try {
                 while (($data = fgetcsv($handle)) !== false) {
+                    // Skip header, we know $data[0] is the Description
+                    if (($data[0] == "Description")) {
+                        continue;
+                    }
+
+                    // Bypass the unique constraint by skipping the record
                     if ($userRepository->findOneBy(['username' => $data[1]])) {
                         continue;
                     }
@@ -47,7 +53,7 @@ class ImportUserController extends AbstractController
                     $user->setSurname($data[4]);
                     $user->setFirstname($data[3]);
                     $user->setUsername($data[1]);
-                    $user->setEmail($data[1] . '@westex.org');
+                    $user->setEmail($data[2]);
                     $user->setTitle($data[0]);
                     $user->setDepartment('Student');
                     $user->setRoles(['ROLE_DENY_LOGIN']);
@@ -58,8 +64,6 @@ class ImportUserController extends AbstractController
                 $entityManager->flush();
             } catch (UniqueConstraintViolationException $e) {
                 throw new \Exception($e->getMessage());
-            } catch (\Exception $e) {
-                throw new \Exception('Unknown exception.');
             }
         }
     }
