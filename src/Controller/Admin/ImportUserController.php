@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\ImportUserType;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,23 +30,37 @@ class ImportUserController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws \Exception
+     */
     private function processUpload(EntityManagerInterface $entityManager, $file): void
     {
         if (($handle = fopen($file->getPathname(), "r")) !== false) {
-            while (($data = fgetcsv($handle)) !== false) {
-                $user = new User();
-                $user->setSurname($data[4]);
-                $user->setFirstname($data[3]);
-                $user->setUsername($data[1]);
-                $user->setEmail($data[1] . '@westex.org');
-                $user->setTitle($data[0]);
-                $user->setDepartment('Student');
-                $user->setRoles(['ROLE_DENY_LOGIN']);
-                $user->setEnabled(false);
-                $entityManager->persist($user);
-            }
+            $userRepository = $entityManager->getRepository(User::class);
+            try {
+                while (($data = fgetcsv($handle)) !== false) {
+                    if ($userRepository->findOneBy(['username' => $data[1]])) {
+                        continue;
+                    }
 
-            $entityManager->flush();
+                    $user = new User();
+                    $user->setSurname($data[4]);
+                    $user->setFirstname($data[3]);
+                    $user->setUsername($data[1]);
+                    $user->setEmail($data[1] . '@westex.org');
+                    $user->setTitle($data[0]);
+                    $user->setDepartment('Student');
+                    $user->setRoles(['ROLE_DENY_LOGIN']);
+                    $user->setEnabled(false);
+                    $entityManager->persist($user);
+                }
+
+                $entityManager->flush();
+            } catch (UniqueConstraintViolationException $e) {
+                throw new \Exception($e->getMessage());
+            } catch (\Exception $e) {
+                throw new \Exception('Unknown exception.');
+            }
         }
     }
 }
