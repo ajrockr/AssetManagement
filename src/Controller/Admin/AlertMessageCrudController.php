@@ -14,13 +14,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 #[Security("is_granted('ROLE_SUPER_ADMIN')")]
 class AlertMessageCrudController extends AbstractCrudController
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     public static function getEntityFqcn(): string
     {
         return AlertMessage::class;
@@ -30,14 +23,6 @@ class AlertMessageCrudController extends AbstractCrudController
     {
         return [
             TextField::new('subject'),
-            // TextEditorField::new('message')->setTrixEditorConfig([
-            //     'blockAttributes' => [
-            //         'default' => ['tagName' => 'p'],
-            //         'code' => ['text' => [
-            //             'plaintext' => false
-            //         ]]
-            //     ]
-            // ]),
             TextareaField::new('message'),
             BooleanField::new('active'),
             TextField::new('source')->onlyOnIndex(),
@@ -45,7 +30,7 @@ class AlertMessageCrudController extends AbstractCrudController
         ];
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): AlertMessage
     {
         $user = $this->getUser()->getUserIdentifier();
         $entity = new AlertMessage();

@@ -27,9 +27,9 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
 {
     use BearerAuthorizationTrait;
 
-    private $clientRegistry;
-    private $entityManager;
-    private $router;
+    private ClientRegistry $clientRegistry;
+    private EntityManagerInterface $entityManager;
+    private RouterInterface $router;
     private EventDispatcherInterface $eventDispatcher;
     private TokenStorageInterface $tokenStorage;
     private Session $session;
@@ -68,11 +68,6 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                 $email = $googleUser->toArray()['email'];
                 $picture = $googleUser->toArray()['picture'];
 
-                if ($existingUser) {
-                    // return $existingUser;
-                }
-
-                
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
                 if ($user) {
                     $user->setAvatar($picture);
@@ -164,15 +159,5 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
             '/connect/',
             Response::HTTP_TEMPORARY_REDIRECT
         );
-   }
-
-   private function forceLogout($request, $token) : void
-   {
-       $logoutEvent = new LogoutEvent($request, $token);
-       $this->eventDispatcher->dispatch($logoutEvent);
-       $this->tokenStorage->setToken(null);
-       $response = new Response();
-       $response->headers->clearCookie('REMEMBERME');
-       $response->send();
    }
 }

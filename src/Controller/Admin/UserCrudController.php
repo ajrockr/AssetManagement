@@ -199,11 +199,11 @@ class UserCrudController extends AbstractCrudController
         ;
     }
 
-    public function delete(AdminContext $adminContext)
+    public function delete(AdminContext $context)
     {
         // Prevent deleting super admin accounts.
         // @todo, Expand with custom role system eventually...
-        $roles = $adminContext->getEntity()->getInstance()->getRoles();
+        $roles = $context->getEntity()->getInstance()->getRoles();
         if (in_array('ROLE_SUPER_ADMIN', $roles)) {
             $url = $this->container->get(AdminUrlGenerator::class)
                 ->setController(UserCrudController::class)
@@ -214,7 +214,7 @@ class UserCrudController extends AbstractCrudController
 
             return new RedirectResponse($url);
         }
-        return parent::delete($adminContext);
+        return parent::delete($context);
     }
 
     public function disableUserAction(AdminContext $context)
