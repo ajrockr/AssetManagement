@@ -39,6 +39,7 @@ class ImportUserController extends AbstractController
             $userRepository = $entityManager->getRepository(User::class);
             try {
                 while (($data = fgetcsv($handle)) !== false) {
+                    // TODO: Eventually support files that have headers.
                     // Skip header, we know $data[0] is the Description
                     if (($data[0] == "Description")) {
                         continue;
@@ -46,6 +47,11 @@ class ImportUserController extends AbstractController
 
                     // Bypass the unique constraint by skipping the record
                     if ($userRepository->findOneBy(['username' => $data[1]])) {
+                        continue;
+                    }
+
+                    // We need an email field, skip if no email in record (bad import data)
+                    if (empty($data[2])) {
                         continue;
                     }
 
