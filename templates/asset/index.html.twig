@@ -20,6 +20,7 @@
                             <th>Condition</th>
                             <th>Make</th>
                             <th>Model</th>
+                            <th>Assigned To</th>
                             <th>Decommissioned</th>
                             <th>Actions</th>
                         </tr>
@@ -37,13 +38,13 @@
                                 <td>{{ asset.condition }}</td>
                                 <td>{{ asset.make }}</td>
                                 <td>{{ asset.model }}</td>
+                                <td>{{ asset.assignedTo }}</td>
                                 <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
                                 <td>
                                     {# TODO: Change these to pictures/fa icons #}
-{#                                    <a href="{{ path('app_asset_show', {'id': asset.id}) }}" class="btn btn-secondary btn-xs" role="button" aria-label="View Asset {{ asset.assettag }}" title="View"><i class="fa-solid fa-magnifying-glass"></i></a>#}
                                     <button id="viewAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-viewAsset" data-assetId="{{ asset.id }}" data-serialNumber="{{ asset.serialnumber }}" data-assetTag="{{ asset.assettag }}" data-purchasedFrom="{{ asset.purchasedfrom }}" data-condition="{{ asset.condition }}" data-make="{{ asset.make }}" data-model="{{ asset.model }}" data-purchasedDate="{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}" data-warrantyStartDate="{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}" data-warrantyEndDate="{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}" data-decommissioned="{{ asset.decomisioned ? 'Yes' : 'No' }}"><i class="fa-solid fa-magnifying-glass"></i></button>
                                     <a href="{{ path('app_asset_edit', {'id': asset.id}) }}" class="btn btn-secondary btn-xs" role="button"><i class="fa-regular fa-pen-to-square"></i></a>
-                                    <a href="#" class="btn btn-secondary btn-xs" role="button"><i class="fa-solid fa-user-plus"></i></a>
+                                    <button id="assignAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-assignAsset" data-assetid="{{ asset.id }}"><i class="fa-solid fa-user-plus"></i></button>
                                 </td>
                             </tr>
                         {% else %}
@@ -63,42 +64,86 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Extra Large Modal</h4>
+                    <h4 class="modal-title">View Asset</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <p>
-                        <div>Asset Tag:</div>
-                        <div>Serial Number:</div>
-                        <div>Purchased Date:</div>
-                        <div>Purchased From:</div>
-                        <div>Warranty Start:</div>
-                        <div>Warranty End:</div>
-                        <div>Condition:</div>
-                        <div>Make:</div>
-                        <div>Model:</div>
-                        <div>Decommissioned:</div>
+                        <div>Asset Tag: <span id="assetTagValue"></span></div>
+                        <div>Serial Number: <span id="serialNumberValue"></span></div>
+                        <div>Purchased Date: <span id="purchasedDateValue"></span></div>
+                        <div>Purchased From: <span id="purchasedFromValue"></span></div>
+                        <div>Warranty Start: <span id="warrantyStartDateValue"></span></div>
+                        <div>Warranty End: <span id="warrantyEndDateValue"></span></div>
+                        <div>Condition: <span id="conditionValue"></span></div>
+                        <div>Make: <span id="makeValue"></span></div>
+                        <div>Model: <span id="modelValue"></span></div>
+                        <div>Assigned To: <span id="assignedToValue"></span></div>
+                        <div>Decommissioned: <span id="decommissionedValue"></span></div>
                     </p>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
     </div>
+    {# ./viewAssetModal #}
+    {# Assign User To Asset Modal #}
+    <div class="modal fade" id="modal-assignAsset">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <form method="POST" action="{{ path('app_assign_user_to_device') }}">
+                    <input id="assignAssetId" type="hidden" name="assetId" value=""/>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Assign User</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body pl-2">
+                        <div class="dropdown hierarchy-select" id="assignUser">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" id="assignUser-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu" aria-labelledby="assignUser-button">
+                                <div class="hs-searchbox">
+                                    <input type="text" class="form-control" autocomplete="off" autofocus>
+                                </div>
+                                <div class="hs-menu-inner">
+                                    {% for user in users %}
+                                        <a href="#" class="dropdown-item" data-value="{{ user.id }}">{{ user.surname }}, {{ user.firstname }} {% if user.title %}({{ user.title }}){% endif %}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <input type="text" class="d-none" name="userId" readonly="readonly" aria-hidden="true"/>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Assign User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {# ./assignUserToAssetModal #}
 {% endblock %}
 {% block optional_javascript %}{% endblock %}
 {% block head_custom_css %}
     <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('bundles/hierarchy-select/hierarchy-select.min.css') }}" rel="stylesheet"/>
 {% endblock %}
 {% block head_custom_javascript %}
+    <!-- Popper Js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+    <script src="{{ asset('bundles/hierarchy-select/hierarchy-select.min.js') }}"></script>
     <!-- DataTables  & Plugins -->
     <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+            // Set the DataTable
             var table = $('#assetTable').DataTable({
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
                 "paging": true,
@@ -107,7 +152,7 @@
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
-                    { orderable: false, targets: 11 }
+                    { orderable: false, targets: 12 }
                 ],
                 "info": true,
                 "autoWidth": false,
@@ -118,22 +163,44 @@
 
             table.buttons().container()
                 .appendTo( $('.col-sm-12:eq(0)', table.table().container()));
-        });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var asset = document.querySelector('#viewAsset');
+            // Set values of modal body on open
+            $("#modal-viewAsset").on("show.bs.modal", function(e) {
+                // var assetId = asset.dataset.id;
+                let serialNumber = $(e.relatedTarget).attr("data-serialNumber");
+                let assetTag = $(e.relatedTarget).attr("data-assetTag");
+                let purchasedDate = $(e.relatedTarget).attr("data-purchasedDate");
+                let purchasedFrom = $(e.relatedTarget).attr("data-purchasedFrom");
+                let warrantyStartDate = $(e.relatedTarget).attr("data-warrantyStartDate");
+                let warrantyEndDate = $(e.relatedTarget).attr("data-warrantyEndDate");
+                let condition = $(e.relatedTarget).attr("data-condition");
+                let make = $(e.relatedTarget).attr("data-make");
+                let model = $(e.relatedTarget).attr("data-model");
+                let decommissioned = $(e.relatedTarget).attr("data-decommissioned");
 
-            var assetId = asset.dataset.id;
-            var serialNumber = asset.dataset.serialNumber
-            var assetTag = asset.dataset.assetTag;
-            var purchasedDate = asset.dataset.purchasedDate;
-            var purchasedFrom = asset.dataset.purchasedFrom;
-            var warrantyStartDate = asset.dataset.warrantyStartDate;
-            var warrantyEndDate = asset.dataset.warrantyEndDate;
-            var condition = asset.dataset.condition;
-            var make = asset.dataset.make;
-            var model = asset.dataset.model;
-            var decommissioned = asset.dataset.decommissioned;
+                document.getElementById("assetTagValue").textContent = assetTag;
+                document.getElementById("serialNumberValue").textContent = serialNumber;
+                document.getElementById("purchasedDateValue").textContent = purchasedDate;
+                document.getElementById("purchasedFromValue").textContent = purchasedFrom;
+                document.getElementById("warrantyStartDateValue").textContent = warrantyStartDate;
+                document.getElementById("warrantyEndDateValue").textContent = warrantyEndDate;
+                document.getElementById("conditionValue").textContent = condition;
+                document.getElementById("makeValue").textContent = make;
+                document.getElementById("modelValue").textContent = model;
+                document.getElementById("decommissionedValue").textContent = decommissioned;
+            });
+
+            $("#modal-assignAsset").on("show.bs.modal", function(e) {
+                let assetId = $(e.relatedTarget).attr("data-assetId");
+                $("#assignAssetId").val(assetId);
+            });
+
+            // Initialize Hierarchy-Select
+            $("#assignUser").hierarchySelect({
+                hierarchy: true,
+                search: true,
+                width: 'auto'
+            });
         });
     </script>
 {% endblock %}

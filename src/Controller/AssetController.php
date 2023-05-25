@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Asset;
 use App\Form\AssetType;
 use App\Repository\AssetRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,11 +16,57 @@ use Symfony\Component\Routing\Annotation\Route;
 class AssetController extends AbstractController
 {
     #[Route('/', name: 'app_asset_index', methods: ['GET'])]
-    public function index(AssetRepository $assetRepository): Response
+    public function index(AssetRepository $assetRepository, UserRepository $userRepository): Response
     {
+        $assets = $assetRepository->findAll();
+        $users = $userRepository->findAll();
+        $assetsArray = [];
+        foreach ($assets as $asset) {
+            $usersName = '';
+            if ($asset->getAssignedTo()) {
+                // Get user information
+                if ($user = $userRepository->findOneBy(['id' => $asset->getAssignedTo()])) {
+                    $usersName = $user->getFirstname() . ' ' . $user->getSurname();
+                }
+            }
+
+            $assetsArray[] = [
+                'id' => $asset->getId(),
+                'serialnumber' => $asset->getSerialnumber(),
+                'assettag' => $asset->getAssettag(),
+                'purchasedate' => $asset->getPurchasedate(),
+                'purchasedfrom' => $asset->getPurchasedfrom(),
+                'warrantystartdate' => $asset->getWarrantystartdate(),
+                'warrantyenddate' => $asset->getWarrantyenddate(),
+                'condition' => $asset->getCondition(),
+                'make' => $asset->getMake(),
+                'model' => $asset->getModel(),
+                'assignedTo' => $usersName,
+                'decomisioned' => $asset->isDecomisioned()
+            ];
+        }
+
+
         return $this->render('asset/index.html.twig', [
-            'assets' => $assetRepository->findAll(),
+            'assets' => $assetsArray,
+            'users' => $users
         ]);
+    }
+
+    #[Route('/assign', name: 'app_assign_user_to_device', methods: ['POST'])]
+    public function assignUserToDevice(Request $request, AssetRepository $assetRepository, EntityManagerInterface $entityManager): Response
+    {
+        $data = $request->request->all();
+        if ($asset = $assetRepository->findOneBy(['id' => $data['assetId']])) {
+            $asset->setAssignedTo($data['userId']);
+            $entityManager->persist($asset);
+            $entityManager->flush();
+            $this->addFlash('success', 'Assigned user to device.');
+        } else {
+            $this->addFlash('warning', 'Failed assign user to device.');
+        }
+
+        return $this->redirectToRoute('app_asset_index');
     }
 
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
