@@ -30,6 +30,7 @@ class AssetType extends AbstractType
                 ]
             ])
             ->add('purchasedate', DateTimeType::class, [
+                'input' => 'datetime_immutable',
                 'label' => 'Purchased Date',
                 'widget' => 'single_text',
                 'attr' => [
@@ -43,6 +44,7 @@ class AssetType extends AbstractType
                 ]
             ])
             ->add('warrantystartdate', DateTimeType::class, [
+                'input' => 'datetime_immutable',
                 'label' => 'Warranty Start',
                 'widget' => 'single_text',
                 'attr' => [
@@ -50,6 +52,7 @@ class AssetType extends AbstractType
                 ]
             ])
             ->add('warrantyenddate', DateTimeType::class, [
+                'input' => 'datetime_immutable',
                 'label' => 'Warranty End',
                 'widget' => 'single_text',
                 'attr' => [

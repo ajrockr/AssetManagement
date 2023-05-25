@@ -1,11 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 
-{% block title %}New Asset{% endblock %}
-
-{% block body %}
-    <h1>Create new Asset</h1>
-
+{% block title %}Assets{% endblock %}
+{% block header_title %}New Asset{% endblock %}
+{% block header_breadcrumb %}Asset{% endblock %}
+{% block body_content %}
     {{ include('asset/_form.html.twig') }}
 
     <a href="{{ path('app_asset_index') }}">back to list</a>
 {% endblock %}
+{% block optional_javascript %}{% endblock %}

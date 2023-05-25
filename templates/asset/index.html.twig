@@ -41,15 +41,10 @@
                                 <td>{{ asset.assignedTo }}</td>
                                 <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
                                 <td>
-                                    {# TODO: Change these to pictures/fa icons #}
                                     <button id="viewAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-viewAsset" data-assetId="{{ asset.id }}" data-serialNumber="{{ asset.serialnumber }}" data-assetTag="{{ asset.assettag }}" data-purchasedFrom="{{ asset.purchasedfrom }}" data-condition="{{ asset.condition }}" data-make="{{ asset.make }}" data-model="{{ asset.model }}" data-purchasedDate="{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}" data-warrantyStartDate="{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}" data-warrantyEndDate="{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}" data-decommissioned="{{ asset.decomisioned ? 'Yes' : 'No' }}"><i class="fa-solid fa-magnifying-glass"></i></button>
                                     <a href="{{ path('app_asset_edit', {'id': asset.id}) }}" class="btn btn-secondary btn-xs" role="button"><i class="fa-regular fa-pen-to-square"></i></a>
                                     <button id="assignAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-assignAsset" data-assetid="{{ asset.id }}"><i class="fa-solid fa-user-plus"></i></button>
                                 </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="12">no records found</td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -63,7 +63,7 @@ class AssetController extends AbstractController
             $entityManager->flush();
             $this->addFlash('success', 'Assigned user to device.');
         } else {
-            $this->addFlash('warning', 'Failed assign user to device.');
+            $this->addFlash('warning', 'Could not find asset.');
         }
 
         return $this->redirectToRoute('app_asset_index');
