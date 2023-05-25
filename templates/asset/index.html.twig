@@ -39,6 +39,7 @@
                                 <td>{{ asset.model }}</td>
                                 <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
                                 <td>
+                                    {# TODO: Change these to pictures/fa icons #}
                                     <a href="{{ path('app_asset_show', {'id': asset.id}) }}">show</a>
                                     <a href="{{ path('app_asset_edit', {'id': asset.id}) }}">edit</a>
                                 </td>

@@ -43,6 +43,9 @@ class Asset
     #[ORM\Column(nullable: true)]
     private ?bool $decomisioned = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $assignedTo = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -164,6 +167,18 @@ class Asset
     public function setDecomisioned(?bool $decomisioned): self
     {
         $this->decomisioned = $decomisioned;
+
+        return $this;
+    }
+
+    public function getAssignedTo(): ?int
+    {
+        return $this->assignedTo;
+    }
+
+    public function setAssignedTo(?int $assignedTo): self
+    {
+        $this->assignedTo = $assignedTo;
 
         return $this;
     }
