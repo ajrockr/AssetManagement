@@ -18,7 +18,12 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('bundles/adminlte/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ absolute_url(asset('bundles/adminlte/plugins/fontawesome-free/css/all.min.css')) }}">
+
+    <!-- Toastr -->
+    <link rel="stylesheet" href="{{ asset('bundles/adminlte/plugins/toastr/toastr.min.css') }}">
+
     <!-- REQUIRED SCRIPTS -->
+
 
     <!-- jQuery -->
     <script src="{{ asset('bundles/adminlte/plugins/jquery/jquery.min.js') }}"></script>
@@ -26,6 +31,11 @@
     <script src="{{ asset('bundles/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE -->
     <script src="{{ asset('bundles/adminlte/js/adminlte.js') }}"></script>
+
+    <!-- Toaster -->
+    <script src="{{ asset('bundles/adminlte/plugins/toastr/toastr.min.js') }}"></script>
+
+    {% include('flash_messages.html.twig') %}
 
     {% block head_custom_css %}{% endblock %}
     {% block head_custom_javascript %}{% endblock %}
@@ -365,7 +375,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-6">
-                    {% include('flash_messages.html.twig') %}
+{#                    {% include('flash_messages.html.twig') %}#}
                 </div>
             </div>
             <div class="row mb-2">
