@@ -1,13 +1,17 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 
-{% block title %}Edit Asset{% endblock %}
-
-{% block body %}
-    <h1>Edit Asset</h1>
+{% block title %}Assets{% endblock %}
+{% block header_title %}Edit Asset{% endblock %}
+{% block header_breadcrumb %}Asset{% endblock %}
+{% block body_content %}
 
     {{ include('asset/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_asset_index') }}">back to list</a>
+    <div class="col-sm-12 col-lg-2">
+        <a href="{{ path('app_asset_index') }}">back to list</a>
+    </div>
+    </div>
 
     {{ include('asset/_delete_form.html.twig') }}
 {% endblock %}
+{% block optional_javascript %}{% endblock %}
