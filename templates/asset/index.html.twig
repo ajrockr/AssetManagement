@@ -40,8 +40,10 @@
                                 <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
                                 <td>
                                     {# TODO: Change these to pictures/fa icons #}
-                                    <a href="{{ path('app_asset_show', {'id': asset.id}) }}">show</a>
-                                    <a href="{{ path('app_asset_edit', {'id': asset.id}) }}">edit</a>
+{#                                    <a href="{{ path('app_asset_show', {'id': asset.id}) }}" class="btn btn-secondary btn-xs" role="button" aria-label="View Asset {{ asset.assettag }}" title="View"><i class="fa-solid fa-magnifying-glass"></i></a>#}
+                                    <button id="viewAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-viewAsset" data-assetId="{{ asset.id }}" data-serialNumber="{{ asset.serialnumber }}" data-assetTag="{{ asset.assettag }}" data-purchasedFrom="{{ asset.purchasedfrom }}" data-condition="{{ asset.condition }}" data-make="{{ asset.make }}" data-model="{{ asset.model }}" data-purchasedDate="{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}" data-warrantyStartDate="{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}" data-warrantyEndDate="{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}" data-decommissioned="{{ asset.decomisioned ? 'Yes' : 'No' }}"><i class="fa-solid fa-magnifying-glass"></i></button>
+                                    <a href="{{ path('app_asset_edit', {'id': asset.id}) }}" class="btn btn-secondary btn-xs" role="button"><i class="fa-regular fa-pen-to-square"></i></a>
+                                    <a href="#" class="btn btn-secondary btn-xs" role="button"><i class="fa-solid fa-user-plus"></i></a>
                                 </td>
                             </tr>
                         {% else %}
@@ -54,8 +56,39 @@
             </div>
         </div>
     </div>
-
     <a href="{{ path('app_asset_new') }}">Create new</a>
+
+    {# View Asset Modal #}
+    <div class="modal fade" id="modal-viewAsset">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Extra Large Modal</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <div>Asset Tag:</div>
+                        <div>Serial Number:</div>
+                        <div>Purchased Date:</div>
+                        <div>Purchased From:</div>
+                        <div>Warranty Start:</div>
+                        <div>Warranty End:</div>
+                        <div>Condition:</div>
+                        <div>Make:</div>
+                        <div>Model:</div>
+                        <div>Decommissioned:</div>
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block optional_javascript %}{% endblock %}
 {% block head_custom_css %}
@@ -69,19 +102,38 @@
             var table = $('#assetTable').DataTable({
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
                 "paging": true,
-                "lengthChange": false,
+                "lengthChange": true,
+                "pageLength": 25,
                 "searching": true,
                 "ordering": true,
+                "columnDefs": [
+                    { orderable: false, targets: 11 }
+                ],
                 "info": true,
                 "autoWidth": false,
                 "responsive": true,
                 "autoFill": true,
                 "colReorder": true,
-                // dom: 'Qfrtip'
             });
 
             table.buttons().container()
                 .appendTo( $('.col-sm-12:eq(0)', table.table().container()));
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var asset = document.querySelector('#viewAsset');
+
+            var assetId = asset.dataset.id;
+            var serialNumber = asset.dataset.serialNumber
+            var assetTag = asset.dataset.assetTag;
+            var purchasedDate = asset.dataset.purchasedDate;
+            var purchasedFrom = asset.dataset.purchasedFrom;
+            var warrantyStartDate = asset.dataset.warrantyStartDate;
+            var warrantyEndDate = asset.dataset.warrantyEndDate;
+            var condition = asset.dataset.condition;
+            var make = asset.dataset.make;
+            var model = asset.dataset.model;
+            var decommissioned = asset.dataset.decommissioned;
         });
     </script>
 {% endblock %}
