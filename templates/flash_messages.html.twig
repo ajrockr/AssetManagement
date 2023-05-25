@@ -1,61 +1,12 @@
 {% set flash_messages = app.session.flashbag.all %}
 {% if flash_messages|length > 0 %}
-{#    <div id="flash-messages">#}
-        {% for label, messages in flash_messages %}
-            {% for message in messages %}
-                <script type="text/javascript">
-                    $(document).ready(function() {
-                        toastr.{{ label }}('{{ message|trans|raw }}')
-                    });
-                </script>
-            {% endfor %}
+    {% for label, messages in flash_messages %}
+        {% for message in messages %}
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    toastr.{{ label }}('{{ message|trans|raw }}')
+                });
+            </script>
         {% endfor %}
+    {% endfor %}
 {% endif %}
-{#                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">#}
-{#                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                    {{ message|trans|raw }}#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        {% endfor %}#}
-{#    </div>#}
-{#{% endif %}#}
-{#{% set success_messages = app.session.flashbag.get('success') %}#}
-{#{% set info_messages = app.session.flashbag.get('info') %}#}
-{#{% set warning_messages = app.session.flashbag.get('warning') %}#}
-{#{% set error_messages = app.session.flashbag.get('error') %}#}
-{#{% if success_messages|length > 0 %}#}
-{#    <script type="text/javascript">#}
-{#        {% for label, messages in success_messages %}#}
-{#            {% for message in messages %}#}
-{#                toastr.success('{{ message|trans|raw }}');#}
-{#            {% endfor %}#}
-{#        {% endfor %}#}
-{#    </script>#}
-{#{% endif %}#}
-{#{% if info_messages|length > 0 %}#}
-{#    <script type="text/javascript">#}
-{#        {% for label, messages in info_messages %}#}
-{#            {% for message in messages %}#}
-{#                toastr.success('{{ message|trans|raw }}');#}
-{#            {% endfor %}#}
-{#        {% endfor %}#}
-{#    </script>#}
-{#{% endif %}#}
-{#{% if warning_messages|length > 0 %}#}
-{#    <script type="text/javascript">#}
-{#        {% for label, messages in warning_messages %}#}
-{#            {% for message in messages %}#}
-{#                toastr.success('{{ message|trans|raw }}');#}
-{#            {% endfor %}#}
-{#        {% endfor %}#}
-{#    </script>#}
-{#{% endif %}#}
-{#{% if error_messages|length > 0 %}#}
-{#    <script type="text/javascript">#}
-{#        {% for label, messages in error_messages %}#}
-{#            {% for message in messages %}#}
-{#                toastr.success('{{ message|trans|raw }}');#}
-{#            {% endfor %}#}
-{#        {% endfor %}#}
-{#    </script>#}
-{#{% endif %}#}
