@@ -1,0 +1,86 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Assets{% endblock %}
+{% block header_title %}Assets{% endblock %}
+{% block header_breadcrumb %}Asset{% endblock %}
+{% block body_content %}
+    <div class="dataTables_wrapper dt-bootstrap4">
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="assetTable" class="table table-bordered table-striped dataTable dtr-inline display" aria-describedby="assetTable_info">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Serial Number</th>
+                            <th>Asset Tag</th>
+                            <th>Purchase Date</th>
+                            <th>Purchased From</th>
+                            <th>Warranty Start</th>
+                            <th>Warranty End</th>
+                            <th>Condition</th>
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th>Decommissioned</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in assets %}
+                            <tr>
+                                <td>{{ asset.id }}</td>
+                                <td>{{ asset.serialnumber }}</td>
+                                <td>{{ asset.assettag }}</td>
+                                <td>{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}</td>
+                                <td>{{ asset.purchasedfrom }}</td>
+                                <td>{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}</td>
+                                <td>{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}</td>
+                                <td>{{ asset.condition }}</td>
+                                <td>{{ asset.make }}</td>
+                                <td>{{ asset.model }}</td>
+                                <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
+                                <td>
+                                    <a href="{{ path('app_asset_show', {'id': asset.id}) }}">show</a>
+                                    <a href="{{ path('app_asset_edit', {'id': asset.id}) }}">edit</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="12">no records found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ path('app_asset_new') }}">Create new</a>
+{% endblock %}
+{% block optional_javascript %}{% endblock %}
+{% block head_custom_css %}
+    <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
+{% endblock %}
+{% block head_custom_javascript %}
+    <!-- DataTables  & Plugins -->
+    <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var table = $('#assetTable').DataTable({
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                "autoFill": true,
+                "colReorder": true,
+                // dom: 'Qfrtip'
+            });
+
+            table.buttons().container()
+                .appendTo( $('.col-sm-12:eq(0)', table.table().container()));
+        });
+    </script>
+{% endblock %}

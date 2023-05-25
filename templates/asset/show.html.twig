@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Asset{% endblock %}
+
+{% block body %}
+    <h1>Asset</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ asset.id }}</td>
+            </tr>
+            <tr>
+                <th>Serialnumber</th>
+                <td>{{ asset.serialnumber }}</td>
+            </tr>
+            <tr>
+                <th>Assettag</th>
+                <td>{{ asset.assettag }}</td>
+            </tr>
+            <tr>
+                <th>Purchasedate</th>
+                <td>{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Purchasedfrom</th>
+                <td>{{ asset.purchasedfrom }}</td>
+            </tr>
+            <tr>
+                <th>Warrantystartdate</th>
+                <td>{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Warrantyenddate</th>
+                <td>{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Condition</th>
+                <td>{{ asset.condition }}</td>
+            </tr>
+            <tr>
+                <th>Make</th>
+                <td>{{ asset.make }}</td>
+            </tr>
+            <tr>
+                <th>Model</th>
+                <td>{{ asset.model }}</td>
+            </tr>
+            <tr>
+                <th>Decomisioned</th>
+                <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_asset_index') }}">back to list</a>
+
+    <a href="{{ path('app_asset_edit', {'id': asset.id}) }}">edit</a>
+
+    {{ include('asset/_delete_form.html.twig') }}
+{% endblock %}
