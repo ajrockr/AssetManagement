@@ -163,7 +163,22 @@ class AppFixtures extends Fixture
                 'name' => 'Deny Login',
                 'value' => 'ROLE_DENY_LOGIN',
                 'description' => 'Deny the user from logging into the application.'
-            ]
+            ],
+            [
+                'name' => 'Asset Read',
+                'value' => 'ROLE_ASSET_READ',
+                'description' => 'Can view asset data.'
+            ],
+            [
+                'name' => 'Asset Modify',
+                'value' => 'ROLE_ASSET_MODIFY',
+                'description' => 'Can modify asset data.'
+            ],
+            [
+                'name' => 'Asset Full Control',
+                'value' => 'ROLE_ASSET_FULL_CONTROL',
+                'description' => 'Has full control over asset data.'
+            ],
         ];
 
         foreach ($userRoles as $role) {

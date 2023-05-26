@@ -7,11 +7,13 @@ use App\Form\AssetType;
 use App\Repository\AssetRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_SUPER_ADMIN')")]
 #[Route('/asset')]
 class AssetController extends AbstractController
 {
@@ -53,6 +55,7 @@ class AssetController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/assign', name: 'app_assign_user_to_device', methods: ['POST'])]
     public function assignUserToDevice(Request $request, AssetRepository $assetRepository, EntityManagerInterface $entityManager): Response
     {
@@ -69,6 +72,7 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index');
     }
 
+    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
     public function new(Request $request, AssetRepository $assetRepository): Response
     {
@@ -90,6 +94,7 @@ class AssetController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}', name: 'app_asset_show', methods: ['GET'])]
     public function show(Asset $asset): Response
     {
@@ -98,6 +103,7 @@ class AssetController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_ASSET_EDIT') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
@@ -118,6 +124,7 @@ class AssetController extends AbstractController
         ]);
     }
 
+    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}', name: 'app_asset_delete', methods: ['POST'])]
     public function delete(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
