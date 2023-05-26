@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\AssetRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 class Asset
@@ -51,6 +53,20 @@ class Asset
         return $this->id;
     }
 
+    /**
+     * @param ExecutionContextInterface $context
+     * @param $payload
+     * @return void
+     */
+    #[Assert\Callback]
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        if ($this->getWarrantyenddate() <= $this->getWarrantystartdate()) {
+            $context->buildViolation('Warranty End Date must not be older than the start date.')
+                ->atPath('warrantyenddate')
+                ->addViolation();
+        }
+    }
     public function getSerialnumber(): ?string
     {
         return $this->serialnumber;
