@@ -6,6 +6,7 @@ use App\Entity\Asset;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -29,12 +30,12 @@ class AssetType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('purchasedate', DateTimeType::class, [
+            ->add('purchasedate', DateType::class, [
                 'input' => 'datetime_immutable',
                 'label' => 'Purchased Date',
                 'widget' => 'single_text',
                 'attr' => [
-                    'class' => 'form-control'
+                    'class' => 'form-control js-datepicker'
                 ]
             ])
             ->add('purchasedfrom', TextType::class, [
@@ -43,7 +44,7 @@ class AssetType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('warrantystartdate', DateTimeType::class, [
+            ->add('warrantystartdate', DateType::class, [
                 'input' => 'datetime_immutable',
                 'label' => 'Warranty Start',
                 'widget' => 'single_text',
@@ -51,7 +52,7 @@ class AssetType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('warrantyenddate', DateTimeType::class, [
+            ->add('warrantyenddate', DateType::class, [
                 'input' => 'datetime_immutable',
                 'label' => 'Warranty End',
                 'widget' => 'single_text',

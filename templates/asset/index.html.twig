@@ -31,10 +31,10 @@
                                 <td>{{ asset.id }}</td>
                                 <td>{{ asset.serialnumber }}</td>
                                 <td>{{ asset.assettag }}</td>
-                                <td>{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}</td>
+                                <td>{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d') : '' }}</td>
                                 <td>{{ asset.purchasedfrom }}</td>
-                                <td>{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}</td>
-                                <td>{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}</td>
+                                <td>{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d') : '' }}</td>
+                                <td>{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d') : '' }}</td>
                                 <td>{{ asset.condition }}</td>
                                 <td>{{ asset.make }}</td>
                                 <td>{{ asset.model }}</td>
