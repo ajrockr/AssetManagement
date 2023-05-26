@@ -79,6 +79,8 @@ class AssetController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $assetRepository->save($asset, true);
 
+            $this->addFlash('success', 'Added new asset.');
+
             return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -105,6 +107,8 @@ class AssetController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $assetRepository->save($asset, true);
 
+            $this->addFlash('success', 'Edited asset.');
+
             return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -119,6 +123,9 @@ class AssetController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$asset->getId(), $request->request->get('_token'))) {
             $assetRepository->remove($asset, true);
+            $this->addFlash('success', 'Deleted asset.');
+        } else {
+            $this->addFlash('warning', 'Failed to delete asset.');
         }
 
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);

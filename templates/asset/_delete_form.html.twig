@@ -1,25 +1,25 @@
-<form method="post" action="{{ path('app_asset_delete', {'id': asset.id}) }}">
+<form method="post" action="{{ path('app_asset_delete', {'id': asset.id}) }}" id="delete-form">
 {#      onsubmit="return confirm('Are you sure you want to delete this item?');">#}
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ asset.id) }}">
-    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modal-delete">Delete</button>
-</form>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-delete">Delete</button>
 
-<div id="modal-delete" class="modal fade" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <h4>Do you really want to delete this item?</h4>
-                <p>There is no undo for this operation.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
-                    <span class="btn-label">Cancel</span>
-                </button>
+    <div id="modal-delete" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>Do you really want to delete this item?</h4>
+                    <p>There is no undo for this operation.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">Cancel</span>
+                    </button>
 
-                <button type="button" data-bs-dismiss="modal" class="btn btn-danger" id="modal-delete-button" form="delete-form">
-                    <span class="btn-label">Delete</span>
-                </button>
+                    <button type="submit" class="btn btn-danger" id="modal-delete-button" form="delete-form">
+                        <span class="btn-label">Delete</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
