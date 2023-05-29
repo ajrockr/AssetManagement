@@ -1,0 +1,31 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Storage{% endblock %}
+{% block header_breadcrumb %}Storage{% endblock %}
+{% block header_title %}Storage{% endblock %}
+{% block body_content %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for storage in storageAll %}
+                <tr>
+                    <td>{{ storage.name }}</td>
+                    <td>{{ storage.description }}</td>
+                    <td>{{ storage.location }}</td>
+                    <td><a href="{{ path('app_storage_view', {id: storage.id}) }}">View</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2"><a href="{{ path('app_storage_new') }}">New</a></th>
+            </tr>
+        </tfoot>
+    </table>
+{% endblock %}
