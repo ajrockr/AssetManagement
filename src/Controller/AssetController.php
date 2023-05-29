@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
+use App\Entity\AssetCollection;
 use App\Form\AssetType;
+use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -136,5 +138,34 @@ class AssetController extends AbstractController
         }
 
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_CHECKIN') or is_granted('ROLE_SUPER_ADMIN')")]
+    #[Route('/{id}/checkin', name: 'app_asset_checkin')]
+    public function checkIn(Request $request): Response
+    {
+        // Get data
+//        $this->assetCheckIn(...withData);
+        return new Response();
+    }
+
+    private function assetCheckIn(AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository)
+    {
+        // TODO: Check to make sure the storage exists
+        // TODO: Make form for check in
+        $location = null;
+        $deviceId = $userId = 100;
+        $loggedInUserId = $this->getUser()->getId();
+
+        $asset = new AssetCollection();
+        $asset->setCollectedDate(new \DateTimeImmutable('now'));
+        $asset->setCollectedBy($loggedInUserId);
+        $asset->setCollectionLocation($location);
+        $asset->setDeviceID($deviceId);
+        $asset->setCollectedFrom($userId);
+        $asset->setCheckedout(false);
+        $asset->setCollectionNotes($notes);
+
+        $assetCollectionRepository->save($asset, true);
     }
 }

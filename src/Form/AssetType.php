@@ -48,7 +48,7 @@ class AssetType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('warrantystartdate', DateType::class, [
+            ->add('warrantystartdate', DateType::class, [ // TODO: Allow warrantystart/end to also be null
                 'required' => false,
                 'input' => 'datetime_immutable',
                 'label' => 'Warranty Start',

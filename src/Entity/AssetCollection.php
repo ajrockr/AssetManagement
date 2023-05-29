@@ -31,6 +31,9 @@ class AssetCollection
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $collectionLocation = null;
 
+    #[ORM\Column]
+    private ?bool $checkedout = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +107,18 @@ class AssetCollection
     public function setCollectionLocation(?string $collectionLocation): self
     {
         $this->collectionLocation = $collectionLocation;
+
+        return $this;
+    }
+
+    public function isCheckedout(): ?bool
+    {
+        return $this->checkedout;
+    }
+
+    public function setCheckedout(bool $checkedout): self
+    {
+        $this->checkedout = $checkedout;
 
         return $this;
     }
