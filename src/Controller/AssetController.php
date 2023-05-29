@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Asset;
 use App\Entity\AssetCollection;
+use App\Form\AssetCollectionType;
 use App\Form\AssetType;
 use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
+use App\Repository\AssetStorageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -142,30 +144,33 @@ class AssetController extends AbstractController
 
     #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_CHECKIN') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}/checkin', name: 'app_asset_checkin')]
-    public function checkIn(Request $request): Response
+    private function assetCheckIn(Request $request, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository)
     {
-        // Get data
-//        $this->assetCheckIn(...withData);
-        return new Response();
+        $form = $this->createForm(AssetCollectionType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // TODO: Check to make sure the storage exists
+            // TODO: Marking up data for now
+            $location = $notes = null;
+            $deviceId = $userId = 100;
+            $loggedInUserId = $this->getUser()->getId();
+            $date = null;
+            $collectedDate = $date ?? new \DateTimeImmutable('now');
+
+            $asset = new AssetCollection();
+            $asset->setCollectedDate($collectedDate);
+            $asset->setCollectedBy($loggedInUserId);
+            $asset->setCollectionLocation($location);
+            $asset->setDeviceID($deviceId);
+            $asset->setCollectedFrom($userId);
+            $asset->setCheckedout(false);
+            $asset->setCollectionNotes($notes);
+
+            $assetCollectionRepository->save($asset, true);
+        }
     }
 
-    private function assetCheckIn(AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository)
-    {
-        // TODO: Check to make sure the storage exists
-        // TODO: Make form for check in
-        $location = null;
-        $deviceId = $userId = 100;
-        $loggedInUserId = $this->getUser()->getId();
-
-        $asset = new AssetCollection();
-        $asset->setCollectedDate(new \DateTimeImmutable('now'));
-        $asset->setCollectedBy($loggedInUserId);
-        $asset->setCollectionLocation($location);
-        $asset->setDeviceID($deviceId);
-        $asset->setCollectedFrom($userId);
-        $asset->setCheckedout(false);
-        $asset->setCollectionNotes($notes);
-
-        $assetCollectionRepository->save($asset, true);
-    }
+    // TODO: Idea is to take the data from AssetStorage::storageData and render it in a human readable view
+    public function renderStorageView() {}
 }
