@@ -131,15 +131,18 @@ class AssetController extends AbstractController
     }
 
     #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
-    #[Route('/{id}/delete', name: 'app_asset_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_asset_delete')]
     public function delete(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$asset->getId(), $request->request->get('_token'))) {
+//        if ($this->isCsrfTokenValid('delete'.$asset->getId(), $request->request->get('_token'))) {
+        try {
             $assetRepository->remove($asset, true);
-            $this->addFlash('success', 'Deleted asset.');
-        } else {
+        } catch (\Exception $e) {
             $this->addFlash('warning', 'Failed to delete asset.');
+            return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
         }
+
+        $this->addFlash('success', 'Deleted asset.');
 
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
     }

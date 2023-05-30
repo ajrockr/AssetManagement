@@ -28,22 +28,29 @@
                     <tbody>
                         {% for asset in assets %}
                             <tr>
-                                <td>{{ asset.id }}</td>
-                                <td>{{ asset.serialnumber }}</td>
-                                <td>{{ asset.assettag }}</td>
-                                <td>{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d') : '' }}</td>
-                                <td>{{ asset.purchasedfrom }}</td>
-                                <td>{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d') : '' }}</td>
-                                <td>{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d') : '' }}</td>
-                                <td>{{ asset.condition }}</td>
-                                <td>{{ asset.make }}</td>
-                                <td>{{ asset.model }}</td>
-                                <td>{{ asset.assignedTo }}</td>
-                                <td>{{ asset.decomisioned ? 'Yes' : 'No' }}</td>
+                                <td class="text-center">{{ asset.id }}</td>
+                                <td class="text-center">{{ asset.serialnumber ?: '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.assettag ?: '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d') : '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.purchasedfrom ?: '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d') : '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d') : '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.condition ?: '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.make ?: '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">{{ asset.model ?: '<span class="badge border border-secondary text-secondary">Empty</span>' }}</td>
+                                <td class="text-center">
+                                    {% if asset.assignedTo is not empty %}
+                                        <a id="assignAsset" class="link-secondary" type="button" data-toggle="modal" data-target="#modal-assignAsset" data-assetid="{{ asset.id }}">{{ asset.assignedTo }}</a>
+                                    {% else %}
+                                        <button id="assignAsset" class="btn btn-xs btn-outline-secondary" type="button" data-toggle="modal" data-target="#modal-assignAsset" data-assetid="{{ asset.id }}"><i class="fa-solid fa-user-plus"></i></button>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ asset.decomisioned ? '<span class="badge badge-warning">Yes</span>' : '<span class="badge badge-secondary">No</span>' }}</td>
                                 <td>
                                     <button id="viewAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-viewAsset" data-assetId="{{ asset.id }}" data-serialNumber="{{ asset.serialnumber }}" data-assetTag="{{ asset.assettag }}" data-purchasedFrom="{{ asset.purchasedfrom }}" data-condition="{{ asset.condition }}" data-make="{{ asset.make }}" data-model="{{ asset.model }}" data-purchasedDate="{{ asset.purchasedate ? asset.purchasedate|date('Y-m-d H:i:s') : '' }}" data-warrantyStartDate="{{ asset.warrantystartdate ? asset.warrantystartdate|date('Y-m-d H:i:s') : '' }}" data-warrantyEndDate="{{ asset.warrantyenddate ? asset.warrantyenddate|date('Y-m-d H:i:s') : '' }}" data-decommissioned="{{ asset.decomisioned ? 'Yes' : 'No' }}"><i class="fa-solid fa-magnifying-glass"></i></button>
                                     <a href="{{ path('app_asset_edit', {'id': asset.id}) }}" class="btn btn-secondary btn-xs" role="button"><i class="fa-regular fa-pen-to-square"></i></a>
                                     <button id="assignAsset" class="btn btn-xs btn-secondary" type="button" data-toggle="modal" data-target="#modal-assignAsset" data-assetid="{{ asset.id }}"><i class="fa-solid fa-user-plus"></i></button>
+                                    <a href="{{ path('app_asset_delete', {'id': asset.id, 'csrf': csrf_token('delete' ~ asset.id) }) }}" data-method="POST" type="button" class="btn btn-xs btn-danger" onclick="return confirm('Are you sure you want to delete this item?');"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>
                         {% endfor %}
