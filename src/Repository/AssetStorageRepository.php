@@ -39,7 +39,7 @@ class AssetStorageRepository extends ServiceEntityRepository
         }
     }
 
-    public function storageDataExists($value): ?AssetStorage
+    public function storageDataExists($value)
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.storageData LIKE :value')

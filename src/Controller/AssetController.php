@@ -151,6 +151,8 @@ class AssetController extends AbstractController
     #[Route('/checkin', name: 'app_asset_checkin')]
     public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
+//        dd($assetStorageRepository->storageDataExists('1003'));
+//        dd($assetCollectionRepository->findOneBy(['collectionLocation' => '1002']) && $assetStorageRepository->storageDataExists('1003'));
         // Set up what is needed to render the page
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $form = $this->createForm(AssetCollectionType::class);
@@ -179,6 +181,7 @@ class AssetController extends AbstractController
                 'assignedUserId' => $asset->getAssignedTo(),
                 'uniqueIdentifier' => ('assettag' == $assetUniqueIdentifier) ? $asset->getAssettag() : $asset->getSerialnumber(),
                 'assignedUsersName' => (null === $assignedUser) ? null : $assignedUser->getSurname() . ', ' . $assignedUser->getFirstname() . ' (' . $assignedUser->getTitle() . ')',
+                'assignedUserId' => (null === $assignedUser) ?: $assignedUser->getId()
             ];
         }
 
@@ -216,10 +219,9 @@ class AssetController extends AbstractController
 
             $assetCollectionRepository->save($assetCollection, true);
 
-
             // If the asset is not assigned or the config value to overwrite the assigned user is true,
             // overwrite the assigned user.
-            $asset = $assetRepository->findOneBy(['id' => $data['device']]);
+            $asset = $assetRepository->findOneBy(['id' => $deviceId]);
             if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
                 $asset->setAssignedTo($data['user']);
                 $assetRepository->save($asset, true);

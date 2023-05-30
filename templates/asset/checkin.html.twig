@@ -19,14 +19,45 @@
                 <tr>
                     <td class="text-center">{{ asset.uniqueIdentifier }}</td>
                     <td class="text-center">{{ asset.assignedUsersName ?: '<span class="badge border border-secondary text-secondary">Not Assigned</span>' }}</td>
-                    <td class="text-center"><button type="button" class="btn btn-outline-secondary">Collect</button></td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#modal-checkin" data-assetId="{{ asset.id }}" data-asset="{{ asset.uniqueIdentifier }}" data-assignedUserId="{{ asset.assignedUserId }}" data-assignedUser="{{ asset.assignedUsersName }}">Collect</button>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
     </div>
     </div>
-    {{ form(form) }}
+
+    {# Check In Asset Modal #}
+    <div class="modal fade" id="modal-checkin">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                {{ form_start(form) }}
+                    <input id="assignAssetId" type="hidden" name="assetId" value=""/>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Assign User</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body pl-2">
+                        ID: <span id="assetId"></span>
+                        Device: <span id="asset">{{ form_widget(form.device) }}</span>
+                        Assigned User: <span id="assetAssignedUser">{{ form_widget(form.user) }}</span>
+                        User ID: <span id="assignedUserId"></span>
+                        Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span>
+                        Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        {{ form_widget(form.Collect) }}
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    {# ./checkInAssetModal #}
 {% endblock %}
 
 {% block head_custom_javascript %}
@@ -42,14 +73,24 @@
             "iDisplayLength": 25,
             "searching": true,
             "ordering": true,
-            // "columnDefs": [
-            //     {orderable: false, targets: 2}
-            // ],
             "info": true,
             "autoWidth": true,
             "responsive": true,
             "autoFill": true,
             "colReorder": true,
+        });
+
+        // Set the checkIn Modal
+        $("#modal-checkin").on("show.bs.modal", function(e) {
+            let assetId = $(e.relatedTarget).attr("data-assetId");
+            let asset = $(e.relatedTarget).attr("data-asset");
+            let assignedUserId = $(e.relatedTarget).attr("data-assignedUserId");
+            let assignedUser = $(e.relatedTarget).attr("data-assignedUser");
+
+            document.getElementById("asset").textContent = asset;
+            document.getElementById("assetId").textContent = assetId;
+            document.getElementById("asset_collection_user").setAttribute('value', assignedUser);
+            document.getElementById("assignedUserId").setAttribute('value', assignedUserId);
         });
     });
 </script>
