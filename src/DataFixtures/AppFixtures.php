@@ -24,98 +24,110 @@ class AppFixtures extends Fixture
                 'name' => 'auth_useGoogle',
                 'value' => 1,
                 'description' => 'Use Google to authenticate users.',
-                'default_value' => 0,
+                'default_value' => 0
             ],
             [
                 'name' => 'auth_useMicrosoft',
                 'value' => 0,
                 'description' => 'Use Microsoft to authenticate users.',
-                'default_value' => 0,
+                'default_value' => 0
             ],
             [
                 'name' => 'company_name',
                 'value' => 'Test Company',
                 'description' => 'Name of your company.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'company_motto',
                 'value' => null,
                 'description' => 'Company motto.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'company_address',
                 'value' => null,
                 'description' => 'Address of the company.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'company_phone',
                 'value' => null,
                 'description' => 'Company phone number.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'company_fax',
                 'value' => null,
                 'description' => 'Company fax line.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'social_facebook',
                 'value' => null,
                 'description' => 'Display a Facebook page.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'social_twitter',
                 'value' => null,
                 'description' => 'Display a Twitter page.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'social_youtube',
                 'value' => null,
                 'description' => 'Display a YouTube page.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'social_instagram',
                 'value' => null,
                 'description' => 'Display a Instagram page.',
-                'default_value' => null,
+                'default_value' => null
             ],
             [
                 'name' => 'profile_allowUserEditing',
                 'value' => 1,
                 'description' => 'Allow users to edit their own profile page.',
-                'default_value' => 1,
+                'default_value' => 1
             ],
             [
                 'name' => 'profile_allowManagerEditing',
                 'value' => 0,
                 'description' => 'Allow a manger to edit other users profile fields.',
-                'default_value' => 0,
+                'default_value' => 0
             ],
             [
                 'name' => 'site_maintenanceModeEnabled',
                 'value' => 0,
                 'description' => 'Set the site to maintenance mode which will disable all but administrators from using it.',
-                'default_value' => 0,
+                'default_value' => 0
             ],
             [
                 'name' => 'site_alertMessageEnabled',
                 'value' => 0,
                 'description' => 'Enable the Alert Message system.',
-                'default_value' => 0,
+                'default_value' => 0
             ],
             [
                 'name' => 'user_allowRegistration',
                 'value' => 1,
                 'description' => 'Allow users to register during initial login attempt.',
-                'default_value' => 1,
+                'default_value' => 1
             ],
+            [
+                'name' => 'asset_assignUser_on_checkin',
+                'value' => 0,
+                'description' => 'Will overwrite an assigned user when the asset is checked in.',
+                'default_value' => 0
+            ],
+            [
+                'name' => 'asset_unique_identifier',
+                'value' => 'assettag',
+                'description' => 'The unique identifier that is used to identify assets in various pages.',
+                'default_value' => 'assettag'
+            ]
         ];
 
         foreach ($siteConfig as $configItem) {

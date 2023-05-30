@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Repository\AssetRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
+#[UniqueEntity(fields: ['serialnumber', 'assettag'], message: 'There is already an account with this serial number/asset tag')]
 class Asset
 {
     #[ORM\Id]
@@ -61,10 +63,12 @@ class Asset
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context, $payload)
     {
-        if ($this->getWarrantyenddate() <= $this->getWarrantystartdate()) {
-            $context->buildViolation('Warranty End Date must not be older than the start date.')
-                ->atPath('warrantyenddate')
-                ->addViolation();
+        if (null !== $this->getWarrantystartdate()) {
+            if ($this->getWarrantyenddate() <= $this->getWarrantystartdate()) {
+                $context->buildViolation('Warranty End Date must not be older than the start date.')
+                    ->atPath('warrantyenddate')
+                    ->addViolation();
+            }
         }
     }
     public function getSerialnumber(): ?string

@@ -9,6 +9,7 @@ use App\Form\AssetType;
 use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
+use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -78,10 +79,11 @@ class AssetController extends AbstractController
 
     #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, AssetRepository $assetRepository): Response
+    public function new(Request $request, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository): Response
     {
+        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $asset = new Asset();
-        $form = $this->createForm(AssetType::class, $asset);
+        $form = $this->createForm(AssetType::class, [$asset, $assetUniqueIdentifier]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -98,14 +100,14 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
-    #[Route('/{id}', name: 'app_asset_show', methods: ['GET'])]
-    public function show(Asset $asset): Response
-    {
-        return $this->render('asset/show.html.twig', [
-            'asset' => $asset,
-        ]);
-    }
+//    #[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
+//    #[Route('/{id}', name: 'app_asset_show', methods: ['GET'])]
+//    public function show(Asset $asset): Response
+//    {
+//        return $this->render('asset/show.html.twig', [
+//            'asset' => $asset,
+//        ]);
+//    }
 
     #[Security("is_granted('ROLE_ASSET_EDIT') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
@@ -129,7 +131,7 @@ class AssetController extends AbstractController
     }
 
     #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
-    #[Route('/{id}', name: 'app_asset_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_asset_delete', methods: ['POST'])]
     public function delete(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$asset->getId(), $request->request->get('_token'))) {
@@ -143,32 +145,81 @@ class AssetController extends AbstractController
     }
 
     #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_CHECKIN') or is_granted('ROLE_SUPER_ADMIN')")]
-    #[Route('/{id}/checkin', name: 'app_asset_checkin')]
-    private function assetCheckIn(Request $request, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository)
+    #[Route('/checkin', name: 'app_asset_checkin')]
+    public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
+        // Set up what is needed to render the page
+        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $form = $this->createForm(AssetCollectionType::class);
+        $assets = $assetRepository->findAll();
+        $returnAssetsArr = [];
+
+        // No assets in the database, so skip this part
+        if (null === $assets) {
+            return $this->render('asset/checkin.html.twig', [
+                'allAssets' => $returnAssetsArr,
+                'form' => $form
+            ]);
+        }
+
+        foreach ($assets as $asset) {
+            if (null != $existingCheckin = $assetCollectionRepository->findOneBy(['DeviceID' => $asset->getId()])) {
+                if (false === $existingCheckin->isCheckedout()) {
+                        continue;
+                    }
+            }
+
+            $assignedUser = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
+
+            $returnAssetsArr[] = [
+                'id' => $asset->getId(),
+                'assignedUserId' => $asset->getAssignedTo(),
+                'uniqueIdentifier' => ('assettag' == $assetUniqueIdentifier) ? $asset->getAssettag() : $asset->getSerialnumber(),
+                'assignedUsersName' => (null === $assignedUser) ? null : $assignedUser->getSurname() . ', ' . $assignedUser->getFirstname() . ' (' . $assignedUser->getTitle() . ')',
+            ];
+        }
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Set up for the database insertion
+            $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
+            $data = $form->getData();
+
             // TODO: Check to make sure the storage exists
-            // TODO: Marking up data for now
-            $location = $notes = null;
-            $deviceId = $userId = 100;
             $loggedInUserId = $this->getUser()->getId();
+
+            // TODO: Add the date field to the form
             $date = null;
-            $collectedDate = $date ?? new \DateTimeImmutable('now');
 
-            $asset = new AssetCollection();
-            $asset->setCollectedDate($collectedDate);
-            $asset->setCollectedBy($loggedInUserId);
-            $asset->setCollectionLocation($location);
-            $asset->setDeviceID($deviceId);
-            $asset->setCollectedFrom($userId);
-            $asset->setCheckedout(false);
-            $asset->setCollectionNotes($notes);
+            // Set the asset collection
+            $assetCollection = new AssetCollection();
+            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
+            $assetCollection->setCollectedBy($loggedInUserId);
+            $assetCollection->setCollectionLocation($data['location']);
+            $assetCollection->setDeviceID($data['device']);
+            $assetCollection->setCollectedFrom($data['user']);
+            $assetCollection->setCheckedout(false);
+            $assetCollection->setCollectionNotes($data['notes']);
 
-            $assetCollectionRepository->save($asset, true);
+            $assetCollectionRepository->save($assetCollection, true);
+
+
+            // If the asset is not assigned or the config value to overwrite the assigned user is true,
+            // overwrite the assigned user.
+            $asset = $assetRepository->findOneBy(['id' => $data['device']]);
+            if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
+                $asset->setAssignedTo($data['user']);
+                $assetRepository->save($asset, true);
+            }
+
+            return $this->redirectToRoute('app_asset_checkin', [], Response::HTTP_SEE_OTHER);
         }
+
+        return $this->render('asset/checkin.html.twig', [
+            'allAssets' => $returnAssetsArr,
+            'form' => $form
+        ]);
     }
 
     // TODO: Idea is to take the data from AssetStorage::storageData and render it in a human readable view

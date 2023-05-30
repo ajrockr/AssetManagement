@@ -1,0 +1,13 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Asset Checkin{% endblock %}
+{% block header_title %}Asset Checkin{% endblock %}
+{% block header_breadcrumb %}Asset{% endblock %}
+{% block body_content %}
+    {{ dump(allAssets) }}
+    <select>
+        {% for asset in allAssets %}
+            <option>{{ asset.uniqueIdentifier }} :: {{ asset.assignedUsersName ?: 'Not Assigned' }}</option>
+        {% endfor %}
+    </select>
+    {{ form(form) }}
+{% endblock %}

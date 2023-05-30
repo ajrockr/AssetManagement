@@ -17,16 +17,17 @@ class AssetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $assetUniqueIdentifier = $options['data'][1];
         $builder
             ->add('serialnumber', TextType::class, [
-                'required' => false,
+                'required' => 'serialnumber' == $assetUniqueIdentifier,
                 'label' => 'Serial Number',
                 'attr' => [
                     'class' => 'form-control'
                 ]
             ])
             ->add('assettag', TextType::class, [
-                'required' => false,
+                'required' => 'assettag' == $assetUniqueIdentifier,
                 'label' => 'Asset Tag',
                 'attr' => [
                     'class' => 'form-control'
@@ -103,18 +104,19 @@ class AssetType extends AbstractType
             ])
         ;
 
-        $builder->addEventListener(FormEvents::SUBMIT, function(FormEvent $event) {
-            $data = $event->getData();
-
-            if (!($data->getAssettag() !== null) && !($data->getSerialnumber() !== null)) {
-                throw new TransformationFailedException(
-                    'Either Asset Tag or Serial Number must be completed',
-                    0,
-                    null,
-                    'Either the Asset Tag or Serial Number must be completed.'
-                );
-            }
-        });
+        // TODO: Should not need this now that we will check which is set as the unique identifier
+//        $builder->addEventListener(FormEvents::SUBMIT, function(FormEvent $event) {
+//            $data = $event->getData();
+//
+//            if (!($data->getAssettag() !== null) && !($data->getSerialnumber() !== null)) {
+//                throw new TransformationFailedException(
+//                    'Either Asset Tag or Serial Number must be completed',
+//                    0,
+//                    null,
+//                    'Either the Asset Tag or Serial Number must be completed.'
+//                );
+//            }
+//        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
