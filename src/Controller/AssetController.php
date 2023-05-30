@@ -83,7 +83,7 @@ class AssetController extends AbstractController
     {
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $asset = new Asset();
-        $form = $this->createForm(AssetType::class, [$asset, $assetUniqueIdentifier]);
+        $form = $this->createForm(AssetType::class, $asset);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

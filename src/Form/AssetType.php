@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Asset;
+use App\Repository\SiteConfigRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -15,9 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AssetType extends AbstractType
 {
+    public function __construct(private readonly SiteConfigRepository $siteConfigRepository) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $assetUniqueIdentifier = $options['data'][1];
+        $assetUniqueIdentifier = $this->siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $builder
             ->add('serialnumber', TextType::class, [
                 'required' => 'serialnumber' == $assetUniqueIdentifier,
