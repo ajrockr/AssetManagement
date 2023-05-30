@@ -106,20 +106,6 @@ class AssetType extends AbstractType
                 ]
             ])
         ;
-
-        // TODO: Should not need this now that we will check which is set as the unique identifier
-//        $builder->addEventListener(FormEvents::SUBMIT, function(FormEvent $event) {
-//            $data = $event->getData();
-//
-//            if (!($data->getAssettag() !== null) && !($data->getSerialnumber() !== null)) {
-//                throw new TransformationFailedException(
-//                    'Either Asset Tag or Serial Number must be completed',
-//                    0,
-//                    null,
-//                    'Either the Asset Tag or Serial Number must be completed.'
-//                );
-//            }
-//        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
