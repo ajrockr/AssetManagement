@@ -195,12 +195,21 @@ class AssetController extends AbstractController
             // TODO: Add the date field to the form
             $date = null;
 
+            switch ($assetUniqueIdentifier) {
+                case 'assettag':
+                    $deviceId = $assetRepository->findOneBy(['assettag' => $data['device']])->getId();
+                    break;
+                case 'serialnumber':
+                    $deviceId = $assetRepository->findOneBy(['serialnumber' => $data['device']])->getId();
+                    break;
+            }
+
             // Set the asset collection
             $assetCollection = new AssetCollection();
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
             $assetCollection->setCollectedBy($loggedInUserId);
             $assetCollection->setCollectionLocation($data['location']);
-            $assetCollection->setDeviceID($data['device']);
+            $assetCollection->setDeviceID($deviceId);
             $assetCollection->setCollectedFrom($data['user']);
             $assetCollection->setCheckedout(false);
             $assetCollection->setCollectionNotes($data['notes']);

@@ -3,11 +3,54 @@
 {% block header_title %}Asset Checkin{% endblock %}
 {% block header_breadcrumb %}Asset{% endblock %}
 {% block body_content %}
-    {{ dump(allAssets) }}
-    <select>
-        {% for asset in allAssets %}
-            <option>{{ asset.uniqueIdentifier }} :: {{ asset.assignedUsersName ?: 'Not Assigned' }}</option>
-        {% endfor %}
-    </select>
+    <div class="row justify-content-center">
+    <div class="col-auto">
+    <table id="assetTable" class="table table-bordered table-striped dataTable dtr-inline display">
+        <thead>
+            <tr>
+                <th class="all">Device</th>
+                <th class="all">Assigned To</th>
+                <th class="all">Collect</th>
+            </tr>
+        </thead>
+        <tbody>
+        {# TODO: Collect will toggle modal with Storage Render #}
+            {% for asset in allAssets %}
+                <tr>
+                    <td class="text-center">{{ asset.uniqueIdentifier }}</td>
+                    <td class="text-center">{{ asset.assignedUsersName ?: '<span class="badge border border-secondary text-secondary">Not Assigned</span>' }}</td>
+                    <td class="text-center"><button type="button" class="btn btn-outline-secondary">Collect</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
     {{ form(form) }}
+{% endblock %}
+
+{% block head_custom_javascript %}
+<script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Set the DataTable
+        var table = $('#assetTable').DataTable({
+            "scrollX": true,
+            "scrollY": 300,
+            "paging": true,
+            "lengthChange": true,
+            "iDisplayLength": 25,
+            "searching": true,
+            "ordering": true,
+            // "columnDefs": [
+            //     {orderable: false, targets: 2}
+            // ],
+            "info": true,
+            "autoWidth": true,
+            "responsive": true,
+            "autoFill": true,
+            "colReorder": true,
+        });
+    });
+</script>
 {% endblock %}
