@@ -9,7 +9,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
-#[UniqueEntity(fields: ['serialnumber', 'assettag'], message: 'There is already an account with this serial number/asset tag')]
+#[UniqueEntity(fields: 'serialnumber', message: 'There is already an account with this serial number')]
+#[UniqueEntity(fields: 'assettag', message: 'There is already an account with this asset tag')]
 class Asset
 {
     #[ORM\Id]
