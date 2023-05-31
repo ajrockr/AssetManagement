@@ -59,6 +59,7 @@ class UserCrudController extends AbstractCrudController
         $roles = $this->getRoles();
         
         return [
+            // Account Data Tab
             FormField::addTab('Account Data')->setIcon('fa fa-user'),
             AvatarField::new('avatar')
                 ->onlyOnIndex()
@@ -69,6 +70,8 @@ class UserCrudController extends AbstractCrudController
             EmailField::new('email')->onlyWhenUpdating()->setDisabled(),
             EmailField::new('email')->onlyWhenCreating(),
             TextField::new('email')->onlyOnIndex(),
+            TextField::new('type'),
+            TextField::new('userUniqueId'),
             ChoiceField::new('roles')
                 ->setChoices(array_combine(array_keys($roles), array_values($roles)))
                 ->allowMultipleChoices()
@@ -87,6 +90,8 @@ class UserCrudController extends AbstractCrudController
                 ->onlyOnForms()
                 ->setFormTypeOptions(['attr' => ['value' => '********']])
                 ->setDisabled(),
+
+            // User Information Tab
             FormField::addTab('User Information')->setIcon('fa fa-id-card'),
             TextField::new('surname')->setRequired(true),
             TextField::new('firstname')->setRequired(true),
@@ -100,6 +105,8 @@ class UserCrudController extends AbstractCrudController
             TextField::new('extension')->onlyOnForms(),
             TextField::new('title')->onlyOnForms(),
             TextField::new('homepage')->onlyOnForms(),
+
+            // Change Password Tab
             FormField::addTab('Change Password')->setIcon('fa fa-key'),
             Field::new('password')
                 ->setFormType(RepeatedType::class)

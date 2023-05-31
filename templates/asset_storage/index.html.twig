@@ -1,10 +1,8 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}AssetStorage index{% endblock %}
-
-{% block body %}
-    <h1>AssetStorage index</h1>
-
+{% extends 'layout.html.twig' %}
+{% block title %}Storage{% endblock %}
+{% block header_breadcrumb %}Storage{% endblock %}
+{% block header_title %}Storage{% endblock %}
+{% block body_content %}
     <table class="table">
         <thead>
             <tr>
@@ -12,7 +10,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Location</th>
-                <th>StorageData</th>
+{#                <th>StorageData</th>#}
                 <th>actions</th>
             </tr>
         </thead>
@@ -23,7 +21,7 @@
                 <td>{{ asset_storage.name }}</td>
                 <td>{{ asset_storage.description }}</td>
                 <td>{{ asset_storage.location }}</td>
-                <td>{{ asset_storage.storageData ? asset_storage.storageData|json_encode : '' }}</td>
+{#                <td>{{ asset_storage.storageData ? asset_storage.storageData|json_encode : '' }}</td>#}
                 <td>
                     <a href="{{ path('app_asset_storage_show', {'id': asset_storage.id}) }}">show</a>
                     <a href="{{ path('app_asset_storage_edit', {'id': asset_storage.id}) }}">edit</a>
