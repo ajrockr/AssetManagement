@@ -39,13 +39,34 @@ class AssetStorageRepository extends ServiceEntityRepository
         }
     }
 
-    public function storageDataExists($value)
+    public function storageDataExists($value): bool
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.storageData LIKE :value')
-            ->setParameter('value', '%'.$value.'%')
-            ->getQuery()
-            ->getResult();
+        $query = $this->findAll();
+        $array_walk = [];
+        foreach ($query as $storage) {
+            $array_walk[] = $storage->getStorageData();
+        }
+
+        return $this->arraySearchRecursive($value, $array_walk);
+    }
+    
+    private function arraySearchRecursive(mixed $term, array $haystack): bool
+    {
+        foreach ($haystack as $array) {
+            foreach ($array as $side) {
+                foreach ($side as $row) {
+                    foreach ($row as $key=>$val) {
+                        if ($term != $val) {
+                            continue;
+                        }
+
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 //    /**

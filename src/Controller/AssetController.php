@@ -151,9 +151,9 @@ class AssetController extends AbstractController
     #[Route('/checkin', name: 'app_asset_checkin')]
     public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
-//        dd($assetStorageRepository->storageDataExists('1003'));
 //        dd($assetCollectionRepository->findOneBy(['collectionLocation' => '1002']) && $assetStorageRepository->storageDataExists('1003'));
         // Set up what is needed to render the page
+        $users = $userRepository->findAll();
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $form = $this->createForm(AssetCollectionType::class);
         $assets = $assetRepository->findAll();
@@ -163,7 +163,8 @@ class AssetController extends AbstractController
         if (null === $assets) {
             return $this->render('asset/checkin.html.twig', [
                 'allAssets' => $returnAssetsArr,
-                'form' => $form
+                'form' => $form,
+                'users' => $users
             ]);
         }
 
@@ -232,7 +233,8 @@ class AssetController extends AbstractController
 
         return $this->render('asset/checkin.html.twig', [
             'allAssets' => $returnAssetsArr,
-            'form' => $form
+            'form' => $form,
+            'users' => $users
         ]);
     }
 

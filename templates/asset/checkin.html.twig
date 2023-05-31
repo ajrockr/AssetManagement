@@ -42,12 +42,12 @@
                         </button>
                     </div>
                     <div class="modal-body pl-2">
-                        ID: <span id="assetId"></span>
-                        Device: <span id="asset">{{ form_widget(form.device) }}</span>
-                        Assigned User: <span id="assetAssignedUser">{{ form_widget(form.user) }}</span>
-                        User ID: <span id="assignedUserId"></span>
-                        Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span>
-                        Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span>
+                        <div class="row">Device: <span id="asset">{{ form_widget(form.device) }}</span></div>
+                        <div class="row">Assigned User: <span id="assignedUser">{{ form_widget(form.user) }}</span></div>
+                        <div class="row">Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span></div>
+                        <div class="row">Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span></div>
+                        {{ form_widget(form.userId) }}
+                        {{ form_widget(form.assetId) }}
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -60,8 +60,12 @@
     {# ./checkInAssetModal #}
 {% endblock %}
 
+{% block head_custom_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
 {% block head_custom_javascript %}
 <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         // Set the DataTable
@@ -84,14 +88,21 @@
         $("#modal-checkin").on("show.bs.modal", function(e) {
             let assetId = $(e.relatedTarget).attr("data-assetId");
             let asset = $(e.relatedTarget).attr("data-asset");
-            let assignedUserId = $(e.relatedTarget).attr("data-assignedUserId");
+            let assignedUserId = $(e.relatedTarget).attr("data-assigneduserid") ?? null;
             let assignedUser = $(e.relatedTarget).attr("data-assignedUser");
 
-            document.getElementById("asset").textContent = asset;
-            document.getElementById("assetId").textContent = assetId;
-            document.getElementById("asset_collection_user").setAttribute('value', assignedUser);
-            document.getElementById("assignedUserId").setAttribute('value', assignedUserId);
+            document.getElementById("asset_collection_device").setAttribute("value", asset);
+            document.getElementById("asset_collection_assetId").setAttribute("value", assetId);
+            $("#asset_collection_user").val(assignedUserId).trigger("change");
+            document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
         });
+
+        $("#modal-checkin").on("hide.bs.modal", function(e) {
+           document.getElementById("asset_collection_userId").removeAttribute("value");
+        });
+
+        $("#asset_collection_user").select2();
     });
 </script>
 {% endblock %}
+{% block optional_javascript %}{% endblock %}
