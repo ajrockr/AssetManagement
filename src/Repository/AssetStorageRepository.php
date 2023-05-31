@@ -49,7 +49,7 @@ class AssetStorageRepository extends ServiceEntityRepository
 
         return $this->arraySearchRecursive($value, $array_walk);
     }
-    
+
     private function arraySearchRecursive(mixed $term, array $haystack): bool
     {
         foreach ($haystack as $array) {
@@ -68,29 +68,4 @@ class AssetStorageRepository extends ServiceEntityRepository
 
         return false;
     }
-
-//    /**
-//     * @return AssetStorage[] Returns an array of AssetStorage objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?AssetStorage
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

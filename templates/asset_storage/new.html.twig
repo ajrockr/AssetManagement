@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New AssetStorage{% endblock %}
+
+{% block body %}
+    <h1>Create new AssetStorage</h1>
+
+    {{ include('asset_storage/_form.html.twig') }}
+
+    <a href="{{ path('app_asset_storage_index') }}">back to list</a>
+{% endblock %}

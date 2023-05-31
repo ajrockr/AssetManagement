@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit AssetStorage{% endblock %}
+
+{% block body %}
+    <h1>Edit AssetStorage</h1>
+
+    {{ include('asset_storage/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_asset_storage_index') }}">back to list</a>
+
+    {{ include('asset_storage/_delete_form.html.twig') }}
+{% endblock %}
