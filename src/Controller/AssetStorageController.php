@@ -115,6 +115,11 @@ class AssetStorageController extends AbstractController
         $storage = $assetStorageRepository->findAll();
         $array = [];
         foreach ($storage as $item) {
+            // Pseudo for do not show
+            if ($item->getLocation() == 0) {
+                continue;
+            }
+
             $array[] = [
                 'name' => $item->getName(),
                 'id' => $item->getId(),
