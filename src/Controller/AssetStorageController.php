@@ -109,4 +109,21 @@ class AssetStorageController extends AbstractController
 
         return $html;
     }
+
+    public function renderNav(AssetStorageRepository $assetStorageRepository): Response
+    {
+        $storage = $assetStorageRepository->findAll();
+        $array = [];
+        foreach ($storage as $item) {
+            $array[] = [
+                'name' => $item->getName(),
+                'id' => $item->getId(),
+                'description' => $item->getDescription()
+            ];
+        }
+
+        return $this->render('asset_storage/_nav.html.twig', [
+            'items' => $array
+        ]);
+    }
 }

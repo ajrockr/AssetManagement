@@ -1,0 +1,10 @@
+<ul class="nav nav-treeview">
+    {% for item in items %}
+        <li class="nav-item">
+            <a href="{{ path('app_asset_storage_show', {id: item.id}) }}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>{{ item.name }}</p>
+            </a>
+        </li>
+    {% endfor %}
+</ul>

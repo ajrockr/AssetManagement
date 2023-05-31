@@ -273,57 +273,25 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ path('app_asset_storage_index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-th nav"></i>
+                            <i class="nav-icon fas fa-th"></i>
                             <p>
                                 Storage
                                 {#                                <span class="right badge badge-danger">New</span>#}
-                                <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Seniors (1000)</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Juniors (2000)</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Sophmores (3000)</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Freshman (4000)</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>8th Grade (5000)</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>7th Grade (6000)</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Extra (7000)</p>
-                                </a>
-                            </li>
-                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>
+                                Carts
+                                <i class="fas fa-angle-left right"></i>
+{#                                <span class="badge badge-info right">6</span>#}
+                            </p>
+                        </a>
+                        {{ render(controller(
+                            'App\\Controller\\AssetStorageController::renderNav'
+                        )) }}
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link">
