@@ -35,7 +35,6 @@ class AssetCollectionType extends AbstractType
             ->add('device', TextType::class, [
                 'attr' => [
                     'class' => 'form-control',
-                    'disabled' => true
                 ]
             ])
             ->add('user', ChoiceType::class, [

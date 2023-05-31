@@ -2,9 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\AssetCollection;
 use App\Entity\AssetStorage;
+use App\Form\AssetCollectionType;
 use App\Form\AssetStorageType;
+use App\Repository\AssetCollectionRepository;
+use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
+use App\Repository\SiteConfigRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,11 +46,38 @@ class AssetStorageController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_asset_storage_show', methods: ['GET'])]
-    public function show(AssetStorage $assetStorage): Response
+    #[Route('/{id}', name: 'app_asset_storage_show')]
+    public function show(Request $request, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
     {
+        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
+        $assetCollection = $assetCollectionRepository->findBy(['checkedout' => false]);
+        $storage = $this->renderStorageView($assetStorageRepository->findOneBy(['id' => $id])->getStorageData());
+        $collectedAssets = [];
+        foreach ($assetCollection as $asset) {
+            $collectedAssets[] = [
+                'slot' => $asset->getCollectionLocation(),
+                'asset' => ($assetUniqueIdentifier == 'assettag')
+                    ? $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getAssettag()
+                    : $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getSerialnumber(),
+                'user' => $userRepository->findOneBy(['id' => $asset->getCollectedFrom()])->getId(),
+                'note' => $asset->getCollectionNotes()
+            ];
+        }
+
+        $form = $this->createForm(AssetCollectionType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->forward('App\Controller\AssetController::checkIn', [
+                'form' => $form
+            ]);
+        }
+
         return $this->render('asset_storage/show.html.twig', [
             'asset_storage' => $assetStorage,
+            'storage_render' => $storage,
+            'form' => $form,
+            'collectedAssets' => $collectedAssets
         ]);
     }
 
@@ -80,12 +113,15 @@ class AssetStorageController extends AbstractController
      * Renders the HTML that represents the storages
      *
      * @param array|null $storageData
-     * @return string|null
+     * @return Response
      */
-    public function renderStorageView(?array $storageData): ?string
+    public function renderStorageView(?array $storageData): string
     {
+        // TODO: Create this HTML in the twig file
         if (null === $storageData) {
-            return null;
+            $this->render('asset_storage/storageRender.html.twig', [
+                'storage' => ''
+            ]);
         }
 
         $html = '<div id="storageStart" class="row">';
@@ -96,7 +132,7 @@ class AssetStorageController extends AbstractController
                 $html .= '<div id="row" class="row align-items-center no-gutters">';
 
                 foreach ($row as $id=>$slot) {
-                    $html .= '<div id="slot" class="col"><a href="#" data-id="'.$id.'" data-toggle="modal" data-target="#slotModal">'.$slot.'</a></div>';
+                    $html .= '<div id="slot-'.$slot.'" class="col p-1"><a href="#" data-slot="'.$slot.'" data-toggle="modal" data-target="#modal-checkin">'.$slot.'</a></div>';
                 }
 
                 $html .= '</div>';
@@ -106,10 +142,18 @@ class AssetStorageController extends AbstractController
         }
 
         $html .= '</div>';
-
         return $html;
+//        return $this->render('asset_storage/storageRender.html.twig', [
+//            'storage' => $html
+//        ]);
     }
 
+    /**
+     * Renders storage items for use in the navigation
+     *
+     * @param AssetStorageRepository $assetStorageRepository
+     * @return Response
+     */
     public function renderNav(AssetStorageRepository $assetStorageRepository): Response
     {
         $storage = $assetStorageRepository->findAll();

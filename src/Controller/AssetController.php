@@ -238,6 +238,74 @@ class AssetController extends AbstractController
         ]);
     }
 
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, $form): Response
+    {
+        // Set up what is needed to render the page
+        $users = $userRepository->findAll();
+        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
+
+        // Set up for the database insertion
+        $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
+        $data = $form->getData();
+
+        $loggedInUserId = $this->getUser()->getId();
+
+        // TODO: Add the date field to the form
+        $date = null;
+
+        switch ($assetUniqueIdentifier) {
+            case 'assettag':
+                $device = $assetRepository->findOneBy(['assettag' => $data['device']]);
+                break;
+            case 'serialnumber':
+                $device = $assetRepository->findOneBy(['serialnumber' => $data['device']]);
+                break;
+        }
+        // TODO: First check if exists, update if so, else insert
+        // Set the asset collection
+        $assetCollection = new AssetCollection();
+
+        // If device doesn't exist, create it
+        if (null === $device) {
+            $asset = new Asset;
+            if ($assetUniqueIdentifier == 'assettag') {
+                $asset->setAssettag($data['device']);
+            } elseif ($assetUniqueIdentifier == 'serialnumber') {
+                $asset->setSerialnumber($data['device']);
+            }
+
+            $assetRepository->save($asset, true);
+            $deviceId = $asset->getId();
+        } else {
+            $deviceId = $device->getId();
+        }
+
+        $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
+        $assetCollection->setCollectedBy($loggedInUserId);
+        $assetCollection->setCollectionLocation($data['location']);
+        $assetCollection->setDeviceID($deviceId);
+        $assetCollection->setCollectedFrom($data['user']);
+        $assetCollection->setCheckedout(false);
+        $assetCollection->setCollectionNotes($data['notes']);
+
+        $assetCollectionRepository->save($assetCollection, true);
+
+        // If the asset is not assigned or the config value to overwrite the assigned user is true,
+        // overwrite the assigned user.
+        $asset = $assetRepository->findOneBy(['id' => $deviceId]);
+        if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
+            $asset->setAssignedTo($data['user']);
+            $assetRepository->save($asset, true);
+        }
+
+        return $this->redirect($request->headers->get('referer'));
+
+//        return $this->render('asset/_checkin_form.html.twig', [
+//            'form' => $form,
+//            'users' => $users
+//        ]);
+    }
+
     // TODO: Idea is to take the data from AssetStorage::storageData and render it in a human readable view
     public function renderStorageView() {}
 }

@@ -1,36 +1,112 @@
 {% extends 'layout.html.twig' %}
 {% block title %}Storage{% endblock %}
 {% block header_breadcrumb %}Storage{% endblock %}
-{% block header_title %}Storage{% endblock %}
+{% block header_title %}Storage {{ asset_storage.name }} ({{ asset_storage.description }}){% endblock %}
 {% block body_content %}
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ asset_storage.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ asset_storage.name }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ asset_storage.description }}</td>
-            </tr>
-            <tr>
-                <th>Location</th>
-                <td>{{ asset_storage.location }}</td>
-            </tr>
-            <tr>
-                <th>StorageData</th>
-                <td>{{ asset_storage.storageData ? asset_storage.storageData|json_encode : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <h4>Located at: {{ asset_storage.location }}</h4>
+    {{ storage_render|raw }}
+    {% set assignedSlots = [] %}
+    {% set assignedSlotsInfo = [] %}
+    {% for collectedAsset in collectedAssets %}
+        {% set assignedSlots = assignedSlots|merge([collectedAsset.slot]) %}
+        {% set assignedSlotsInfo = assignedSlotsInfo|merge([{user: collectedAsset.user, slot: collectedAsset.slot, asset: collectedAsset.asset, note: collectedAsset.note}]) %}
+    {% endfor %}
+    <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
+    <div class="js-assignedSlotsInfo" data-assignedSlotsInfo="{{ assignedSlotsInfo|json_encode }}"></div>
 
-    <a href="{{ path('app_asset_storage_index') }}">back to list</a>
-
-    <a href="{{ path('app_asset_storage_edit', {'id': asset_storage.id}) }}">edit</a>
-
-    {{ include('asset_storage/_delete_form.html.twig') }}
+    {# View Asset Modal #}
+    <div class="modal fade" id="modal-checkin">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-body">
+                    {{ form_start(form) }}
+                    <input id="assignAssetId" type="hidden" name="assetId" value=""/>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Assign User</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body pl-2">
+                        <div class="row">Asset: <span id="asset">{{ form_widget(form.device) }}</span></div>
+                        <div class="row">Assigned User: <span id="assignedUser">{{ form_widget(form.user) }}</span></div>
+                        <div class="row">Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span></div>
+                        <div class="row">Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span></div>
+                        {{ form_widget(form.userId) }}
+                        {{ form_widget(form.assetId) }}
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        {{ form_widget(form.Collect) }}
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {# ./viewAssetModal #}
 {% endblock %}
+
+{% block head_custom_javascript %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Set the checkIn Modal
+        $("#modal-checkin").on("show.bs.modal", function(e) {
+            let storageSlot = $(e.relatedTarget).attr("data-slot");
+            // let assetId = $(e.relatedTarget).attr("data-assetId");
+            let asset = $(e.relatedTarget).attr("data-asset") ?? '';
+            let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
+            let note = $(e.relatedTarget).attr("data-note") ?? '';
+
+            document.getElementById("asset_collection_device").setAttribute("value", asset);
+            document.getElementById("asset_collection_notes").innerText = note;
+            // document.getElementById("asset_collection_assetId").setAttribute("value", assetId);
+            $("#asset_collection_user").val(assignedUserId).trigger("change");
+            document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
+            document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
+        });
+
+        $("#modal-checkin").on("hide.bs.modal", function(e) {
+            document.getElementById("asset_collection_userId").removeAttribute("value");
+        });
+
+        $("#asset_collection_user").select2();
+
+        const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
+        const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
+        console.log(assignedSlotsInfo[0]['slot']);
+
+        var ancestor = document.getElementById("row"),
+            descendents = ancestor.getElementsByTagName("div");
+
+        var i, e, d;
+        for (i = 0; i < descendents.length; ++i) {
+            e = descendents[i];
+
+            var id = e.id;
+            var newId = id.replace('slot-','');
+
+            if (assignedSlots.includes(newId)) {
+                document.getElementById(id).classList.add('bg-info');
+            }
+        }
+        for (i = 0; i < descendents.length; ++i) {
+            e = descendents[i];
+
+            var id = e.id;
+            var newId = id.replace('slot-','');
+
+            for (d = 0; d < assignedSlotsInfo.length; ++d) {
+                if (newId === assignedSlotsInfo[d]['slot']) {
+                    $("#"+id).find("[data-slot='" + newId + "'").attr("data-asset", assignedSlotsInfo[d]['asset']);
+                    $("#"+id).find("[data-slot='" + newId + "'").attr("data-user", assignedSlotsInfo[d]['user']);
+                    $("#"+id).find("[data-slot='" + newId + "'").attr("data-note", assignedSlotsInfo[d]['note']);
+                }
+            }
+        }
+
+    });
+</script>
+{% endblock %}
+{% block optional_javascript %}{% endblock %}
