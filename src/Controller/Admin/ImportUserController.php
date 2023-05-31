@@ -61,7 +61,6 @@ class ImportUserController extends AbstractController
                     $user->setUsername($data[1]);
                     $user->setEmail($data[2]);
                     $user->setTitle($data[0]);
-//                    $user->setDepartment('Student');
                     $user->setRoles(['ROLE_DENY_LOGIN']);
                     $user->setEnabled(false);
                     $user->setUserUniqueId($data[5]);
