@@ -74,41 +74,28 @@
             document.getElementById("asset_collection_userId").removeAttribute("value");
         });
 
+        // Start select2
         $("#asset_collection_user").select2();
 
+        // Populate cells that are assigned
         const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
         const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
-        console.log(assignedSlotsInfo[0]['slot']);
 
-        var ancestor = document.getElementById("row"),
-            descendents = ancestor.getElementsByTagName("div");
-
-        var i, e, d;
-        for (i = 0; i < descendents.length; ++i) {
-            e = descendents[i];
-
-            var id = e.id;
-            var newId = id.replace('slot-','');
-
-            if (assignedSlots.includes(newId)) {
-                document.getElementById(id).classList.add('bg-info');
+        $("div[id='row']").children('.col').each(function() {
+            if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
+                $(this).addClass('bg-info');
+                $(this).children('a').each(function() {
+                    var i;
+                    for (i = 0; i < assignedSlotsInfo.length; ++i) {
+                        if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
+                            $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
+                            $(this).attr('data-user', assignedSlotsInfo[i]['user']);
+                            $(this).attr('data-note', assignedSlotsInfo[i]['note']);
+                        }
+                    }
+                })
             }
-        }
-        for (i = 0; i < descendents.length; ++i) {
-            e = descendents[i];
-
-            var id = e.id;
-            var newId = id.replace('slot-','');
-
-            for (d = 0; d < assignedSlotsInfo.length; ++d) {
-                if (newId === assignedSlotsInfo[d]['slot']) {
-                    $("#"+id).find("[data-slot='" + newId + "'").attr("data-asset", assignedSlotsInfo[d]['asset']);
-                    $("#"+id).find("[data-slot='" + newId + "'").attr("data-user", assignedSlotsInfo[d]['user']);
-                    $("#"+id).find("[data-slot='" + newId + "'").attr("data-note", assignedSlotsInfo[d]['note']);
-                }
-            }
-        }
-
+       });
     });
 </script>
 {% endblock %}

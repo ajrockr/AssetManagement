@@ -262,6 +262,7 @@ class AssetController extends AbstractController
                 break;
         }
         // TODO: First check if exists, update if so, else insert
+
         // Set the asset collection
         $assetCollection = new AssetCollection();
 
@@ -280,15 +281,27 @@ class AssetController extends AbstractController
             $deviceId = $device->getId();
         }
 
-        $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
-        $assetCollection->setCollectedBy($loggedInUserId);
-        $assetCollection->setCollectionLocation($data['location']);
-        $assetCollection->setDeviceID($deviceId);
-        $assetCollection->setCollectedFrom($data['user']);
-        $assetCollection->setCheckedout(false);
-        $assetCollection->setCollectionNotes($data['notes']);
+        if ($check = $assetCollectionRepository->findOneBy(['DeviceID' => $deviceId])) {
+            $check->setCollectedDate($date ?? new \DateTimeImmutable('now'))
+                ->setCollectedBy($loggedInUserId)
+                ->setCollectionLocation($data['location'])
+                ->setDeviceID($deviceId)
+                ->setCollectedFrom($data['user'])
+                ->setCheckedout(false)
+                ->setCollectionNotes($data['notes']);
 
-        $assetCollectionRepository->save($assetCollection, true);
+            $assetCollectionRepository->save($check, true);
+        } else {
+            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
+            $assetCollection->setCollectedBy($loggedInUserId);
+            $assetCollection->setCollectionLocation($data['location']);
+            $assetCollection->setDeviceID($deviceId);
+            $assetCollection->setCollectedFrom($data['user']);
+            $assetCollection->setCheckedout(false);
+            $assetCollection->setCollectionNotes($data['notes']);
+
+            $assetCollectionRepository->save($assetCollection, true);
+        }
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,
         // overwrite the assigned user.

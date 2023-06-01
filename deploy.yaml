@@ -1,0 +1,17 @@
+import: 
+  - recipe/symfony.php
+
+config:
+  repository: 'https://github.com/ajrockr/ajrit.git'
+
+hosts:
+  10.10.4.9:
+    remote_user: deployer
+    deploy_path: '~/ajrit'
+
+tasks:
+  build:
+    - run: uptime  
+
+after:
+  deploy:failed: deploy:unlock
