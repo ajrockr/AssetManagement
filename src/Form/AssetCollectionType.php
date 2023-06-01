@@ -34,6 +34,7 @@ class AssetCollectionType extends AbstractType
         $builder
             ->add('device', TextType::class, [
                 'attr' => [
+                    'autofocus' => true,
                     'class' => 'form-control',
                 ]
             ])
@@ -53,6 +54,7 @@ class AssetCollectionType extends AbstractType
                 ]
             ])
             ->add('notes', TextareaType::class, [
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control'
                 ]
