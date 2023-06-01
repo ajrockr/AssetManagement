@@ -281,7 +281,7 @@ class AssetController extends AbstractController
             $deviceId = $device->getId();
         }
 
-        if ($check = $assetCollectionRepository->findOneBy(['DeviceID' => $deviceId])) {
+        if ($check = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
             $check->setCollectedDate($date ?? new \DateTimeImmutable('now'))
                 ->setCollectedBy($loggedInUserId)
                 ->setCollectionLocation($data['location'])
