@@ -58,8 +58,8 @@ class ReportController extends AbstractController
             $reportArray[] = array_merge($assignedTo, $collectedFrom);
         }
 
-        dd($reportArray);
-
-        return $this->render('report/collectedassets.html.twig');
+        return $this->render('report/collectedassets.html.twig', [
+            'reportData' => $reportArray
+        ]);
     }
 }
