@@ -53,7 +53,7 @@ class AssetCollectionType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'autocomplete' => 'off'
-                ],
+                ]
             ])
             ->add('location', TextType::class, [
                 'attr' => [
@@ -70,6 +70,12 @@ class AssetCollectionType extends AbstractType
                 'attr' => [
                     'class' => 'btn btn-primary'
                 ]
+            ])
+            ->add('checkout', CheckboxType::class, [
+                'required' => false,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ],
             ])
         ;
     }

@@ -62,11 +62,12 @@ class AssetStorageController extends AbstractController
                     ? $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getAssettag()
                     : $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getSerialnumber(),
                 'user' => $userRepository->findOneBy(['id' => $asset->getCollectedFrom()])->getId(),
-                'note' => $asset->getCollectionNotes()
+                'note' => $asset->getCollectionNotes(),
+                'checkedOut' => $asset->isCheckedout()
             ];
         }
 
-        $form = $this->createForm(AssetCollectionType::class);
+        $form = $this->createForm(AssetCollectionType::class, $assetCollection);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -75,8 +76,13 @@ class AssetStorageController extends AbstractController
             ]);
         }
 
+        $colors['cellOccupied'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_occupied'])->getConfigValue();
+        $colors['cellCheckedOut'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_checkedout'])->getConfigValue();
+        $colors['cellProcessed'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_processed'])->getConfigValue();
+
         return $this->render('asset_storage/show.html.twig', [
             'assetStorage' => $assetStorage,
+            'colors' => $colors,
             'storageCounts' => $storageCounts,
             'storageRender' => $storage,
             'form' => $form,

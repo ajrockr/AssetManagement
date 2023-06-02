@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -106,7 +107,17 @@ class AdminSiteConfigType extends AbstractType
                 'data' => $options['data']['user_allowRegistration'] ? true : false,
                 'required' => false
             ])
-
+            ->add('setDeviceUniqueId', TextType::class, [
+                'data' => $options['data']['asset_unique_identifier'],
+                'required' => true
+            ])
+            ->add('setAssignUserOnCheckIn', CheckboxType::class, [
+                'data' => (bool)$options['data']['asset_assignUser_on_checkin'],
+                'required' => false
+            ])
+            ->add('setCollectionCelColorOccupied', TextType::class, [
+                'data' => $options['data']['collection_color_cell_occupied'],
+            ])
             ->add('save', SubmitType::class, [
                 'label' => 'Save Changes',
                 'attr' => ['class' => 'save']

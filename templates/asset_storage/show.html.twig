@@ -18,7 +18,13 @@
     {% set assignedSlotsInfo = [] %}
     {% for collectedAsset in collectedAssets %}
         {% set assignedSlots = assignedSlots|merge([collectedAsset.slot]) %}
-        {% set assignedSlotsInfo = assignedSlotsInfo|merge([{user: collectedAsset.user, slot: collectedAsset.slot, asset: collectedAsset.asset, note: collectedAsset.note}]) %}
+        {% set assignedSlotsInfo = assignedSlotsInfo|merge([{
+            user: collectedAsset.user,
+            slot: collectedAsset.slot,
+            asset: collectedAsset.asset,
+            note: collectedAsset.note,
+            checkedOut: collectedAsset.checkedOut
+        }]) %}
     {% endfor %}
     <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
     <div class="js-assignedSlotsInfo" data-assignedSlotsInfo="{{ assignedSlotsInfo|json_encode }}"></div>
@@ -42,10 +48,17 @@
                         <div class="row">Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span></div>
                         <div class="row">Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span></div>
                         <div class="row">
-                            <div class="btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-secondary">
-                                 {{ form_widget(form.needsrepair) }} Needs Repair
-                                </label>
+                            <div class="btn-group">
+                                <div class="btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary">
+                                     {{ form_widget(form.needsrepair) }} Needs Repair
+                                    </label>
+                                </div>
+                                <div class="btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary">
+                                     {{ form_widget(form.checkout) }} Check Out
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         {{ form_widget(form.userId) }}
@@ -53,7 +66,7 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        {{ form_widget(form.Collect) }}
+                        {{ form_widget(form.Collect, {'label': 'Update'}) }}
                     </div>
                     {{ form_end(form) }}
                 </div>
@@ -65,6 +78,19 @@
 
 {% block head_custom_css %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .cellOccupied {
+            background-color: {{ colors.cellOccupied }}
+        }
+        
+        .cellCheckedOut {
+            background-color: {{ colors.cellCheckedOut }}
+        }
+        
+        .cellProcessed {
+            background-color: {{ colors.cellProcessed }};
+        }
+    </style>
 {% endblock %}
 {% block head_custom_javascript %}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -73,14 +99,12 @@
         // Set the checkIn Modal
         $("#modal-checkin").on("show.bs.modal", function(e) {
             let storageSlot = $(e.relatedTarget).attr("data-slot");
-            // let assetId = $(e.relatedTarget).attr("data-assetId");
             let asset = $(e.relatedTarget).attr("data-asset") ?? '';
             let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
             let note = $(e.relatedTarget).attr("data-note") ?? '';
 
             document.getElementById("asset_collection_device").setAttribute("value", asset);
             document.getElementById("asset_collection_notes").innerText = note;
-            // document.getElementById("asset_collection_assetId").setAttribute("value", assetId);
             $("#asset_collection_user").val(assignedUserId).trigger("change");
             document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
             document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
@@ -99,19 +123,29 @@
 
         $("div[id='row']").children('.col').each(function() {
             if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
-                $(this).addClass('bg-info');
+                $(this).addClass('cellOccupied');
+                var i;
+                for (i = 0; i < assignedSlotsInfo.length; ++i) {
+                    if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
+                        if (assignedSlotsInfo[i]['checkedOut']) {
+                            $("#asset_collection_checkout").attr('checked', 'checked');
+                            $(this).addClass('cellCheckedOut')
+                        }
+                    }
+                }
                 $(this).children('a').each(function() {
-                    var i;
+                    // $(this).parent().addClass('cellProcessed');
                     for (i = 0; i < assignedSlotsInfo.length; ++i) {
                         if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
                             $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
                             $(this).attr('data-user', assignedSlotsInfo[i]['user']);
                             $(this).attr('data-note', assignedSlotsInfo[i]['note']);
+                            $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
                         }
                     }
                 })
             }
-       });
+        });
     });
 </script>
 {% endblock %}

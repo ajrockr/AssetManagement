@@ -45,10 +45,15 @@ class SiteConfigController extends AbstractController
             $this->updateConfigItem($entityManager, 'profile_allowUserEditing', $data['allowUserEditProfile']);
             $this->updateConfigItem($entityManager, 'profile_allowManagerEditing', $data['allowManagerEditProfile']);
             
-            // Site Information
+            // Site Settings
             $this->updateConfigItem($entityManager, 'site_maintenanceModeEnabled', $data['setMaintenanceModeEnabled']);
             $this->updateConfigItem($entityManager, 'site_alertMessageEnabled', $data['setAlertMessageEnabled']);
             $this->updateConfigItem($entityManager, 'user_allowRegistration', $data['setAllowUserRegistration']);
+
+            // Device Settings
+            $this->updateConfigItem($entityManager, 'asset_unique_identifier', $data['setDeviceUniqueId']);
+            $this->updateConfigItem($entityManager, 'asset_assignUser_on_checkin', $data['setAssignUserOnCheckIn']);
+            $this->updateConfigItem($entityManager, 'collection_color_cell_occupied', $data['setCollectionCelColorOccupied']);
         }
 
         return $this->render('admin/site_config/index.html.twig', [

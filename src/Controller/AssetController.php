@@ -262,10 +262,6 @@ class AssetController extends AbstractController
                 $device = $assetRepository->findOneBy(['serialnumber' => $data['device']]);
                 break;
         }
-        // TODO: First check if exists, update if so, else insert
-
-        // Set the asset collection
-        $assetCollection = new AssetCollection();
 
         // If device doesn't exist, create it
         if (null === $device) {
@@ -282,34 +278,33 @@ class AssetController extends AbstractController
             $deviceId = $device->getId();
         }
 
-        if ($check = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
-            $check->setCollectedDate($date ?? new \DateTimeImmutable('now'))
+        $action = false;
+        if ($assetCollection = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
+            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
                 ->setCollectedBy($loggedInUserId)
                 ->setCollectionLocation($data['location'])
                 ->setDeviceID($deviceId)
                 ->setCollectedFrom($data['user'])
-                ->setCheckedout(false)
+                ->setCheckedout($data['checkout'])
                 ->setCollectionNotes($data['notes']);
-
-            try {
-                $assetCollectionRepository->save($check, true);
-            } catch(\Exception $e) {
-                $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
-            }
+            $action = 'update';
         } else {
-            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
-            $assetCollection->setCollectedBy($loggedInUserId);
-            $assetCollection->setCollectionLocation($data['location']);
-            $assetCollection->setDeviceID($deviceId);
-            $assetCollection->setCollectedFrom($data['user']);
-            $assetCollection->setCheckedout(false);
-            $assetCollection->setCollectionNotes($data['notes']);
+            $assetCollection = new AssetCollection();
+            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
+                ->setCollectedBy($loggedInUserId)
+                ->setCollectionLocation($data['location'])
+                ->setDeviceID($deviceId)
+                ->setCollectedFrom($data['user'])
+                ->setCollectionNotes($data['notes']);
+            $action = 'create';
+        }
 
-            try {
-                $assetCollectionRepository->save($assetCollection, true);
-            } catch(\Exception $e) {
-                $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
-            }
+        try {
+            $assetCollectionRepository->save($assetCollection, true);
+        } catch(\Exception $e) {
+            // Failed, get out of here with Flash Message
+            $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
+            return $this->redirect($request->headers->get('referer'));
         }
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,
@@ -335,7 +330,11 @@ class AssetController extends AbstractController
             $repairController->createRepair($assetRepository, $repairRepository, $repairData);
         }
 
-        $this->addFlash('success', 'Asset ('.$data['device'].') assigned to slot ('.$data['location'].')');
+        if ($action == 'update') {
+            $this->addFlash('success', 'Asset (' . $data['device'] . ') assigned to slot (' . $data['location'] . ')');
+        } elseif ($action == 'create') {
+            $this->addFlash('success', 'Asset (' . $data['device'] . ') has been updated on slot (' . $data['location'] . ')');
+        }
         return $this->redirect($request->headers->get('referer'));
     }
 
