@@ -1,38 +1,39 @@
 {% extends 'layout.html.twig' %}
 
 {% block title %}Reports{% endblock %}
-{% block header_title %}Assets Collected{% endblock %}
+{% block header_title %}Users Assets Not Collected{% endblock %}
 {% block header_breadcrumb %}Report{% endblock %}
 {% block body_content %}
     <div class="dataTables_wrapper dt-bootstrap4">
+        <div class="row mb-4">
+            <div class="col-xs-3 col-md-3 form-floating">
+                <label for="chooseUserType">Choose a type of user to report on.</label>
+                <select name="chooseUserType" id="chooseUserType" class="form-control" onChange="window.document.location.href=this.options[this.selectedIndex].value;">
+                    <option value="" selected disabled>Choose a User Type</option>
+                    <option value="{{ path('app_report_usersnotcollected', { userType: 'Student' }) }}">Student</option>
+                </select>
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-12">
                 <table id="assetTable" class="table table-bordered table-striped dataTable dtr-inline display" aria-describedby="assetTable_info">
                     <thead>
                     <tr>
-                        <th class="all">Asset Tag</th>
-                        <th class="all">Serial Number</th>
-                        <th class="all">Collected From</th>
+                        <th class="all">Last Name</th>
+                        <th class="all">First Name</th>
+                        <th class="all">Title</th>
                         <th class="all">Email</th>
-                        <th class="all">Collected Unique ID</th>
-{#                        <th class="all">Type</th>#}
-                        <th class="all">Assigned Person</th>
-                        <th class="all">Assigned Email</th>
-                        <th class="all">Assigned Unique ID</th>
+                        <th class="all">Unique ID</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for row in reportData %}
                         <tr>
-                            <td class="text-center">{{ row.collectedDeviceAssetTag }}</td>
-                            <td class="text-center">{{ row.collectedDeviceSerialNumber }}</td>
-                            <td class="text-center">{{ row.collectedFromSurName }}, {{ row.collectedFromFirstName }}</td>
-                            <td class="text-center">{{ row.collectedFromEmail }}</td>
-                            <td class="text-center">{{ row.collectedFromUniqueId }}</td>
-{#                            <td class="text-center">{{ row.collectedFromType }}</td>#}
-                            <td class="text-center">{% if row.assignedToSurName is defined %}{{ row.assignedToSurName }}, {{ row.assignedToSurName }}{% endif %}</td>
-                            <td class="text-center">{% if row.assignedToEmail is defined %}{{ row.assignedToEmail }}{% endif %}</td>
-                            <td class="text-center">{% if row.assignedToUniqueId is defined %}{{ row.assignedToUniqueId }}{% endif %}</td>
+                            <td class="text-center">{{ row.surName }}</td>
+                            <td class="text-center">{{ row.firstName }}</td>
+                            <td class="text-center">{{ row.title }}</td>
+                            <td class="text-center">{{ row.email }}</td>
+                            <td class="text-center">{{ row.uniqueId }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -61,11 +62,11 @@
                 "scrollX": true,
                 "paging": true,
                 "lengthChange": true,
-                "iDisplayLength": 25,
+                "iDisplayLength": 10,
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
-                    {orderable: false, targets: 7}
+                    {orderable: false, targets: 4}
                 ],
                 "info": true,
                 "autoWidth": true,

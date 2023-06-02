@@ -1,7 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block title %}Reports{% endblock %}
-{% block header_title %}Assets Collected{% endblock %}
+{% block header_title %}Assets Collected Per Storage{% endblock %}
 {% block header_breadcrumb %}Report{% endblock %}
 {% block body_content %}
     <div class="dataTables_wrapper dt-bootstrap4">
@@ -10,29 +10,15 @@
                 <table id="assetTable" class="table table-bordered table-striped dataTable dtr-inline display" aria-describedby="assetTable_info">
                     <thead>
                     <tr>
-                        <th class="all">Asset Tag</th>
-                        <th class="all">Serial Number</th>
-                        <th class="all">Collected From</th>
-                        <th class="all">Email</th>
-                        <th class="all">Collected Unique ID</th>
-{#                        <th class="all">Type</th>#}
-                        <th class="all">Assigned Person</th>
-                        <th class="all">Assigned Email</th>
-                        <th class="all">Assigned Unique ID</th>
+                        <th class="all">Storage</th>
+                        <th class="all">Count</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for row in reportData %}
+                    {% for key, value in reportData %}
                         <tr>
-                            <td class="text-center">{{ row.collectedDeviceAssetTag }}</td>
-                            <td class="text-center">{{ row.collectedDeviceSerialNumber }}</td>
-                            <td class="text-center">{{ row.collectedFromSurName }}, {{ row.collectedFromFirstName }}</td>
-                            <td class="text-center">{{ row.collectedFromEmail }}</td>
-                            <td class="text-center">{{ row.collectedFromUniqueId }}</td>
-{#                            <td class="text-center">{{ row.collectedFromType }}</td>#}
-                            <td class="text-center">{% if row.assignedToSurName is defined %}{{ row.assignedToSurName }}, {{ row.assignedToSurName }}{% endif %}</td>
-                            <td class="text-center">{% if row.assignedToEmail is defined %}{{ row.assignedToEmail }}{% endif %}</td>
-                            <td class="text-center">{% if row.assignedToUniqueId is defined %}{{ row.assignedToUniqueId }}{% endif %}</td>
+                            <td class="text-center">{{ key }}</td>
+                            <td class="text-center">{{ value }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -65,7 +51,7 @@
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
-                    {orderable: false, targets: 7}
+                    {orderable: false, targets: 1}
                 ],
                 "info": true,
                 "autoWidth": true,
