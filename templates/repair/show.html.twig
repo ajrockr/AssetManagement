@@ -1,0 +1,64 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Repairs{% endblock %}
+{% block header_breadcrumb %}Repairs{% endblock %}
+{% block header_title %}Repairs{% endblock %}
+{% block body_content %}
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ repair.id }}</td>
+            </tr>
+            <tr>
+                <th>AssetId</th>
+                <td>{{ repair.assetId }}</td>
+            </tr>
+            <tr>
+                <th>CreatedDate</th>
+                <td>{{ repair.createdDate ? repair.createdDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>StartedDate</th>
+                <td>{{ repair.startedDate ? repair.startedDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ResolvedDate</th>
+                <td>{{ repair.resolvedDate ? repair.resolvedDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>TechnicianId</th>
+                <td>{{ repair.technicianId }}</td>
+            </tr>
+            <tr>
+                <th>Issue</th>
+                <td>{{ repair.issue }}</td>
+            </tr>
+            <tr>
+                <th>PartsNeeded</th>
+                <td>{{ repair.partsNeeded ? repair.partsNeeded|join(', ') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ActionsPerformed</th>
+                <td>{{ repair.actionsPerformed ? repair.actionsPerformed|join(', ') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ repair.status }}</td>
+            </tr>
+            <tr>
+                <th>LastModifiedDate</th>
+                <td>{{ repair.lastModifiedDate ? repair.lastModifiedDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UsersFollowing</th>
+                <td>{{ repair.usersFollowing ? repair.usersFollowing|join(', ') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_repair_index') }}">back to list</a>
+
+    <a href="{{ path('app_repair_edit', {'id': repair.id}) }}">edit</a>
+
+{% endblock %}
+{% block optional_javascript %}{% endblock %}

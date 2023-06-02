@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -48,6 +49,12 @@ class AssetCollectionType extends AbstractType
             ])
             ->add('userId', HiddenType::class)
             ->add('assetId', HiddenType::class)
+            ->add('needsrepair', CheckboxType::class, [
+                'required' => false,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ],
+            ])
             ->add('location', TextType::class, [
                 'attr' => [
                     'class' => 'form-control'

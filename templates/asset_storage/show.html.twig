@@ -32,6 +32,13 @@
                         <div class="row">Assigned User: <span id="assignedUser">{{ form_widget(form.user) }}</span></div>
                         <div class="row">Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span></div>
                         <div class="row">Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span></div>
+                        <div class="row">
+                            <div class="btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-secondary">
+                                 {{ form_widget(form.needsrepair) }} Needs Repair
+                                </label>
+                            </div>
+                        </div>
                         {{ form_widget(form.userId) }}
                         {{ form_widget(form.assetId) }}
                     </div>

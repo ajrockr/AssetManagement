@@ -191,6 +191,11 @@ class AppFixtures extends Fixture
                 'value' => 'ROLE_ASSET_FULL_CONTROL',
                 'description' => 'Has full control over asset data.'
             ],
+            [
+                'name' => 'Repair Technician',
+                'value' => 'ROLE_REPAIR_TECHNICIAN',
+                'description' => 'User can perform repairs on assets.'
+            ]
         ];
 
         foreach ($userRoles as $role) {

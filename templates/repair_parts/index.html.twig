@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RepairParts index{% endblock %}
+
+{% block body %}
+    <h1>RepairParts index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Cost</th>
+                <th>Vendor</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for repair_part in repair_parts %}
+            <tr>
+                <td>{{ repair_part.id }}</td>
+                <td>{{ repair_part.name }}</td>
+                <td>{{ repair_part.description }}</td>
+                <td>{{ repair_part.cost }}</td>
+                <td>{{ repair_part.vendor }}</td>
+                <td>
+                    <a href="{{ path('app_repair_parts_show', {'id': repair_part.id}) }}">show</a>
+                    <a href="{{ path('app_repair_parts_edit', {'id': repair_part.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_repair_parts_new') }}">Create new</a>
+{% endblock %}

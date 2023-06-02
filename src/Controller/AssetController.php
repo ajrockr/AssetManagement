@@ -9,6 +9,7 @@ use App\Form\AssetType;
 use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
+use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -238,7 +239,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, $form): Response
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form): Response
     {
         // Set up what is needed to render the page
         $users = $userRepository->findAll();
@@ -290,7 +291,11 @@ class AssetController extends AbstractController
                 ->setCheckedout(false)
                 ->setCollectionNotes($data['notes']);
 
-            $assetCollectionRepository->save($check, true);
+            try {
+                $assetCollectionRepository->save($check, true);
+            } catch(\Exception $e) {
+                $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
+            }
         } else {
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
             $assetCollection->setCollectedBy($loggedInUserId);
@@ -300,7 +305,11 @@ class AssetController extends AbstractController
             $assetCollection->setCheckedout(false);
             $assetCollection->setCollectionNotes($data['notes']);
 
-            $assetCollectionRepository->save($assetCollection, true);
+            try {
+                $assetCollectionRepository->save($assetCollection, true);
+            } catch(\Exception $e) {
+                $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
+            }
         }
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,
@@ -308,15 +317,26 @@ class AssetController extends AbstractController
         $asset = $assetRepository->findOneBy(['id' => $deviceId]);
         if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
             $asset->setAssignedTo($data['user']);
-            $assetRepository->save($asset, true);
+
+            try {
+                $assetRepository->save($asset, true);
+            } catch(\Exception $e) {
+                $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
+            }
         }
 
-        return $this->redirect($request->headers->get('referer'));
+        // Check if Repair is needed
+        if ($data['needsrepair']) {
+            $repairData = [
+                'asset' => $data['device'],
+                'issue' => $data['notes'] ?? 'Issue not listed',
+                'assetId' => $deviceId
+            ];
+            $repairController->createRepair($assetRepository, $repairRepository, $repairData);
+        }
 
-//        return $this->render('asset/_checkin_form.html.twig', [
-//            'form' => $form,
-//            'users' => $users
-//        ]);
+        $this->addFlash('success', 'Asset ('.$data['device'].') assigned to slot ('.$data['location'].')');
+        return $this->redirect($request->headers->get('referer'));
     }
 
     // TODO: Idea is to take the data from AssetStorage::storageData and render it in a human readable view
