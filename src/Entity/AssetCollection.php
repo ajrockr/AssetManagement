@@ -34,6 +34,9 @@ class AssetCollection
     #[ORM\Column]
     private ?bool $checkedout = null;
 
+    #[ORM\Column]
+    private ?bool $processed = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +122,18 @@ class AssetCollection
     public function setCheckedout(bool $checkedout): self
     {
         $this->checkedout = $checkedout;
+
+        return $this;
+    }
+
+    public function isProcessed(): ?bool
+    {
+        return $this->processed;
+    }
+
+    public function setProcessed(bool $processed): self
+    {
+        $this->processed = $processed;
 
         return $this;
     }

@@ -23,7 +23,8 @@
             slot: collectedAsset.slot,
             asset: collectedAsset.asset,
             note: collectedAsset.note,
-            checkedOut: collectedAsset.checkedOut
+            checkedOut: collectedAsset.checkedOut,
+            processed: collectedAsset.processed
         }]) %}
     {% endfor %}
     <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
@@ -57,6 +58,11 @@
                                 <div class="btn-group-toggle" data-toggle="buttons">
                                     <label class="btn btn-secondary">
                                      {{ form_widget(form.checkout) }} Check Out
+                                    </label>
+                                </div>
+                                <div class="btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary">
+                                     {{ form_widget(form.processed) }} Processed
                                     </label>
                                 </div>
                             </div>
@@ -131,6 +137,10 @@
                             $("#asset_collection_checkout").attr('checked', 'checked');
                             $(this).addClass('cellCheckedOut')
                         }
+                        if (assignedSlotsInfo[i]['processed']) {
+                            $("#asset_collection_processed").attr('checked', 'checked');
+                            $(this).addClass('cellProcessed')
+                        }
                     }
                 }
                 $(this).children('a').each(function() {
@@ -141,6 +151,7 @@
                             $(this).attr('data-user', assignedSlotsInfo[i]['user']);
                             $(this).attr('data-note', assignedSlotsInfo[i]['note']);
                             $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
+                            $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
                         }
                     }
                 })

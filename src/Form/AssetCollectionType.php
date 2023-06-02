@@ -77,6 +77,12 @@ class AssetCollectionType extends AbstractType
                     'autocomplete' => 'off'
                 ],
             ])
+            ->add('processed', CheckboxType::class, [
+                'required' => false,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ],
+            ])
         ;
     }
 

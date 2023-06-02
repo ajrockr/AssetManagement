@@ -286,6 +286,7 @@ class AssetController extends AbstractController
                 ->setDeviceID($deviceId)
                 ->setCollectedFrom($data['user'])
                 ->setCheckedout($data['checkout'])
+                ->setProcessed($data['processed'])
                 ->setCollectionNotes($data['notes']);
             $action = 'update';
         } else {
@@ -295,6 +296,8 @@ class AssetController extends AbstractController
                 ->setCollectionLocation($data['location'])
                 ->setDeviceID($deviceId)
                 ->setCollectedFrom($data['user'])
+                ->setCheckedout($data['checkout'])
+                ->setProcessed($data['processed'])
                 ->setCollectionNotes($data['notes']);
             $action = 'create';
         }

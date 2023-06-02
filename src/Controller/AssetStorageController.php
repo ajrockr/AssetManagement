@@ -63,7 +63,8 @@ class AssetStorageController extends AbstractController
                     : $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getSerialnumber(),
                 'user' => $userRepository->findOneBy(['id' => $asset->getCollectedFrom()])->getId(),
                 'note' => $asset->getCollectionNotes(),
-                'checkedOut' => $asset->isCheckedout()
+                'checkedOut' => $asset->isCheckedout(),
+                'processed' => $asset->isProcessed()
             ];
         }
 
