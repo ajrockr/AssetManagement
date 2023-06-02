@@ -11,14 +11,16 @@
                     <thead>
                     <tr>
                         <th class="all">Storage</th>
-                        <th class="all">Count</th>
+                        <th class="all">Collected</th>
+                        <th class="all">Total</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for key, value in reportData %}
                         <tr>
                             <td class="text-center">{{ key }}</td>
-                            <td class="text-center">{{ value }}</td>
+                            <td class="text-center">{{ value.collected }}</td>
+                            <td class="text-center">{{ value.total }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -51,7 +53,7 @@
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
-                    {orderable: false, targets: 1}
+                    {orderable: false, targets: 2}
                 ],
                 "info": true,
                 "autoWidth": true,

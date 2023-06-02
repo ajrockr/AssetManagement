@@ -100,15 +100,23 @@ class ReportController extends AbstractController
     }
 
     #[Route('/assetsperstorage', name: 'app_report_assetsperstorage')]
-    public function assetsPerStorage(Request $request, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository): Response
+    public function assetsPerStorage(AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, ?int $storageId = null): array|Response
     {
-        $assetStorages = $assetStorageRepository->findAll();
+        $assetStorages = (null === $storageId) ? $assetStorageRepository->findAll() : $assetStorageRepository->findOneBy(['id' => $storageId]);
         $collectedAssets = $assetCollectionRepository->findAll();
 
-        foreach ($assetStorages as $assetStorage) {
+        $storages = [];
+        if (gettype($assetStorages) == 'arra') {
+            foreach ($assetStorages as $assetStorage) {
+                $storages[] = [
+                    'name' => $assetStorage->getName(),
+                    'data' => $assetStorage->getStorageData()
+                ];
+            }
+        } else {
             $storages[] = [
-                'name' => $assetStorage->getName(),
-                'data' => $assetStorage->getStorageData()
+                'name' => $assetStorages->getName(),
+                'data' => $assetStorages->getStorageData()
             ];
         }
 
@@ -117,12 +125,20 @@ class ReportController extends AbstractController
         foreach($storages as $storage) {
             foreach($collectedAssets as $collectedAsset) {
                 $index = $this->array_compound_key_alias($storage);
+                $storageDataCount = count($index) - 1;
 
                 if (in_array($collectedAsset->getCollectionLocation(), $index)) {
-                    $reportArray[$storage['name']] = $count++;
+                    $reportArray[$storage['name']] = [
+                        'collected' => $count++,
+                        'total' => $storageDataCount
+                    ];
                 }
             }
             $count = 1;
+        }
+
+        if (!is_null($storageId)) {
+            return $reportArray;
         }
 
         return $this->render('report/collectedassetsperstorage.html.twig', [

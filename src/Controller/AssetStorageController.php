@@ -47,11 +47,13 @@ class AssetStorageController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_asset_storage_show')]
-    public function show(Request $request, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
+    public function show(Request $request, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
     {
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
-        $assetCollection = $assetCollectionRepository->findBy(['checkedout' => false]);
+        $assetCollection = $assetCollectionRepository->findAll();
         $storage = $this->renderStorageView($assetStorageRepository->findOneBy(['id' => $id])->getStorageData());
+        $storageCounts = $reportController->assetsPerStorage($assetStorageRepository, $assetCollectionRepository, $id);
+
         $collectedAssets = [];
         foreach ($assetCollection as $asset) {
             $collectedAssets[] = [
@@ -74,8 +76,9 @@ class AssetStorageController extends AbstractController
         }
 
         return $this->render('asset_storage/show.html.twig', [
-            'asset_storage' => $assetStorage,
-            'storage_render' => $storage,
+            'assetStorage' => $assetStorage,
+            'storageCounts' => $storageCounts,
+            'storageRender' => $storage,
             'form' => $form,
             'collectedAssets' => $collectedAssets
         ]);

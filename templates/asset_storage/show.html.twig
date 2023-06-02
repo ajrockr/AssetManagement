@@ -1,10 +1,19 @@
 {% extends 'layout.html.twig' %}
 {% block title %}Storage{% endblock %}
 {% block header_breadcrumb %}Storage{% endblock %}
-{% block header_title %}Storage {{ asset_storage.name }} ({{ asset_storage.description }}){% endblock %}
+{% block header_title %}Storage {{ assetStorage.name }} ({{ assetStorage.description }}){% endblock %}
 {% block body_content %}
-    <h4>Located at: {{ asset_storage.location }}</h4>
-    {{ storage_render|raw }}
+    <h4>Located at: {{ assetStorage.location }}</h4>
+    <div class="row">
+        {{ storageRender|raw }}
+    </div>
+    <div class="container-fluid">
+        <p class="text-right">
+            {% for counts in storageCounts %}
+                 <strong>{{ counts.collected }}</strong> / {{ counts.total }}
+            {% endfor %}
+        </p>
+    </div>
     {% set assignedSlots = [] %}
     {% set assignedSlotsInfo = [] %}
     {% for collectedAsset in collectedAssets %}
