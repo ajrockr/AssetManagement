@@ -29,7 +29,7 @@
                     </div>
                     <div class="modal-body pl-2">
                         <div class="row">Asset: <span id="asset">{{ form_widget(form.device) }}</span></div>
-                        <div class="row">Assigned User: <span id="assignedUser">{{ form_widget(form.user) }}</span></div>
+                        <div class="row">Assigned User: <span id="assignedUser">{{ form_widget(form.user, { 'attr': {'style': 'width:260px'}}) }}</span></div>
                         <div class="row">Collection Location: <span id="assetCollectionLocation">{{ form_widget(form.location) }}</span></div>
                         <div class="row">Note: <span id="assetCollectionNotes">{{ form_widget(form.notes) }}</span></div>
                         <div class="row">
