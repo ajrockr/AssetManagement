@@ -152,7 +152,7 @@ class AssetController extends AbstractController
     #[Route('/checkin', name: 'app_asset_checkin')]
     public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
-//        dd($assetCollectionRepository->findOneBy(['collectionLocation' => '1002']) && $assetStorageRepository->storageDataExists('1003'));
+        // TODO: Fix form submit, forward to checkin, check unique identifier
         // Set up what is needed to render the page
         $users = $userRepository->findAll();
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
@@ -169,22 +169,22 @@ class AssetController extends AbstractController
             ]);
         }
 
+        foreach ($assetCollectionRepository->findAll() as $collectedAsset) {
+            $collectedAssets[] = $collectedAsset->getDeviceID();
+        }
+
         foreach ($assets as $asset) {
-            if (null != $existingCheckin = $assetCollectionRepository->findOneBy(['DeviceID' => $asset->getId()])) {
-                if (false === $existingCheckin->isCheckedout()) {
-                        continue;
-                    }
+            if (!in_array($asset->getId(), $collectedAssets)) {
+                $user = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
+                // Not collected
+                $returnAssetsArr[] = [
+                    'id' => $asset->getId(),
+                    'assettag' => $asset->getAssettag(),
+                    'serialnumber' => $asset->getSerialnumber(),
+                    'assignedTo' => (null === $user) ? null : $user->getSurname() . ', ' . $user->getFirstname(),
+                    'assignedToId' => $asset->getAssignedTo()
+                ];
             }
-
-            $assignedUser = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
-
-            $returnAssetsArr[] = [
-                'id' => $asset->getId(),
-                'assignedUserId' => $asset->getAssignedTo(),
-                'uniqueIdentifier' => ('assettag' == $assetUniqueIdentifier) ? $asset->getAssettag() : $asset->getSerialnumber(),
-                'assignedUsersName' => (null === $assignedUser) ? null : $assignedUser->getSurname() . ', ' . $assignedUser->getFirstname() . ' (' . $assignedUser->getTitle() . ')',
-                'assignedUserId' => (null === $assignedUser) ?: $assignedUser->getId()
-            ];
         }
 
         $form->handleRequest($request);
