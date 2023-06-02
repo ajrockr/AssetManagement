@@ -106,7 +106,7 @@ class ReportController extends AbstractController
         $collectedAssets = $assetCollectionRepository->findAll();
 
         $storages = [];
-        if (gettype($assetStorages) == 'arra') {
+        if (gettype($assetStorages) == 'array') {
             foreach ($assetStorages as $assetStorage) {
                 $storages[] = [
                     'name' => $assetStorage->getName(),
