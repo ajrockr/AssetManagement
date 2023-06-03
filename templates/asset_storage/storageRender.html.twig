@@ -1,12 +1,16 @@
-{{ storage|raw }}
-{# View Asset Modal #}
-<div class="modal fade" id="modal-checkin">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-body">
-
+{{ storage }}
+<div class="row" id="storageContainer">
+    {% for side in storage %}
+        <div class="col" id="storageContainerCol">
+            {% for row in side %}
+            <div id="row" class="row align-items-center no-gutters">
+                {% for id, slot in row %}
+                    <div class="col p-1" id="slot-{{ slot }}">
+                        <a href="#" class="slot btn"></a>
+                    </div>
+                {% endfor %}
             </div>
+            {% endfor %}
         </div>
-    </div>
+    {% endfor %}
 </div>
-{# ./viewAssetModal #}

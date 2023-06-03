@@ -156,7 +156,7 @@ class AssetStorageController extends AbstractController
                 $html .= '<div id="row" class="row align-items-center no-gutters">';
 
                 foreach ($row as $id=>$slot) {
-                    $html .= '<div id="slot-'.$slot.'" class="col p-1"><a href="#" data-slot="'.$slot.'" data-bs-toggle="modal" data-bs-target="#modal-checkin">'.$slot.'</a></div>';
+                    $html .= '<div id="slot-'.$slot.'" class="col ml-1 mb-3"><a style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" href="#" data-slot="'.$slot.'" data-bs-toggle="modal" data-bs-target="#modal-checkin"><span class="fs-6">' . $slot . '</span></a></div>';
                 }
 
                 $html .= '</div>';
