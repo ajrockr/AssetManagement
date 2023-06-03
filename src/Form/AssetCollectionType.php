@@ -66,11 +66,7 @@ class AssetCollectionType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('Collect', SubmitType::class, [
-                'attr' => [
-                    'class' => 'btn btn-primary'
-                ]
-            ])
+            ->add('Collect', SubmitType::class)
             ->add('checkout', CheckboxType::class, [
                 'required' => false,
                 'attr' => [

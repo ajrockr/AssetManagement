@@ -23,9 +23,13 @@
 
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
-    <script src="{{ asset('bundles/adminlte/plugins/jquery/jquery.min.js') }}"></script>
+    {% block jquery_js %}
+        <script src="{{ asset('bundles/adminlte/plugins/jquery/jquery.min.js') }}"></script>
+    {% endblock %}
     <!-- Bootstrap -->
-    <script src="{{ asset('bundles/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {% block bootstrap_js %}
+        <script src="{{ asset('bundles/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {% endblock %}
     <!-- AdminLTE -->
     <script src="{{ asset('bundles/adminlte/js/adminlte.js') }}"></script>
     <!-- Toaster -->
