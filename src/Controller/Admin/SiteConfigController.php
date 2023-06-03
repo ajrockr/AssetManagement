@@ -54,6 +54,8 @@ class SiteConfigController extends AbstractController
             $this->updateConfigItem($entityManager, 'asset_unique_identifier', $data['setDeviceUniqueId']);
             $this->updateConfigItem($entityManager, 'asset_assignUser_on_checkin', $data['setAssignUserOnCheckIn']);
             $this->updateConfigItem($entityManager, 'collection_color_cell_occupied', $data['setCollectionCelColorOccupied']);
+            $this->updateConfigItem($entityManager, 'collection_color_cell_checkedout', $data['setCollectionCelColorCheckedOut']);
+            $this->updateConfigItem($entityManager, 'collection_color_cell_processed', $data['setCollectionCelColorProcessed']);
         }
 
         return $this->render('admin/site_config/index.html.twig', [

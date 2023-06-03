@@ -118,6 +118,12 @@ class AdminSiteConfigType extends AbstractType
             ->add('setCollectionCelColorOccupied', TextType::class, [
                 'data' => $options['data']['collection_color_cell_occupied'],
             ])
+            ->add('setCollectionCelColorCheckedOut', TextType::class, [
+                'data' => $options['data']['collection_color_cell_checkedout'],
+            ])
+            ->add('setCollectionCelColorProcessed', TextType::class, [
+                'data' => $options['data']['collection_color_cell_processed'],
+            ])
             ->add('save', SubmitType::class, [
                 'label' => 'Save Changes',
                 'attr' => ['class' => 'save']
