@@ -254,6 +254,7 @@ class AssetController extends AbstractController
         // TODO: Add the date field to the form
         $date = null;
 
+        $device = null;
         switch ($assetUniqueIdentifier) {
             case 'assettag':
                 $device = $assetRepository->findOneBy(['assettag' => $data['device']]);
@@ -337,6 +338,8 @@ class AssetController extends AbstractController
             $this->addFlash('success', 'Asset (' . $data['device'] . ') assigned to slot (' . $data['location'] . ')');
         } elseif ($action == 'create') {
             $this->addFlash('success', 'Asset (' . $data['device'] . ') has been updated on slot (' . $data['location'] . ')');
+        } else {
+            $this->addFlash('warning', 'Something went wrong, could not update asset (' . $data['device'] . ') in slot ' . $data['location'] . '.');
         }
         return $this->redirect($request->headers->get('referer'));
     }

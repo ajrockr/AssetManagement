@@ -9,6 +9,7 @@ use App\Form\AssetStorageType;
 use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
+use App\Repository\RepairPartsRepository;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,7 +48,7 @@ class AssetStorageController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_asset_storage_show')]
-    public function show(Request $request, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
+    public function show(Request $request, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
     {
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $assetCollection = $assetCollectionRepository->findAll();
@@ -77,6 +78,18 @@ class AssetStorageController extends AbstractController
             ]);
         }
 
+        $repairParts = $repairPartsRepository->findAll();
+        $parts = [];
+        foreach ($repairParts as $repairPart) {
+            if (null === $repairPart) {
+                continue;
+            }
+            $parts[] = [
+                'name' => $repairPart->getName(),
+                'value' => $repairPart->getName()
+            ];
+        }
+
         $colors['cellOccupied'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_occupied'])->getConfigValue();
         $colors['cellCheckedOut'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_checkedout'])->getConfigValue();
         $colors['cellProcessed'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_processed'])->getConfigValue();
@@ -84,6 +97,7 @@ class AssetStorageController extends AbstractController
         return $this->render('asset_storage/show.html.twig', [
             'assetStorage' => $assetStorage,
             'colors' => $colors,
+            'repairParts' => $parts,
             'storageCounts' => $storageCounts,
             'storageRender' => $storage,
             'form' => $form,

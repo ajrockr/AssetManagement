@@ -5,7 +5,6 @@ namespace App\Form;
 use App\Entity\User;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -35,14 +34,12 @@ class AssetCollectionType extends AbstractType
         $builder
             ->add('device', TextType::class, [
                 'attr' => [
-                    'autofocus' => true,
                     'class' => 'form-control',
                 ]
             ])
             ->add('user', ChoiceType::class, [
-                'choices' => [
-                    array_combine(array_values($this->users), array_keys($this->users))
-                ],
+                'choices' => array_combine(array_values($this->users), array_keys($this->users)),
+                'multiple' => false,
                 'attr' => [
                     'class' => 'form-control js-example-basic-single',
                 ]
@@ -66,7 +63,6 @@ class AssetCollectionType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('Collect', SubmitType::class)
             ->add('checkout', CheckboxType::class, [
                 'required' => false,
                 'attr' => [
@@ -79,6 +75,7 @@ class AssetCollectionType extends AbstractType
                     'autocomplete' => 'off'
                 ],
             ])
+            ->add('Collect', SubmitType::class)
         ;
     }
 

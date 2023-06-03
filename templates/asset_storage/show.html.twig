@@ -32,7 +32,7 @@
 
     {# View Asset Modal #}
     <div class="modal fade" tabindex="-1" id="modal-checkin">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
                     {{ form_start(form, { 'attr': { 'class': 'form-floating' } }) }}
@@ -45,7 +45,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group form-floating">
-                                    {{ form_widget(form.device) }}
+                                    {{ form_widget(form.device, { 'attr': { 'tabindex': 1 }}) }}
                                     {{ form_label(form.device, 'Asset') }}
                                 </div>
                             </div>
@@ -58,24 +58,29 @@
                         </div>
                         <div class="form-group">
                             {{ form_label(form.user, 'Collected From') }}
-                            {{ form_widget(form.user, { 'attr': {'style': 'width:260px', 'class': '' }, 'id': 'single-select-field'}) }}
+                            {{ form_widget(form.user, { 'attr': {'style': 'width:260px', 'tabindex': 2 }}) }}
                         </div>
                         <div class="input-group">
-                            <div class="btn-group-toggle" data-toggle="buttons">
-                                {{ form_widget(form.needsrepair, { 'attr': { 'class': 'btn-check'} }) }}
-                                <label for="asset_collection_needsrepair" class="btn btn-outline-secondary">Needs Repair</label>
-                            </div>
-                            <div class="btn-group-toggle mx-3" data-toggle="buttons">
-                                {{ form_widget(form.checkout, { 'attr': { 'class': 'btn-check'} }) }}
-                                <label for="asset_collection_checkout" class="btn btn-outline-secondary">Check Out</label>
-                            </div>
-                            <div class="btn-group-toggle" data-toggle="buttons">
-                                {{ form_widget(form.processed, { 'attr': { 'class': 'btn-check'} }) }}
-                                <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
-                            </div>
+                            {# Needs Repair #}
+                            {{ form_widget(form.needsrepair, { 'attr': { 'class': 'btn-check'} }) }}
+                            <label for="asset_collection_needsrepair" class="btn btn-outline-secondary">Needs Repair</label>
+                            {# Check Out #}
+                            {{ form_widget(form.checkout, { 'attr': { 'class': 'btn-check'} }) }}
+                            <label for="asset_collection_checkout" class="btn btn-outline-secondary">Check Out</label>
+                            {# Processed #}
+                            {{ form_widget(form.processed, { 'attr': { 'class': 'btn-check'} }) }}
+                            <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
                         </div>
-                        <div class="form-group form-floating mt-3">
-                            {{ form_widget(form.notes, { 'placeholder': 'Leave notes here', 'attr': { 'rows': 4 } }) }}
+                        <div class="input-group my-2" id="partsNeeded">
+                            {% for part in repairParts %}
+                                <div class="form-check form-check-inline">
+                                    <input id="{{ part.name }}" type="checkbox" class="form-check-input" value="{{ part.value }}" name="{{ part.name }}">
+                                    <label for="{{ part.name }}" class="form-check-label">{{ part.name }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="input-group form-floating mt-sm-2">
+                            {{ form_widget(form.notes, { 'placeholder': 'Leave notes here', 'attr': { 'tabindex': 3 } }) }}
                             {{ form_label(form.notes) }}
                         </div>
                         {{ form_widget(form.userId) }}
@@ -83,7 +88,7 @@
                     </div>
                     <div class="modal-footer justify-content-between">
 {#                        <button type="button" class="btn" data-dismiss="modal">Close</button>#}
-                        {{ form_widget(form.Collect, {'label': 'Update', 'attr': { 'class': 'btn btn-primary'}}) }}
+                        {{ form_widget(form.Collect, {'label': 'Update', 'attr': { 'tabindex': 4, 'class': 'btn btn-outline-success'}}) }}
                     </div>
                     {{ form_end(form) }}
                 </div>
@@ -123,71 +128,85 @@
 {% block head_custom_javascript %}
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function() {
-        // Set the checkIn Modal
-        $("#modal-checkin").on("show.bs.modal", function(e) {
-            let storageSlot = $(e.relatedTarget).attr("data-slot");
-            let asset = $(e.relatedTarget).attr("data-asset") ?? '';
-            let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
-            let note = $(e.relatedTarget).attr("data-note") ?? '';
-            console.log(storageSlot);
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Parts needed hide/show
+            let partsNeededDiv = $("#partsNeeded")
+            let partsNeededTrigger = $("#asset_collection_needsrepair");
 
-            document.getElementById("asset_collection_device").setAttribute("value", asset);
-            document.getElementById("asset_collection_notes").innerText = note;
-            $("#asset_collection_user").val(assignedUserId).trigger("change");
-            document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
-            document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
-        });
+            partsNeededDiv.hide();
 
-        $("#modal-checkin").on("hide.bs.modal", function(e) {
-            document.getElementById("asset_collection_userId").removeAttribute("value");
-        });
-
-        // Start select2
-        $("#single-select-field").select2({
-            placeholder: 'Select a user',
-            width: 'resolve',
-            theme: 'bootstrap-5',
-            // selectionCssClass: "select2--small",
-            // dropdownCssClass: "select2--small"
-        });
-
-        // Populate cells that are assigned
-        const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
-        const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
-
-        $("div[id='row']").children('.col').each(function() {
-            if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
-                $(this).addClass('cellOccupied');
-                var i;
-                for (i = 0; i < assignedSlotsInfo.length; ++i) {
-                    if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
-                        if (assignedSlotsInfo[i]['checkedOut']) {
-                            $("#asset_collection_checkout").attr('checked', 'checked');
-                            $(this).addClass('cellCheckedOut')
-                        }
-                        if (assignedSlotsInfo[i]['processed']) {
-                            $("#asset_collection_processed").attr('checked', 'checked');
-                            $(this).addClass('cellProcessed')
-                        }
-                    }
+            partsNeededTrigger.on("click", function() {
+                if ($(this).is(':checked')) {
+                    partsNeededDiv.show();
+                } else {
+                    partsNeededDiv.hide();
                 }
-                $(this).children('a').each(function() {
-                    // $(this).parent().addClass('cellProcessed');
+            });
+
+            // Set the checkIn Modal
+            $("#modal-checkin").on("show.bs.modal", function(e) {
+                let storageSlot = $(e.relatedTarget).attr("data-slot");
+                let asset = $(e.relatedTarget).attr("data-asset") ?? '';
+                let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
+                let note = $(e.relatedTarget).attr("data-note") ?? '';
+
+                setTimeout(function() {
+                    $("#asset_collection_device").focus();
+                }, 600);
+
+                document.getElementById("asset_collection_device").setAttribute("value", asset);
+                document.getElementById("asset_collection_notes").innerText = note;
+                $("#asset_collection_user").val(assignedUserId).trigger("change");
+                document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
+                document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
+            });
+
+            $("#modal-checkin").on("hide.bs.modal", function(e) {
+                document.getElementById("asset_collection_userId").removeAttribute("value");
+            });
+
+            // Start select2
+            $("#asset_collection_user").select2({
+                placeholder: 'Select a user',
+                width: 'resolve',
+                theme: 'bootstrap-5',
+            });
+
+            // Populate cells that are assigned
+            const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
+            const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
+
+            $("div[id='row']").children('.col').each(function() {
+                if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
+                    $(this).addClass('cellOccupied');
+                    var i;
                     for (i = 0; i < assignedSlotsInfo.length; ++i) {
-                        if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
-                            $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
-                            $(this).attr('data-user', assignedSlotsInfo[i]['user']);
-                            $(this).attr('data-note', assignedSlotsInfo[i]['note']);
-                            $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
-                            $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
+                        if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
+                            if (assignedSlotsInfo[i]['checkedOut']) {
+                                $("#asset_collection_checkout").attr('checked', 'checked');
+                                $(this).addClass('cellCheckedOut')
+                            }
+                            if (assignedSlotsInfo[i]['processed']) {
+                                $("#asset_collection_processed").attr('checked', 'checked');
+                                $(this).addClass('cellProcessed')
+                            }
                         }
                     }
-                })
-            }
+                    $(this).children('a').each(function() {
+                        for (i = 0; i < assignedSlotsInfo.length; ++i) {
+                            if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
+                                $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
+                                $(this).attr('data-user', assignedSlotsInfo[i]['user']);
+                                $(this).attr('data-note', assignedSlotsInfo[i]['note']);
+                                $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
+                                $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
+                            }
+                        }
+                    })
+                }
+            });
         });
-    });
-</script>
+    </script>
 {% endblock %}
 {% block optional_javascript %}{% endblock %}
