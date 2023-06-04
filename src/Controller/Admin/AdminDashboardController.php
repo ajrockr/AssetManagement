@@ -2,8 +2,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Asset;
+use App\Entity\AssetCollection;
 use App\Entity\User;
-use App\Entity\SiteView;
 use App\Entity\UserRoles;
 use App\Entity\SiteConfig;
 use App\Entity\AlertMessage;
@@ -32,17 +33,16 @@ class AdminDashboardController extends AbstractDashboardController
         $userCount = $this->entityManager->getRepository(User::class)->getUserCount();
 
         // @todo This is a very basic subscriber counting user hits. Production should probably be a little more robust
-        $visitorCount = $this->entityManager->getRepository(SiteView::class)->getCount();
+        $assetCount = count($this->entityManager->getRepository(Asset::class)->findAll());
 
-        $lastCreatedUser = $this->entityManager->getRepository(User::class)->getLastCreatedUser();
-        $lastCreatedUser = $lastCreatedUser['firstname'] . ' ' . $lastCreatedUser['surname'];
+        $assetsCollectedCount = count($this->entityManager->getRepository(AssetCollection::class)->findAll());
 
         $pendingUsers = count($this->entityManager->getRepository(User::class)->findBy(['pending' => true]));
 
         return $this->render('admin/index.html.twig', [
             'userCount' => $userCount,
-            'visitorCount' => $visitorCount,
-            'lastCreatedUser' => $lastCreatedUser,
+            'assetCount' => $assetCount,
+            'assetsCollectedCount' => $assetsCollectedCount,
             'pendingUserCount' => $pendingUsers
         ]);
     }
@@ -65,7 +65,7 @@ class AdminDashboardController extends AbstractDashboardController
     {
         return [
 
-            MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
+            MenuItem::linkToRoute('Back to site', 'fa fa-house', 'app_home'),
 
             MenuItem::section('Site'),
             MenuItem::linkToRoute('Configuration', 'fa fa-gear', 'app_admin_site_config'),
