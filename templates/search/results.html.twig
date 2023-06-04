@@ -2,6 +2,16 @@
 {% block header_title %}Search Results{% endblock %}
 {% block header_breadcrumb %}Search{% endblock %}
 {% block body_content %}
+    {% for result in searchResults %}
+        <div class="card">
+            <div class="card-body">
+                {% for key, value in result %}
+                    {{ key }}: {{ value|join(', ') }}<br />
 
+
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
 {% block optional_javascript %}{% endblock %}

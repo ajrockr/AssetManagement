@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Repository\AssetCollectionRepository;
-use App\Repository\AssetRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use function Doctrine\ORM\QueryBuilder;
@@ -18,7 +18,6 @@ class SearchController extends AbstractController
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly AssetRepository $assetRepository,
         private readonly AssetCollectionRepository $assetCollectionRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {}
@@ -26,55 +25,61 @@ class SearchController extends AbstractController
     public function index(Request $request): Response
     {
         $searchQuery = $request->query->get('query');
-        dd($this->searchForAsset($searchQuery));
 
-        return $this->render('search/results.html.twig');
+        $searchResults = array_merge($this->searchForCollectedAsset($searchQuery),
+            $this->searchForUser($searchQuery));
+
+        return $this->render('search/results.html.twig', [
+            'searchResults' => $searchResults
+        ]);
     }
 
-    private function searchForAsset(string $query)
+    /**
+     * @throws \Exception
+     */
+    private function searchForAsset(string $query): array
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $results = $queryBuilder->select('a')
             ->from('App\Entity\Asset', 'a')
-            ->where($queryBuilder->expr()->like('a.assettag', ':assettag'))
-            ->orWhere($queryBuilder->expr()->like('a.serialnumber', ':serialnumber'))
-            ->setParameter('assettag', $query)
-            ->setParameter('serialnumber', $query)
+            ->where($queryBuilder->expr()->like('a.assettag', ':query'))
+            ->orWhere($queryBuilder->expr()->like('a.serialnumber', ':query'))
+            ->setParameter('query', '%' . $query . '%')
             ->getQuery()
             ->getResult();
 
         $returnArray = [];
-        $userInfo = [];
         $serializer = new Serializer([new ObjectNormalizer()]);
         foreach ($results as $result) {
             if (null !== $result->getAssignedTo()) {
                 $user = $this->userRepository->findOneBy(['id' => $result->getAssignedTo()]);
                 $userInfo = [
-                    'assignedUsername' => $user->getUsername(),
-                    'assignedUserFirstname' => $user->getFirstname(),
-                    'assignedUserSurname' => $user->getSurname()
+                    'assignedToUsername' => $user->getUsername(),
+                    'assignedToUserFirstname' => $user->getFirstname(),
+                    'assignedToUserSurname' => $user->getSurname()
                 ];
+            } else {
+                $userInfo = [];
             }
 
-            $returnArray = $serializer->normalize($result);
-            $returnArray = array_merge($returnArray, $userInfo);
+            try {
+                $returnArray[] = array_merge($serializer->normalize($result), $userInfo);
+            } catch (ExceptionInterface $e) {
+                throw new \Exception($e->getMessage());
+            }
 
-//            $returnArray[] = [
-//                'serialnumber' => $result->getSerialnumber(),
-//                'assettag' => $result->getAssettag(),
-//                'purchasedate' => $result->getPurchasedate(),
-//                'purchasedfrom' => $result->getPurchasedfrom(),
-//                'warrantystartdate' => $result->getWarrantystartdate(),
-//                'warrantyenddate' => $result->getWarrantyenddate()
-//            ];
         }
-            return $returnArray;
+
+        return $returnArray;
     }
 
-    private function searchForUser(EntityManagerInterface $entityManager, mixed $query)
+    /**
+     * @throws \Exception
+     */
+    private function searchForUser(mixed $query)
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        return $queryBuilder->select('u')
+        $result = $queryBuilder->select('u')
             ->from('App\Entity\User', 'u')
             ->where('u.id = :query')
             ->orWhere($queryBuilder->expr()->like('u.userUniqueId', ':query'))
@@ -87,5 +92,26 @@ class SearchController extends AbstractController
             ->setParameter('query', '%' . $query . '%')
             ->getQuery()
             ->getResult();
+
+        $serializer = new Serializer([new ObjectNormalizer()]);
+
+        try {
+            return $serializer->normalize($result);
+        } catch (ExceptionInterface $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    private function searchForCollectedAsset(string $query): array
+    {
+        $assetSearch = $this->searchForAsset($query);
+        for ($i=0;$i<count($assetSearch);$i++) {
+            $assetCollected = $this->assetCollectionRepository->findOneBy(['DeviceID' => $assetSearch[$i]['id']]);
+            if (null !== $assetCollected) {
+                $assetSearch[$i]['collectedStorageSlot'] = $assetCollected->getCollectionLocation();
+            }
+        }
+
+        return $assetSearch;
     }
 }
