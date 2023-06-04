@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="{{ absolute_url(asset('bundles/adminlte/plugins/fontawesome-free/css/all.min.css')) }}">
     <!-- Toastr -->
     <link rel="stylesheet" href="{{ asset('bundles/adminlte/plugins/toastr/toastr.min.css') }}">
+    {% block head_custom_css %}{% endblock %}
 
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
@@ -58,7 +59,6 @@
     </script>
     {% include('flash_messages.html.twig') %}
 
-    {% block head_custom_css %}{% endblock %}
     {% block head_custom_javascript %}{% endblock %}
 </head>
 <body class="hold-transition sidebar-mini">

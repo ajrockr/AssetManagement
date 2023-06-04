@@ -4,12 +4,23 @@
 {% block body_content %}
     {% for result in searchResults %}
         <div class="card">
-            <div class="card-body">
-                {% for key, value in result %}
-                    {{ key }}: {{ value|join(', ') }}<br />
-
-
-                {% endfor %}
+            <h5 class="card-header">
+                    <a href="javascript:void(0);" data-target="#card-result-{{ loop.index }}" data-toggle="collapse" class="d-block">
+                        <i class="fa fa-chevron-down pull-right float-right"></i>
+                        {{ loop.index }}
+                    </a>
+            </h5>
+            <div class="collapse show" id="card-result-{{ loop.index }}">
+                <div class="card-body" style="background-color:#fcfcfc;">
+                    {% for key, value in result %}
+                        <div class="row">
+                            <div class="col">{{ key|capitalize }}</div>
+                            <div class="col float-right text-end">
+                                <strong>{{ value|join(', ') ?: '<div class="badge badge-pill badge-secondary">Empty</div>' }}</strong>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     {% endfor %}

@@ -79,7 +79,7 @@ class SearchController extends AbstractController
     private function searchForUser(mixed $query)
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        $result = $queryBuilder->select('u')
+        $result = $queryBuilder->select('u.username', 'u.email', 'u.firstname', 'u.surname', 'u.userUniqueId', 'u.roles', 'u.title', 'u.department')
             ->from('App\Entity\User', 'u')
             ->where('u.id = :query')
             ->orWhere($queryBuilder->expr()->like('u.userUniqueId', ':query'))
