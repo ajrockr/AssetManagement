@@ -24,7 +24,8 @@
             asset: collectedAsset.asset,
             note: collectedAsset.note,
             checkedOut: collectedAsset.checkedOut,
-            processed: collectedAsset.processed
+            processed: collectedAsset.processed,
+            usersName: collectedAsset.usersName
         }]) %}
     {% endfor %}
     <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
@@ -42,21 +43,21 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body pl-2">
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col">
-                                <div class="form-group form-floating">
+                                <div class="form-floating">
                                     {{ form_widget(form.device, { 'attr': { 'tabindex': 1 }}) }}
                                     {{ form_label(form.device, 'Asset') }}
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="form-group form-floating">
+                                <div class="form-floating">
                                     {{ form_widget(form.location) }}
                                     {{ form_label(form.location, 'Location') }}
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="mb-3">
                             {{ form_label(form.user, 'Collected From') }}
                             {{ form_widget(form.user, { 'attr': {'style': 'width:260px', 'tabindex': 2 }}) }}
                         </div>
@@ -71,7 +72,7 @@
                             {{ form_widget(form.processed, { 'attr': { 'class': 'btn-check'} }) }}
                             <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
                         </div>
-                        <div class="input-group my-2" id="partsNeeded">
+                        <div class="my-2" id="partsNeeded">
                             {% for part in repairParts %}
                                 <div class="form-check form-check-inline">
                                     <input id="{{ part.name }}" type="checkbox" class="form-check-input" value="{{ part.value }}" name="{{ part.name }}">
@@ -79,8 +80,8 @@
                                 </div>
                             {% endfor %}
                         </div>
-                        <div class="input-group form-floating mt-sm-2">
-                            {{ form_widget(form.notes, { 'placeholder': 'Leave notes here', 'attr': { 'tabindex': 3 } }) }}
+                        <div class="form-floating mt-sm-2">
+                            {{ form_widget(form.notes, { 'placeholder': 'Leave notes here', 'attr': { 'tabindex': 3, 'rows': 3, 'style': 'height:100%;' } }) }}
                             {{ form_label(form.notes) }}
                         </div>
                         {{ form_widget(form.userId) }}
@@ -99,7 +100,7 @@
 {% endblock %}
 
 {% block head_custom_css %}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{#    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />#}
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
@@ -107,15 +108,39 @@
 
     <style>
         .cellOccupied {
-            background-color: {{ colors.cellOccupied }}
+            background-color: {{ colors.cellOccupied }} !important;
         }
         
         .cellCheckedOut {
-            background-color: {{ colors.cellCheckedOut }}
+            background-color: {{ colors.cellCheckedOut }} !important;
         }
         
         .cellProcessed {
-            background-color: {{ colors.cellProcessed }};
+            background-color: {{ colors.cellProcessed }} !important;
+        }
+
+        .storageSides {
+            padding: 10px;
+            border: 1px #000 solid;
+            border-radius: 5px;
+            background-color: #343a40;
+        }
+
+        .storageSide .storageRow:last-child {
+            margin: 0;
+        }
+
+        /*.storageSides, .storageRows {*/
+        /*    background-color: #999999;*/
+        /*}*/
+
+        .storageCells {
+            background-color: #4e555c;
+            font-size: 0.85rem;
+        }
+
+        .storageCells a {
+            color: #fff;
         }
     </style>
 {% endblock %}
@@ -177,7 +202,7 @@
             const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
             const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
 
-            $("div[id='row']").children('.col').each(function() {
+            $("div[id='storageContainerRow']").children('.col').each(function() {
                 if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
                     $(this).addClass('cellOccupied');
                     var i;
@@ -201,11 +226,16 @@
                                 $(this).attr('data-note', assignedSlotsInfo[i]['note']);
                                 $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
                                 $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
+                                $(this).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
                             }
                         }
                     })
                 }
             });
+
+            // Enable Tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         });
     </script>
 {% endblock %}

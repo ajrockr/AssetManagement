@@ -57,12 +57,14 @@ class AssetStorageController extends AbstractController
 
         $collectedAssets = [];
         foreach ($assetCollection as $asset) {
+            $user = $userRepository->findOneBy(['id' => $asset->getCollectedFrom()]);
             $collectedAssets[] = [
                 'slot' => $asset->getCollectionLocation(),
                 'asset' => ($assetUniqueIdentifier == 'assettag')
                     ? $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getAssettag()
                     : $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getSerialnumber(),
-                'user' => $userRepository->findOneBy(['id' => $asset->getCollectedFrom()])->getId(),
+                'user' => $user->getId(),
+                'usersName' => $user->getSurname() . ', ' . $user->getFirstname(),
                 'note' => $asset->getCollectionNotes(),
                 'checkedOut' => $asset->isCheckedout(),
                 'processed' => $asset->isProcessed()
@@ -142,21 +144,28 @@ class AssetStorageController extends AbstractController
     public function renderStorageView(?array $storageData): string
     {
         // TODO: Create this HTML in the twig file
-        if (null === $storageData) {
-            $this->render('asset_storage/storageRender.html.twig', [
-                'storage' => ''
-            ]);
-        }
+//        if (null === $storageData) {
+//            $this->render('asset_storage/storageRender.html.twig', [
+//                'storage' => ''
+//            ]);
+//        }
 
-        $html = '<div id="storageStart" class="row">';
+        $html = '<div id="storageStart" class="">';
         foreach ($storageData as $side) {
-            $html .= '<div id="side" class="col">';
+            $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
 
             foreach ($side as $row) {
-                $html .= '<div id="row" class="row align-items-center no-gutters">';
+                $html .= '<div id="storageContainerRow" class="row no-gutters storageRows">';
 
                 foreach ($row as $id=>$slot) {
-                    $html .= '<div id="slot-'.$slot.'" class="col ml-1 mb-3"><a style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" href="#" data-slot="'.$slot.'" data-bs-toggle="modal" data-bs-target="#modal-checkin"><span class="fs-6">' . $slot . '</span></a></div>';
+                    $html .= '
+                    <div id="slot-'.$slot.'" class="col-sm p-0 storageCells">
+                        <a href="#" class="text-decoration-none" data-slot="'.$slot.'" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="' . $slot . '">
+                            <span data-bs-toggle="modal" data-bs-target="#modal-checkin" id="slotNumber">
+                                ' . $slot . '
+                            </span>
+                        </a>
+                    </div><div class="col-sm"></div>';
                 }
 
                 $html .= '</div>';

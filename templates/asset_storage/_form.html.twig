@@ -1,4 +1,21 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.name, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.name) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.description, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.description) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.location, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.location) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.storageData, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;' } }) }}
+        {{ form_label(form.storageData) }}
+    </div>
+    <div class="btn-group" role="buttons">
+        <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    </div>
 {{ form_end(form) }}
