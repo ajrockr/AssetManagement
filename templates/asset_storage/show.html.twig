@@ -46,7 +46,7 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <div class="form-floating">
-                                    {{ form_widget(form.device, { 'attr': { 'tabindex': 1 }}) }}
+                                    {{ form_widget(form.device, { 'attr': { 'tabindex': 1, 'placeholder': 'Asset' }}) }}
                                     {{ form_label(form.device, 'Asset') }}
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
                             {% endfor %}
                         </div>
                         <div class="form-floating mt-sm-2">
-                            {{ form_widget(form.notes, { 'placeholder': 'Leave notes here', 'attr': { 'tabindex': 3, 'rows': 3, 'style': 'height:100%;' } }) }}
+                            {{ form_widget(form.notes, { 'attr': { 'tabindex': 3, 'rows': 3, 'style': 'height:100%;', 'placeholder': 'Notes' } }) }}
                             {{ form_label(form.notes) }}
                         </div>
                         {{ form_widget(form.userId) }}

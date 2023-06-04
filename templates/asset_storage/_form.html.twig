@@ -1,18 +1,18 @@
 {{ form_start(form) }}
     <div class="mb-3 form-floating">
-        {{ form_widget(form.name, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_widget(form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Container Name' } }) }}
         {{ form_label(form.name) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.description, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_widget(form.description, { 'attr': {'class': 'form-control', 'placeholder': 'Description' } }) }}
         {{ form_label(form.description) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.location, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_widget(form.location, { 'attr': {'class': 'form-control', 'placeholder': 'Location' } }) }}
         {{ form_label(form.location) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.storageData, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;' } }) }}
+        {{ form_widget(form.storageData, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;', 'placeholder': 'Storage JSON String' } }) }}
         {{ form_label(form.storageData) }}
     </div>
     <div class="btn-group" role="buttons">
