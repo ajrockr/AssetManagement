@@ -150,7 +150,7 @@ class AssetStorageController extends AbstractController
 //            ]);
 //        }
 
-        $html = '<div id="storageStart" class="">';
+        $html = '<div id="storageStart">';
         foreach ($storageData as $side) {
             $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
 
@@ -159,7 +159,7 @@ class AssetStorageController extends AbstractController
 
                 foreach ($row as $id=>$slot) {
                     $html .= '
-                    <div id="slot-'.$slot.'" class="col-sm p-0 storageCells">
+                    <div id="slot-'.$slot.'" class="col-sm p-0 storageCell">
                         <a href="#" class="text-decoration-none" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="' . $slot . '">
                             <span data-bs-toggle="modal" data-bs-target="#modal-checkin" data-slot="'.$slot.'" id="slotNumber">
                                 ' . $slot . '

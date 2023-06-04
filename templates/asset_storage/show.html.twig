@@ -130,16 +130,12 @@
             margin: 0;
         }
 
-        /*.storageSides, .storageRows {*/
-        /*    background-color: #999999;*/
-        /*}*/
-
-        .storageCells {
+        .storageCell {
             background-color: #4e555c;
             font-size: 0.85rem;
         }
 
-        .storageCells a {
+        .storageCell a {
             color: #fff;
         }
     </style>
@@ -207,7 +203,7 @@
             const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
             const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
 
-            $("div[id='storageContainerRow']").children('.col').each(function() {
+            $("div[id='storageContainerRow']").children('.storageCell').each(function() {
                 if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
                     $(this).addClass('cellOccupied');
                     var i;
@@ -223,7 +219,7 @@
                             }
                         }
                     }
-                    $(this).children('a').each(function() {
+                    $(this).children('a').children('span').each(function() {
                         for (i = 0; i < assignedSlotsInfo.length; ++i) {
                             if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
                                 $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
