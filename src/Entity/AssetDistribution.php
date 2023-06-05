@@ -34,6 +34,9 @@ class AssetDistribution
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $location = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +122,18 @@ class AssetDistribution
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?string $location): self
+    {
+        $this->location = $location;
 
         return $this;
     }
