@@ -177,7 +177,7 @@
                 let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
                 let note = $(e.relatedTarget).attr("data-note") ?? '';
                 // let locationEntity = document.getElementById('asset_collection_location');
-                
+
                 setTimeout(function() {
                     $("#asset_collection_device").focus();
                 }, 600);
@@ -220,7 +220,6 @@
                     var i;
                     for (i = 0; i < assignedSlotsInfo.length; ++i) {
                         if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
-                            console.log(assignedSlotsInfo[i]['hasRepair']);
                             if (assignedSlotsInfo[i]['hasRepair']) {
                                 $(this).addClass('cellHasRepair')
                             } else {
