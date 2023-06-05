@@ -10,6 +10,7 @@ use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
 use App\Repository\RepairPartsRepository;
+use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,7 +49,7 @@ class AssetStorageController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_asset_storage_show')]
-    public function show(Request $request, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
+    public function show(Request $request, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
     {
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $assetCollection = $assetCollectionRepository->findAll();
@@ -58,6 +59,7 @@ class AssetStorageController extends AbstractController
         $collectedAssets = [];
         foreach ($assetCollection as $asset) {
             $user = $userRepository->findOneBy(['id' => $asset->getCollectedFrom()]);
+            $hasRepair = $repairRepository->findOneBy(['assetId' => $asset->getDeviceID()]);
             $collectedAssets[] = [
                 'slot' => $asset->getCollectionLocation(),
                 'asset' => ($assetUniqueIdentifier == 'assettag')
@@ -67,7 +69,8 @@ class AssetStorageController extends AbstractController
                 'usersName' => $user->getSurname() . ', ' . $user->getFirstname(),
                 'note' => $asset->getCollectionNotes(),
                 'checkedOut' => $asset->isCheckedout(),
-                'processed' => $asset->isProcessed()
+                'processed' => $asset->isProcessed(),
+                'hasRepair' => !(null === $hasRepair)
             ];
         }
 
@@ -95,6 +98,7 @@ class AssetStorageController extends AbstractController
         $colors['cellOccupied'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_occupied'])->getConfigValue();
         $colors['cellCheckedOut'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_checkedout'])->getConfigValue();
         $colors['cellProcessed'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_processed'])->getConfigValue();
+        $colors['cellHasRepair'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_hasrepair'])->getConfigValue();
 
         return $this->render('asset_storage/show.html.twig', [
             'assetStorage' => $assetStorage,

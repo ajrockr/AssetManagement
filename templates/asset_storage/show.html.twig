@@ -25,7 +25,8 @@
             note: collectedAsset.note,
             checkedOut: collectedAsset.checkedOut,
             processed: collectedAsset.processed,
-            usersName: collectedAsset.usersName
+            usersName: collectedAsset.usersName,
+            hasRepair: collectedAsset.hasRepair
         }]) %}
     {% endfor %}
     <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
@@ -64,7 +65,7 @@
                         <div class="input-group">
                             {# Needs Repair #}
                             {{ form_widget(form.needsrepair, { 'attr': { 'class': 'btn-check'} }) }}
-                            <label for="asset_collection_needsrepair" class="btn btn-outline-secondary">Needs Repair</label>
+                            <label for="asset_collection_needsrepair" class="btn btn-outline-secondary" id="needsRepairLabel">Needs Repair</label>
                             {# Check Out #}
                             {{ form_widget(form.checkout, { 'attr': { 'class': 'btn-check'} }) }}
                             <label for="asset_collection_checkout" class="btn btn-outline-secondary">Check Out</label>
@@ -119,6 +120,10 @@
             background-color: {{ colors.cellProcessed }} !important;
         }
 
+        .cellHasRepair {
+            background-color: {{ colors.cellHasRepair }} !important;
+        }
+
         .storageSides {
             padding: 10px;
             border: 1px #000 solid;
@@ -171,8 +176,8 @@
                 let asset = $(e.relatedTarget).attr("data-asset") ?? '';
                 let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
                 let note = $(e.relatedTarget).attr("data-note") ?? '';
-                let locationEntity = document.getElementById('asset_collection_location');
-
+                // let locationEntity = document.getElementById('asset_collection_location');
+                
                 setTimeout(function() {
                     $("#asset_collection_device").focus();
                 }, 600);
@@ -182,10 +187,12 @@
                 $("#asset_collection_user").val(assignedUserId).trigger("change");
                 document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
                 document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
-                locationEntity.disabled = true;
-                $("asset_collection_location").on('blur', function() {
-                    $("asset_collection_location").prop( "disabled", true);
-                });
+
+                // When disabled, returns NULL post. no good
+                // locationEntity..css('disabled', true);
+                // $("asset_collection_location").on('blur', function() {
+                //     $("asset_collection_location").prop( "disabled", true);
+                // });
             });
 
             $("#modal-checkin").on("hide.bs.modal", function(e) {
@@ -213,6 +220,13 @@
                     var i;
                     for (i = 0; i < assignedSlotsInfo.length; ++i) {
                         if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
+                            console.log(assignedSlotsInfo[i]['hasRepair']);
+                            if (assignedSlotsInfo[i]['hasRepair']) {
+                                $(this).addClass('cellHasRepair')
+                            } else {
+                                $("#needsRepairLabel").text("Needs Repair");
+                                $("#asset_collection_needsrepair").prop('disabled', false);
+                            }
                             if (assignedSlotsInfo[i]['checkedOut']) {
                                 $("#asset_collection_checkout").attr('checked', 'checked');
                                 $(this).addClass('cellCheckedOut')

@@ -127,7 +127,31 @@ class AppFixtures extends Fixture
                 'value' => 'assettag',
                 'description' => 'The unique identifier that is used to identify assets in various pages.',
                 'default_value' => 'assettag'
-            ]
+            ],
+            [
+                'name' => 'collection_color_cell_occupied',
+                'value' => '#80c0ed',
+                'description' => 'The cell color to represent when occupied with an asset.',
+                'default_value' => '#80c0ed'
+            ],
+            [
+                'name' => '	collection_color_cell_checkedout',
+                'value' => '#ff0000',
+                'description' => 'The cell color to represent when occupied asset is checked out.',
+                'default_value' => '#ff0000'
+            ],
+            [
+                'name' => '	collection_color_cell_processed',
+                'value' => '#4287f5',
+                'description' => 'The cell color to represent when occupied asset has been processed by technician.',
+                'default_value' => '#4287f5'
+            ],
+            [
+                'name' => '	collection_color_cell_hasrepair',
+                'value' => '#ff9c9c',
+                'description' => 'The cell color to represent when occupied asset has a repair associated with it.',
+                'default_value' => '#ff9c9c'
+            ],
         ];
 
         foreach ($siteConfig as $configItem) {
