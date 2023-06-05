@@ -59,7 +59,7 @@
                         </div>
                         <div class="mb-3">
                             {{ form_label(form.user, 'Collected From') }}
-                            {{ form_widget(form.user, { 'attr': {'style': 'width:260px', 'tabindex': 2 }}) }}
+                            {{ form_widget(form.user, { 'attr': {'style': 'width:260px'}}) }}
                         </div>
                         <div class="input-group">
                             {# Needs Repair #}
@@ -190,6 +190,9 @@
 
             $("#modal-checkin").on("hide.bs.modal", function(e) {
                 document.getElementById("asset_collection_userId").removeAttribute("value");
+                document.getElementById("asset_collection_user").removeAttribute("value");
+                document.getElementById("asset_collection_location").removeAttribute("value");
+                document.getElementById("asset_collection_notes").removeAttribute("value");
             });
 
             // Start select2
@@ -197,6 +200,7 @@
                 placeholder: 'Select a user',
                 width: 'resolve',
                 theme: 'bootstrap-5',
+                dropdownParent: $("#modal-checkin")
             });
 
             // Populate cells that are assigned
