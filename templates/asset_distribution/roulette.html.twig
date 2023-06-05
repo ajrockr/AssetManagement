@@ -1,0 +1,31 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Asset Distribution{% endblock %}
+{% block header_title %}Distribution{% endblock %}
+{% block header_breadcrumb %}Distribution{% endblock %}
+{% block body_content %}
+    <div id="rouletteWrapper">
+        <ul class="list-group text-center">
+            {% for asset in assets %}
+                <li class="list-group-item">
+                    {% if loop.first %}
+                        <h1><a href="{{ path('app_distribute_clear', {'id': asset.id}) }}">{{ asset.location ?: 'No Location' }}</a></h1>
+                    {% else %}
+                        <h4><a href="{{ path('app_distribute_clear', {'id': asset.id}) }}">{{ asset.location ?: 'No Location' }}</a></h4>
+                    {% endif %}
+                    {{ asset.assettag }}<br />
+                    {{ asset.userSurname }}, {{ asset.userFirstName }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+{% block head_custom_javascript %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            let timeout = setInterval(reloadRouletteWrapper, 2000);
+            function reloadRouletteWrapper() {
+                $('#rouletteWrapper').load(window.location.href + " #rouletteWrapper");
+            }
+        });
+    </script>
+{% endblock %}

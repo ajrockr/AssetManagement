@@ -1,0 +1,83 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Asset Distribution{% endblock %}
+{% block header_title %}Distribution{% endblock %}
+{% block header_breadcrumb %}Distribution{% endblock %}
+{% block body_content %}
+    <div class="dataTables_wrapper dt-bootstrap4 container-fluid">
+        <table id="assetTable" class="table table-bordered table-hover table-striped dataTable" aria-describedby="assetTable_info" style="width:100%;">
+            <thead>
+            <tr>
+                <th class="all">Location</th>
+                <th class="all">Distributed At</th>
+                <th class="all">Distributed By</th>
+                <th class="all">Asset Tag</th>
+                <th class="all">Serial Number</th>
+                <th class="all">Last Name</th>
+                <th class="all">First Name</th>
+                <th class="all" id="notesColumn">Notes</th>
+                <th class="all">Revoke</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+                <tr{% if asset.sentToDistribution is defined %} class="sentToDistribution"{% endif %}>
+                    <form method="post" action="{{ path('app_distribute_revoke_id') }}">
+                        <input type="hidden" name="distributionId" value="{{ asset.id }}" />
+                        <td class="text-center">{{ asset.location }}</td>
+                        <td class="text-center">{{ asset.distributedAt|date('Y-m-d H:i') }}</td>
+                        <td class="text-center">{{ asset.distributedBySurname }}, {{ asset.distributedByFirstName }}</td>
+                        <td class="text-center">{{ asset.assetTag }}</td>
+                        <td class="text-center">{{ asset.serialNumber }}</td>
+                        <td class="text-center">{{ asset.userSurname }}</td>
+                        <td class="text-center">{{ asset.userFirstName }}</td>
+                        <td class="text-center">{{ asset.notes }}</td>
+                        <td class="text-center"><button type="submit" class="btn btn-outline-secondary">Revoke</button></td>
+                    </form>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+{% block head_custom_css %}
+    <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
+    <style>
+        .sentToDistribution {
+            background-color: #ff9c9c !important;
+        }
+    </style>
+{% endblock %}
+{% block head_custom_javascript %}
+    <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Set the DataTable
+            var table = $('#assetTable').DataTable({
+                "scrollX": true,
+                "paging": true,
+                "lengthChange": true,
+                "iDisplayLength": 25,
+                "searching": true,
+                "ordering": true,
+                "columnDefs": [
+                    {orderable: false, targets: 7}
+                ],
+                "info": true,
+                "autoWidth": true,
+                "responsive": true,
+                "autoFill": true,
+                "colReorder": true,
+            });
+
+            $('.dataTables_filter input[type="search"]').css(
+                {'width': '350px', 'display': 'inline-block'}
+            );
+
+            $('.dataTables_filter input[type="search"]').
+            attr('placeholder', 'Search assets ....').
+            css({'width': '350px', 'display': 'inline-block'});
+
+        });
+    </script>
+{% endblock %}
+{% block optional_javascript %}{% endblock %}
