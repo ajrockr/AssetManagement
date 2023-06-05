@@ -4,10 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\Asset;
 use App\Entity\AssetCollection;
+use App\Entity\RepairParts;
 use App\Entity\User;
 use App\Entity\UserRoles;
 use App\Entity\SiteConfig;
 use App\Entity\AlertMessage;
+use App\Entity\Vendor;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -71,9 +73,6 @@ class AdminDashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Configuration', 'fa fa-gear', 'app_admin_site_config'),
             MenuItem::linkToRoute('Plugins', 'fa fa-plug', 'admin'),
             MenuItem::linkToCrud('Alert Message', 'fa fa-solid fa-message', AlertMessage::class),
-            MenuItem::linkToCrud('Site Config (dev)', 'fa fa-home', SiteConfig::class),
-            
-            MenuItem::section('People'),
             MenuItem::subMenu('Users', 'fa fa-users')->setSubItems([
                 MenuItem::linkToCrud('List Users', 'fa fa-users-line', User::class)
                     ->setController(UserCrudController::class),
@@ -83,7 +82,14 @@ class AdminDashboardController extends AbstractDashboardController
                     ->setController(UserDisabledCrudController::class),
                 MenuItem::linkToRoute('Import Users', 'fa fa-user-plus', 'app_admin_import_user')
             ]),
+
+            MenuItem::section('Repairs'),
+            MenuItem::linkToCrud('Repair Parts', 'fa fa-wrench', RepairParts::class),
+            MenuItem::linkToCrud('Vendors', 'fa fa-building', Vendor::class),
+
+            MenuItem::section('DEV'),
             MenuItem::linkToCrud('User Roles (dev)', 'fa fa-home', UserRoles::class),
+            MenuItem::linkToCrud('Site Config (dev)', 'fa fa-home', SiteConfig::class),
         ];
     }
 }

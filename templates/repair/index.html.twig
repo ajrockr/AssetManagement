@@ -6,39 +6,31 @@
 <div class="dataTables_wrapper dt-bootstrap4">
     <div class="row">
         <div class="col-sm-12">
-            <table id="repairTable" class="table table-bordered table-striped dataTable dtr-inline display" aria-describedby="repairTable_info">
+            <table id="repairTable" class="table table-bordered table-striped dataTable dtr-inline display" style="width:100%;" aria-describedby="repairTable_info">
                 <thead>
                     <tr>
-                        <th>Id</th>
                         <th>Asset</th>
-                        <th>CreatedDate</th>
-                        <th>StartedDate</th>
-                        <th>ResolvedDate</th>
-                        <th>TechnicianId</th>
+                        <th>Created Date</th>
+                        <th>Started Date</th>
+                        <th>Technician</th>
                         <th>Issue</th>
-                        <th>PartsNeeded</th>
-                        <th>ActionsPerformed</th>
+                        <th>Parts Needed</th>
                         <th>Status</th>
-                        <th>LastModifiedDate</th>
-                        <th>UsersFollowing</th>
+                        <th>Last Modified Date</th>
                         <th>actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for repair in repairs %}
                     <tr>
-                        <td>{{ repair.id }}</td>
                         <td>{{ repair.assetUniqueIdentifier }}</td>
                         <td>{{ repair.createdDate ? repair.createdDate|date('Y-m-d H:i:s') : '' }}</td>
                         <td>{{ repair.startedDate ? repair.startedDate|date('Y-m-d H:i:s') : '' }}</td>
-                        <td>{{ repair.resolvedDate ? repair.resolvedDate|date('Y-m-d H:i:s') : '' }}</td>
                         <td>{{ repair.technicianId }}</td>
                         <td>{{ repair.issue }}</td>
                         <td>{{ repair.partsNeeded ? repair.partsNeeded|join(', ') : '' }}</td>
-                        <td>{{ repair.actionsPerformed ? repair.actionsPerformed|join(', ') : '' }}</td>
                         <td>{{ repair.status }}</td>
                         <td>{{ repair.lastModifiedDate ? repair.lastModifiedDate|date('Y-m-d H:i:s') : '' }}</td>
-                        <td>{{ repair.usersFollowing ? repair.usersFollowing|join(', ') : '' }}</td>
                         <td>
                             <a href="{{ path('app_repair_show', {'id': repair.id}) }}">show</a>
                             <a href="{{ path('app_repair_edit', {'id': repair.id}) }}">edit</a>
@@ -75,7 +67,7 @@
                 "searching": true,
                 "ordering": true,
                 "columnDefs": [
-                    {orderable: false, targets: 12}
+                    {orderable: false, targets: 8}
                 ],
                 "info": true,
                 "autoWidth": true,

@@ -17,6 +17,22 @@ class RepairController extends AbstractController
     #[Route('/', name: 'app_repair_index', methods: ['GET'])]
     public function index(RepairRepository $repairRepository): Response
     {
+        $repairs = $repairRepository->findAll();
+        $returnArray = [];
+
+        foreach($repairs as $repair) {
+            $returnArray[] = [
+                'id' => $repair->getId(),
+                'assetUniqueIdentifier' => $repair->getAssetUniqueIdentifier(),
+                'createdDate' => $repair->getCreatedDate(),
+                'startedDate' => $repair->getStartedDate(),
+                'technicianId' => $repair->getTechnicianId(),
+                'issue' => $repair->getIssue(),
+                'partsNeeded' => $repair->getPartsNeeded(),
+                'status' => $repair->getStatus(),
+                'lastModifiedDate' => $repair->getLastModifiedDate()
+            ];
+        }
         return $this->render('repair/index.html.twig', [
             'repairs' => $repairRepository->findAll(),
         ]);
