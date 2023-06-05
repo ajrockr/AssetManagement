@@ -27,6 +27,7 @@ class ReportController extends AbstractController
     {
         $collectedAssets = $assetCollectionRepository->findAll();
         $reportArray = [];
+        $assignedTo = [];
 
         foreach ($collectedAssets as $collectedAsset) {
             $user = $userRepository->findOneBy(['id' => $collectedAsset->getCollectedFrom()]);
