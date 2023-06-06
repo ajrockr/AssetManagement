@@ -244,7 +244,7 @@
                                 $(this).attr('data-note', assignedSlotsInfo[i]['note']);
                                 $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
                                 $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
-                                $(this).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
+                                $("#href-slot-" + assignedSlotsInfo[i]['slot']).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
                             }
                         }
                     })
