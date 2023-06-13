@@ -44,6 +44,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body pl-2">
+                        <div class="mb-3">
+                            {{ form_label(form.user, 'Collected From') }}
+                            {{ form_widget(form.user, { 'attr': {'style': 'width:100%'}}) }}
+                        </div>
                         <div class="row mb-3">
                             <div class="col">
                                 <div class="form-floating">
@@ -57,10 +61,6 @@
                                     {{ form_label(form.location, 'Location') }}
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            {{ form_label(form.user, 'Collected From') }}
-                            {{ form_widget(form.user, { 'attr': {'style': 'width:260px'}}) }}
                         </div>
                         <div class="input-group">
                             {# Needs Repair #}
@@ -208,6 +208,10 @@
                 width: 'resolve',
                 theme: 'bootstrap-5',
                 dropdownParent: $("#modal-checkin")
+            });
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
             });
 
             // Populate cells that are assigned
