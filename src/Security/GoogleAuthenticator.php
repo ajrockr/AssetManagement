@@ -11,6 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -98,7 +99,10 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                 }
 
                 return $user;
-            })
+            }),
+            [
+                (new RememberMeBadge())->enable()
+            ]
         );
     }
 
@@ -159,5 +163,10 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
             '/connect/',
             Response::HTTP_TEMPORARY_REDIRECT
         );
+   }
+
+   public function supportsRememberMe(): bool
+   {
+       return true;
    }
 }
