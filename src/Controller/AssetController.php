@@ -273,6 +273,8 @@ class AssetController extends AbstractController
                 $asset->setSerialnumber($data['device']);
             }
 
+//            dd($asset);
+
             $assetRepository->save($asset, true);
             $deviceId = $asset->getId();
         } else {

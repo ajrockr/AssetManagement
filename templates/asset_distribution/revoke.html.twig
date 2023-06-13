@@ -40,7 +40,7 @@
     </div>
 {% endblock %}
 {% block head_custom_css %}
-    <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('3rdparty/DataTables/datatables.min.css') }}" rel="stylesheet"/>
     <style>
         .sentToDistribution {
             background-color: #ff9c9c !important;
@@ -48,7 +48,7 @@
     </style>
 {% endblock %}
 {% block head_custom_javascript %}
-    <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+    <script charset="utf8" src="{{ asset('3rdparty/DataTables/datatables.min.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             // Set the DataTable
