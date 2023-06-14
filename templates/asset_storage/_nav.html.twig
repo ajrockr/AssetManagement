@@ -3,7 +3,7 @@
         <li class="nav-item">
             <a href="{{ path('app_asset_storage_show', {id: item.id}) }}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
-                <p>{{ item.name }}</p>
+                <p>{{ item.name }} ({{ item.description }})</p>
             </a>
         </li>
     {% endfor %}
