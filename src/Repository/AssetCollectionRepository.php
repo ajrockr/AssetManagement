@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\AssetCollection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,28 +40,33 @@ class AssetCollectionRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return AssetCollection[] Returns an array of AssetCollection objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getAll(): array
+    {
+        $assets = $this->createQueryBuilder('ac')
+            ->select('ac')
+            ->addSelect('a.assettag', 'a.serialnumber')
+            ->innerJoin('App\Entity\Asset', 'a', 'WHERE', 'a.id = ac.DeviceID')
+            ->getQuery()
+            ->getArrayResult()
+        ;
 
-//    public function findOneBySomeField($value): ?AssetCollection
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $return = [];
+        foreach ($assets as $asset) {
+            $return[] = [
+                'id' => $asset[0]['id'],
+                'asset_id' => $asset[0]['DeviceID'],
+                'collected_from' => $asset[0]['CollectedFrom'],
+                'collected_by' => $asset[0]['CollectedBy'],
+                'collected_date' => $asset[0]['collectedDate'],
+                'notes' => $asset[0]['collectionNotes'],
+                'location' => $asset[0]['collectionLocation'],
+                'checked_out' => $asset[0]['checkedout'],
+                'processed' => $asset[0]['processed'],
+                'asset_tag' => $asset['assettag'],
+                'serial_number' => $asset['serialnumber']
+            ];
+        }
+
+        return $return;
+    }
 }

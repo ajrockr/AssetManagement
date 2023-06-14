@@ -67,15 +67,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function getLastCreatedUser(): array
     {
-        $result = $this->createQueryBuilder('u')
+        return $this->createQueryBuilder('u')
             ->select('u.surname', 'u.firstname')
             ->orderBy('u.id', 'DESC')
             ->getQuery()
             ->setMaxResults(1)
             ->getOneOrNullResult()
         ;
-        // dd($result);
-        return $result;
     }
 
     public function adminImportUsers(array $users)
@@ -83,13 +81,40 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         
     }
 
-    public function getUsers()
+    public function getUsers(): array
     {
-        return $this->createQueryBuilder('u')
-            ->select()
+        $users = $this->createQueryBuilder('u')
+            ->select('u')
             ->getQuery()
-            ->getResult()
+            ->getScalarResult()
         ;
+
+        $return = [];
+        foreach ($users as $user) {
+            $return[$user['u_id']] = [
+                'id' => $user['u_id'],
+                'username' => $user['u_username'],
+                'roles' => $user['u_roles'],
+                'email' => $user['u_email'],
+                'location' => $user['u_location'],
+                'department' => $user['u_department'],
+                'phone' => $user['u_phone'],
+                'phone_extension' => $user['u_extension'],
+                'title' => $user['u_title'],
+                'homepage' => $user['u_homepage'],
+                'manager' => $user['u_manager'],
+                'date_created' => $user['u_dateCreated'],
+                'surname' => $user['u_surname'],
+                'firstname' => $user['u_firstname'],
+                'enabled' => (bool) $user['u_enabled'],
+                'pending' => (bool) $user['u_pending'],
+                'avatar' => $user['u_avatar'],
+                'unique_id' => $user['u_userUniqueId'],
+                'type' => $user['u_type']
+            ];
+        }
+
+        return $return;
     }
 
     public function setPendingStatus(int $id, bool $pending = true)

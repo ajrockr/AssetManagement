@@ -39,28 +39,33 @@ class RepairRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Repair[] Returns an array of Repair objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getAll(): array
+    {
+        $repairs = $this->createQueryBuilder('r')
+            ->select('r')
+            ->getQuery()
+            ->getScalarResult()
+        ;
 
-//    public function findOneBySomeField($value): ?Repair
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $return = [];
+        foreach ($repairs as $repair) {
+            $return[$repair['r_id']] = [
+                'id' => $repair['r_id'],
+                'asset_id' => $repair['r_assetId'],
+                'created_date' => $repair['r_createdDate'],
+                'started_date' => $repair['r_startedDate'],
+                'modified_date' => $repair['r_lastModifiedDate'],
+                'resolved_date' => $repair['r_resolvedDate'],
+                'technician' => $repair['r_technicianId'],
+                'issue' => $repair['r_issue'],
+                'parts_needed' => $repair['r_partsNeeded'],
+                'actions_performed' => $repair['r_actionsPerformed'],
+                'status' => $repair['r_status'],
+                'users_following' => $repair['r_usersFollowing'],
+                'asset_identifier' => $repair['r_assetUniqueIdentifier']
+            ];
+        }
+
+        return $return;
+    }
 }

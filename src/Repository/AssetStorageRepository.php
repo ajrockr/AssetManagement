@@ -68,4 +68,22 @@ class AssetStorageRepository extends ServiceEntityRepository
 
         return false;
     }
+
+    public function getAll()
+    {
+        return $this->createQueryBuilder('as')
+            ->select('as')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getOne(int $id)
+    {
+        return $this->createQueryBuilder('as')
+            ->select('as')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

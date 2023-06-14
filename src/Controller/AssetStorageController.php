@@ -21,6 +21,16 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/asset/storage')]
 class AssetStorageController extends AbstractController
 {
+    private array $config;
+    private array $storage;
+
+    public function __construct(
+        private readonly SiteConfigRepository $siteConfigRepository,
+        private readonly AssetStorageRepository $assetStorageRepository
+    )
+    {
+        $this->config = $this->siteConfigRepository->getAllConfigItems();
+    }
     #[Route('/', name: 'app_asset_storage_index', methods: ['GET'])]
     public function index(AssetStorageRepository $assetStorageRepository): Response
     {
@@ -30,14 +40,14 @@ class AssetStorageController extends AbstractController
     }
 
     #[Route('/new', name: 'app_asset_storage_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, AssetStorageRepository $assetStorageRepository): Response
+    public function new(Request $request): Response
     {
         $assetStorage = new AssetStorage();
         $form = $this->createForm(AssetStorageType::class, $assetStorage);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $assetStorageRepository->save($assetStorage, true);
+            $this->assetStorageRepository->save($assetStorage, true);
 
             return $this->redirectToRoute('app_asset_storage_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -49,32 +59,39 @@ class AssetStorageController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_asset_storage_show')]
-    public function show(Request $request, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetStorageRepository $assetStorageRepository, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository, $id): Response
+    public function showStorage(Request $request, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, $id): Response
     {
-        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
-        $assetCollection = $assetCollectionRepository->findAll();
-        $storage = $this->renderStorageView($assetStorageRepository->findOneBy(['id' => $id])->getStorageData());
-        $storageCounts = $reportController->assetsPerStorage($assetStorageRepository, $assetCollectionRepository, $id);
+        $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
+        $collectedAssets = $assetCollectionRepository->getAll();
+        $storage = $this->renderStorageView($this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData());
+        $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
-        $collectedAssets = [];
-        foreach ($assetCollection as $asset) {
-            $user = $userRepository->findOneBy(['id' => $asset->getCollectedFrom()]);
-            $hasRepair = $repairRepository->findOneBy(['assetId' => $asset->getDeviceID()]);
-            $collectedAssets[] = [
-                'slot' => $asset->getCollectionLocation(),
+        $users = $userRepository->getUsers();
+        $repairs = $repairRepository->getAll();
+
+        $assets = [];
+        foreach ($collectedAssets as $asset) {
+            $user = $users[$asset['collected_from']];
+
+            // Check if asset has a repair associated with it
+            $repairAssets = array_column($repairs, 'asset_id');
+            $hasRepair = in_array($asset['asset_id'], $repairAssets);
+
+            $assets[] = [
+                'slot' => $asset['location'],
                 'asset' => ($assetUniqueIdentifier == 'assettag')
-                    ? $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getAssettag()
-                    : $assetRepository->findOneBy(['id' => $asset->getDeviceID()])->getSerialnumber(),
-                'user' => $user->getId(),
-                'usersName' => $user->getSurname() . ', ' . $user->getFirstname(),
-                'note' => $asset->getCollectionNotes(),
-                'checkedOut' => $asset->isCheckedout(),
-                'processed' => $asset->isProcessed(),
-                'hasRepair' => !(null === $hasRepair)
+                    ? $asset['asset_tag']
+                    : $asset['serial_number'],
+                'user' => $user['id'],
+                'usersName' => $user['surname'] . ', ' . $user['firstname'],
+                'note' => $asset['notes'],
+                'checkedOut' => $asset['checked_out'],
+                'processed' => $asset['processed'],
+                'hasRepair' => $hasRepair,
             ];
         }
 
-        $form = $this->createForm(AssetCollectionType::class, $assetCollection);
+        $form = $this->createForm(AssetCollectionType::class, $collectedAssets);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -95,10 +112,10 @@ class AssetStorageController extends AbstractController
             ];
         }
 
-        $colors['cellOccupied'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_occupied'])->getConfigValue();
-        $colors['cellCheckedOut'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_checkedout'])->getConfigValue();
-        $colors['cellProcessed'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_processed'])->getConfigValue();
-        $colors['cellHasRepair'] = $siteConfigRepository->findOneBy(['configName' => 'collection_color_cell_hasrepair'])->getConfigValue();
+        $colors['cellOccupied'] = $this->config['collection_color_cell_occupied'];
+        $colors['cellCheckedOut'] = $this->config['collection_color_cell_checkedout'];
+        $colors['cellProcessed'] = $this->config['collection_color_cell_processed'];
+        $colors['cellHasRepair'] = $this->config['collection_color_cell_hasrepair'];
 
         return $this->render('asset_storage/show.html.twig', [
             'assetStorage' => $assetStorage,
@@ -107,7 +124,7 @@ class AssetStorageController extends AbstractController
             'storageCounts' => $storageCounts,
             'storageRender' => $storage,
             'form' => $form,
-            'collectedAssets' => $collectedAssets
+            'collectedAssets' => $assets
         ]);
     }
 
