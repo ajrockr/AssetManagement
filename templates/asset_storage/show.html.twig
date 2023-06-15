@@ -215,9 +215,9 @@
                 document.getElementById("asset_collection_user").removeAttribute("value");
                 document.getElementById("asset_collection_location").removeAttribute("value");
                 document.getElementById("asset_collection_notes").removeAttribute("value");
-                $("asset_collection_needsrepair").prop("checked", false);
-                $("asset_collection_checkout").prop("checked", false);
-                $("asset_collection_processed").prop("checked", false);
+                document.getElementById("asset_collection_needsrepair").checked = false;
+                document.getElementById("asset_collection_checkout").checked = false;
+                document.getElementById("asset_collection_processed").checked = false;
             });
 
             // Start select2
