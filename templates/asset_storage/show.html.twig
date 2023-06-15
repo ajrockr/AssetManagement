@@ -156,6 +156,21 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+            // Populate cells that are assigned
+            const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
+            const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
+
+            /**
+             * .urlParam
+             * Check for GET in uri
+             * @param name
+             * @returns {string|number}
+             */
+            $.urlParam = function(name){
+                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+                return results[1] || 0;
+            }
+
             // Parts needed hide/show
             let partsNeededDiv = $("#partsNeeded")
             let partsNeededTrigger = $("#asset_collection_needsrepair");
@@ -179,7 +194,7 @@
                 // let locationEntity = document.getElementById('asset_collection_location');
 
                 setTimeout(function() {
-                    $("#asset_collection_device").focus();
+                    $("#asset_collection_user").focus();
                 }, 600);
 
                 document.getElementById("asset_collection_device").setAttribute("value", asset);
@@ -200,6 +215,9 @@
                 document.getElementById("asset_collection_user").removeAttribute("value");
                 document.getElementById("asset_collection_location").removeAttribute("value");
                 document.getElementById("asset_collection_notes").removeAttribute("value");
+                $("asset_collection_needsrepair").prop("checked", false);
+                $("asset_collection_checkout").prop("checked", false);
+                $("asset_collection_processed").prop("checked", false);
             });
 
             // Start select2
@@ -213,10 +231,6 @@
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus();
             });
-
-            // Populate cells that are assigned
-            const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
-            const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
 
             $("div[id='storageContainerRow']").children('.storageCell').each(function() {
                 if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
@@ -255,9 +269,21 @@
                 }
             });
 
-            // Enable Tooltips
+            // // Enable Tooltips
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+            // Check if 'slot' was passed in GET
+            if ($.urlParam('slot')) {
+                let slotNumber = $.urlParam('slot');
+                let slotElementId = "#slotNumber-" + slotNumber;
+
+                console.log('Opening Slot: ' + slotNumber);
+                let selector = $(slotElementId);
+
+                // Open the Modal
+                selector.click();
+            }
         });
     </script>
 {% endblock %}

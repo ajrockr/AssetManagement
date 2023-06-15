@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Repository\AssetCollectionRepository;
+use App\Repository\AssetRepository;
+use App\Repository\AssetStorageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +23,8 @@ class SearchController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly AssetCollectionRepository $assetCollectionRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly AssetRepository $assetRepository,
+        private readonly AssetStorageRepository $assetStorageRepository
     ) {}
     #[Route('/search', name: 'app_search', methods: ['GET'])]
     public function index(Request $request): Response
@@ -35,7 +40,7 @@ class SearchController extends AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function searchForAsset(string $query): array
     {
@@ -65,21 +70,20 @@ class SearchController extends AbstractController
             try {
                 $returnArray[] = array_merge($serializer->normalize($result), $userInfo);
             } catch (ExceptionInterface $e) {
-                throw new \Exception($e->getMessage());
+                throw new Exception($e->getMessage());
             }
-
         }
 
         return $returnArray;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    private function searchForUser(mixed $query)
+    private function searchForUser(mixed $query): array
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        $result = $queryBuilder->select('u.username', 'u.email', 'u.firstname', 'u.surname', 'u.userUniqueId', 'u.roles', 'u.title', 'u.department')
+        $results = $queryBuilder->select('u.id', 'u.username', 'u.email', 'u.firstname', 'u.surname', 'u.userUniqueId', 'u.roles', 'u.title', 'u.department')
             ->from('App\Entity\User', 'u')
             ->where('u.id = :query')
             ->orWhere($queryBuilder->expr()->like('u.userUniqueId', ':query'))
@@ -95,11 +99,41 @@ class SearchController extends AbstractController
 
         $serializer = new Serializer([new ObjectNormalizer()]);
 
-        try {
-            return $serializer->normalize($result);
-        } catch (ExceptionInterface $e) {
-            throw new \Exception($e->getMessage());
+        $returnArray = [];
+        foreach($results as $result) {
+            $collectedAsset = $this->assetCollectionRepository->findOneBy(['CollectedFrom' => $result['id']]);
+            $asset = (!$collectedAsset) ?: $this->assetRepository->findOneBy(['id' => $collectedAsset->getDeviceID()]);
+
+            if (null !== $collectedAsset) {
+                if ($data = $this->assetStorageRepository->storageDataExists($collectedAsset->getCollectionLocation())) {
+                    $url = $this->generateUrl('app_asset_storage_show', [
+                        'id' => $data['id'],
+                        'slot' => $collectedAsset->getCollectionLocation()
+                    ]);
+                    $location = '<a href="'. $url . '">' . $collectedAsset->getCollectionLocation() . '</a>';
+                } else {
+                    $location = $collectedAsset->getCollectionLocation();
+                }
+
+                $assetInfo = [
+                    'asset collected' => true,
+//                    'location' => $collectedAsset->getCollectionLocation(),
+                    'location' => $location,
+                    'assettag' => $asset->getAssettag(),
+                    'serialnumber' => $asset->getSerialnumber()
+                ];
+            } else {
+                $assetInfo = [];
+            }
+
+            try {
+                $returnArray[] = array_merge($serializer->normalize($result), $assetInfo);
+            } catch (ExceptionInterface $e) {
+                throw new Exception($e->getMessage());
+            }
         }
+
+        return $returnArray;
     }
 
     private function searchForCollectedAsset(string $query): array

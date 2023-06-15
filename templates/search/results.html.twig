@@ -16,7 +16,7 @@
                         <div class="row">
                             <div class="col">{{ key|capitalize }}</div>
                             <div class="col float-right text-end">
-                                <strong>{{ value|join(', ') ?: '<div class="badge badge-pill badge-secondary">Empty</div>' }}</strong>
+                                <strong>{{ value|join(', ')|raw ?: '<div class="badge badge-pill badge-secondary">Empty</div>' }}</strong>
                             </div>
                         </div>
                     {% endfor %}

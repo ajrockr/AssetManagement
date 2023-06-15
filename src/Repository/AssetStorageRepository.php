@@ -39,20 +39,27 @@ class AssetStorageRepository extends ServiceEntityRepository
         }
     }
 
-    public function storageDataExists($value): bool
+    public function storageDataExists($value): bool|array
     {
         $query = $this->findAll();
         $array_walk = [];
         foreach ($query as $storage) {
-            $array_walk[] = $storage->getStorageData();
+            $array_walk[$storage->getId()] = $storage->getStorageData();
         }
 
-        return $this->arraySearchRecursive($value, $array_walk);
+//        return $this->arraySearchRecursive($value, $array_walk);
+        foreach ($array_walk as $storage => $storageData) {
+            if ($this->arraySearchRecursive($value, $storageData)) {
+                return [ 'id' => $storage];
+            }
+        }
+
+        return false;
     }
 
-    private function arraySearchRecursive(mixed $term, array $haystack): bool
+    private function arraySearchRecursive(mixed $term, array $array): bool
     {
-        foreach ($haystack as $array) {
+//        foreach ($haystack as $array) {
             foreach ($array as $side) {
                 foreach ($side as $row) {
                     foreach ($row as $key=>$val) {
@@ -64,7 +71,7 @@ class AssetStorageRepository extends ServiceEntityRepository
                     }
                 }
             }
-        }
+//        }
 
         return false;
     }
