@@ -199,6 +199,8 @@
                 let asset = $(e.relatedTarget).attr("data-asset") ?? '';
                 let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
                 let note = $(e.relatedTarget).attr("data-note") ?? '';
+                let checkedOut = $(e.relatedTarget).attr("data-checkedout") ?? null;
+                let processed = $(e.relatedTarget).attr("data-processed") ?? null;
                 // let locationEntity = document.getElementById('asset_collection_location');
 
                 setTimeout(function() {
@@ -210,6 +212,18 @@
                 $("#asset_collection_user").val(assignedUserId).trigger("change");
                 document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
                 document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
+
+                if (checkedOut != null) {
+                    document.getElementById("asset_collection_checkout").checked = true;
+                } else {
+                    document.getElementById("asset_collection_checkout").checked = false;
+                }
+
+                if (processed != null) {
+                    document.getElementById("asset_collection_processed").checked = true;
+                } else {
+                    document.getElementById("asset_collection_processed").checked = false;
+                }
 
                 // When disabled, returns NULL post. no good
                 // locationEntity..css('disabled', true);
@@ -253,11 +267,9 @@
                                 $("#asset_collection_needsrepair").prop('disabled', false);
                             }
                             if (assignedSlotsInfo[i]['checkedOut']) {
-                                $("#asset_collection_checkout").attr('checked', 'checked');
                                 $(this).addClass('cellCheckedOut')
                             }
                             if (assignedSlotsInfo[i]['processed']) {
-                                $("#asset_collection_processed").attr('checked', 'checked');
                                 $(this).addClass('cellProcessed')
                             }
                         }
@@ -268,7 +280,7 @@
                                 $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
                                 $(this).attr('data-user', assignedSlotsInfo[i]['user']);
                                 $(this).attr('data-note', assignedSlotsInfo[i]['note']);
-                                $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedout']);
+                                $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedOut']);
                                 $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
                                 $("#href-slot-" + assignedSlotsInfo[i]['slot']).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
                             }
