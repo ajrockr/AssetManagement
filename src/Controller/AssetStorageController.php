@@ -12,6 +12,7 @@ use App\Repository\AssetStorageRepository;
 use App\Repository\RepairPartsRepository;
 use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
+use App\Repository\StorageLockRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,8 +60,10 @@ class AssetStorageController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_asset_storage_show')]
-    public function showStorage(Request $request, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, $id): Response
+    public function showStorage(Request $request, StorageModerationController $storageModerationController, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, $id): Response
     {
+        $storageLocked = $storageModerationController->isLocked($id);
+        $this->assetStorageRepository->getStorageData($id);
         $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
         $collectedAssets = $assetCollectionRepository->getAll();
         $storage = $this->renderStorageView($this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData());
@@ -95,6 +98,11 @@ class AssetStorageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // If storage is locked, don't forward request
+            if ($storageLocked) {
+                return $this->redirectToRoute('app_asset_storage_show');
+            }
+
             return $this->forward('App\Controller\AssetController::checkIn', [
                 'form' => $form
             ]);
@@ -117,6 +125,10 @@ class AssetStorageController extends AbstractController
         $colors['cellProcessed'] = $this->config['collection_color_cell_processed'];
         $colors['cellHasRepair'] = $this->config['collection_color_cell_hasrepair'];
 
+        if ($storageLocked) {
+            $this->addFlash('warning', 'This storage has been locked, editing has been disabled.');
+        }
+
         return $this->render('asset_storage/show.html.twig', [
             'assetStorage' => $assetStorage,
             'colors' => $colors,
@@ -124,7 +136,8 @@ class AssetStorageController extends AbstractController
             'storageCounts' => $storageCounts,
             'storageRender' => $storage,
             'form' => $form,
-            'collectedAssets' => $assets
+            'collectedAssets' => $assets,
+            'storageLocked' => $storageLocked ? 'true' : 'false'
         ]);
     }
 

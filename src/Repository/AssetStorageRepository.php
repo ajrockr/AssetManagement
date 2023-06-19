@@ -57,6 +57,33 @@ class AssetStorageRepository extends ServiceEntityRepository
         return false;
     }
 
+    public function getStorageData(int $id): array
+    {
+        $qb = $this->createQueryBuilder('s');
+        $result = $qb->select('s.storageData')
+            ->where('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getArrayResult();
+        $slots = [];
+        foreach ($result as $data) {
+            foreach ($data as $side) {
+                foreach ($side as $row) {
+                    foreach ($row as $i => $slot) {
+                        $slots[] = $slot;
+                    }
+                }
+            }
+        }
+
+        $flattened_array = [];
+        array_walk_recursive($slots, function($a) use (&$flattened_array) {
+           $flattened_array[] = $a;
+        });
+
+        return $flattened_array;
+    }
+
     private function arraySearchRecursive(mixed $term, array $array): bool
     {
 //        foreach ($haystack as $array) {

@@ -3,7 +3,14 @@
 {% block header_breadcrumb %}Storage{% endblock %}
 {% block header_title %}Storage {{ assetStorage.name }} ({{ assetStorage.description }}){% endblock %}
 {% block body_content %}
-    <h4>Located at: {{ assetStorage.location }}</h4>
+    <div class="row">
+        <div class="col">
+            <h4>Located at: {{ assetStorage.location }}</h4>
+        </div>
+        <div class="col text-end">
+            {{ render(controller('App\\Controller\\StorageModerationController::renderModerationButton', {id: assetStorage.id})) }}
+        </div>
+    </div>
     <div class="row">
         {{ storageRender|raw }}
     </div>
@@ -56,7 +63,9 @@
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="form-floating" ondblclick="document.getElementById('asset_collection_location').disabled = false;" data-bs-toggle="tooltip" data-bs-title="Double click to edit.">
+                                <div class="form-floating" data-bs-toggle="tooltip" data-bs-title="Double click to edit.">
+                                    {# todo: on double click, enable field #}
+                                    {# ondblclick="document.getElementById('asset_collection_location').disabled = false;"  #}
                                     {{ form_widget(form.location) }}
                                     {{ form_label(form.location, 'Location') }}
                                 </div>
@@ -203,7 +212,7 @@
                 let processed = $(e.relatedTarget).attr("data-processed") ?? null;
                 // let locationEntity = document.getElementById('asset_collection_location');
 
-                setTimeout(function() {
+                setTimeout(function () {
                     $("#asset_collection_user").focus();
                 }, 600);
 
@@ -230,6 +239,9 @@
                 // $("asset_collection_location").on('blur', function() {
                 //     $("asset_collection_location").prop( "disabled", true);
                 // });
+                if ({{ storageLocked }}) {
+                    $(":input").prop("disabled", true);
+                }
             });
 
             $("#modal-checkin").on("hide.bs.modal", function(e) {
