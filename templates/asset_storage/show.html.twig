@@ -33,7 +33,8 @@
             checkedOut: collectedAsset.checkedOut,
             processed: collectedAsset.processed,
             usersName: collectedAsset.usersName,
-            hasRepair: collectedAsset.hasRepair
+            hasRepair: collectedAsset.hasRepair,
+            repairId: collectedAsset.repairId
         }]) %}
     {% endfor %}
     <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
@@ -210,6 +211,8 @@
                 let note = $(e.relatedTarget).attr("data-note") ?? '';
                 let checkedOut = $(e.relatedTarget).attr("data-checkedout") ?? null;
                 let processed = $(e.relatedTarget).attr("data-processed") ?? null;
+                let hasRepair = $(e.relatedTarget).attr("data-hasrepair") ?? null;
+                let repairId = $(e.relatedTarget).attr("data-repairid") ?? null;
                 // let locationEntity = document.getElementById('asset_collection_location');
 
                 setTimeout(function () {
@@ -232,6 +235,18 @@
                     document.getElementById("asset_collection_processed").checked = true;
                 } else {
                     document.getElementById("asset_collection_processed").checked = false;
+                }
+
+                if (hasRepair == "true") {
+                    $("#needsRepairLabel").text("Has Repair");
+                    $("#asset_collection_needsrepair").click(function() {
+                        let url = "{{ path('app_repair_show', { id: 'repairId' }) }}";
+                        url = url.replace("repairId", repairId);
+                        window.location.replace(url);
+                    });
+                } else {
+                    $("#needsRepairLabel").text("Needs Repair");
+                    $("#asset_collection_needsrepair").prop("disabled", false).prop("checked", false);
                 }
 
                 // When disabled, returns NULL post. no good
@@ -274,9 +289,6 @@
                         if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
                             if (assignedSlotsInfo[i]['hasRepair']) {
                                 $(this).addClass('cellHasRepair')
-                            } else {
-                                $("#needsRepairLabel").text("Needs Repair");
-                                $("#asset_collection_needsrepair").prop('disabled', false);
                             }
                             if (assignedSlotsInfo[i]['checkedOut']) {
                                 $(this).addClass('cellCheckedOut')
@@ -294,6 +306,8 @@
                                 $(this).attr('data-note', assignedSlotsInfo[i]['note']);
                                 $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedOut']);
                                 $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
+                                $(this).attr('data-hasrepair', assignedSlotsInfo[i]['hasRepair']);
+                                $(this).attr('data-repairId', assignedSlotsInfo[i]['repairId']);
                                 $("#href-slot-" + assignedSlotsInfo[i]['slot']).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
                             }
                         }

@@ -68,4 +68,37 @@ class RepairRepository extends ServiceEntityRepository
 
         return $return;
     }
+
+    public function getAllOpen(): array
+    {
+        $qb = $this->createQueryBuilder('r');
+        $repairs = $qb
+            ->select('r')
+            ->where($qb->expr()->neq('r.status', ':repairstatus'))
+            ->setParameter('repairstatus', 'status_resolved')
+            ->getQuery()
+            ->getScalarResult()
+        ;
+
+        $return = [];
+        foreach ($repairs as $repair) {
+            $return[$repair['r_id']] = [
+                'id' => $repair['r_id'],
+                'asset_id' => $repair['r_assetId'],
+                'created_date' => $repair['r_createdDate'],
+                'started_date' => $repair['r_startedDate'],
+                'modified_date' => $repair['r_lastModifiedDate'],
+                'resolved_date' => $repair['r_resolvedDate'],
+                'technician' => $repair['r_technicianId'],
+                'issue' => $repair['r_issue'],
+                'parts_needed' => $repair['r_partsNeeded'],
+                'actions_performed' => $repair['r_actionsPerformed'],
+                'status' => $repair['r_status'],
+                'users_following' => $repair['r_usersFollowing'],
+                'asset_identifier' => $repair['r_assetUniqueIdentifier']
+            ];
+        }
+
+        return $return;
+    }
 }

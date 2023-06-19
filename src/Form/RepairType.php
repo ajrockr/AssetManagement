@@ -88,14 +88,16 @@ class RepairType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'Select Parts'
                 ],
+                // TODO: Make this based off config
                 'choices' => [
-                    'Not Started' => 'nostart',
-                    'Started' => 'started',
-                    'In Progress' => 'inprogress',
-                    'Delayed' => 'delayed',
-                    'Waiting On Parts' => 'waitingonparts',
-                    'Waiting On Technician' => 'waitingontechnician',
-                    'Waiting On Customer' => 'waitingoncustomer'
+                    'Not Started' => 'status_nostart',
+                    'Started' => 'status_started',
+                    'In Progress' => 'status_inprogress',
+                    'Delayed' => 'status_delayed',
+                    'Waiting On Parts' => 'status_waitingonparts',
+                    'Waiting On Technician' => 'status_waitingontechnician',
+                    'Waiting On Customer' => 'status_waitingoncustomer',
+                    'Resolved' => 'status_resolved'
                 ]
             ])
             ->add('usersFollowing')

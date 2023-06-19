@@ -70,7 +70,7 @@ class AssetStorageController extends AbstractController
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
         $users = $userRepository->getUsers();
-        $repairs = $repairRepository->getAll();
+        $repairs = $repairRepository->getAllOpen();
 
         $assets = [];
         foreach ($collectedAssets as $asset) {
@@ -79,6 +79,11 @@ class AssetStorageController extends AbstractController
             // Check if asset has a repair associated with it
             $repairAssets = array_column($repairs, 'asset_id');
             $hasRepair = in_array($asset['asset_id'], $repairAssets);
+
+            $repairId = null;
+            if ($hasRepair) {
+                $repairId = $repairRepository->findOneBy(['assetId' => $asset['asset_id']])->getId();
+            }
 
             $assets[] = [
                 'slot' => $asset['location'],
@@ -91,6 +96,7 @@ class AssetStorageController extends AbstractController
                 'checkedOut' => $asset['checked_out'],
                 'processed' => $asset['processed'],
                 'hasRepair' => $hasRepair,
+                'repairId' => $repairId
             ];
         }
 
