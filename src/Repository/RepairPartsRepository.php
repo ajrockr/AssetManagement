@@ -39,28 +39,11 @@ class RepairPartsRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return RepairParts[] Returns an array of RepairParts objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?RepairParts
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function getAllParts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

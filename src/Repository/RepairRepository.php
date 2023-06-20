@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Repair;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -67,6 +68,43 @@ class RepairRepository extends ServiceEntityRepository
         }
 
         return $return;
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function getRepair(int $id): ?Repair
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r')
+            ->where('r.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+//
+//        dd($repairs);
+//
+//        $return = [];
+//        foreach ($repairs as $repair) {
+//            $return[$repair['id']] = [
+//                'id' => $repair['id'],
+//                'asset_id' => $repair['assetId'],
+//                'created_date' => $repair['createdDate'],
+//                'started_date' => $repair['startedDate'],
+//                'modified_date' => $repair['lastModifiedDate'],
+//                'resolved_date' => $repair['resolvedDate'],
+//                'technician' => $repair['technicianId'],
+//                'issue' => $repair['issue'],
+//                'parts_needed' => $repair['partsNeeded'],
+//                'actions_performed' => $repair['actionsPerformed'],
+//                'status' => $repair['status'],
+//                'users_following' => $repair['usersFollowing'],
+//                'asset_identifier' => $repair['assetUniqueIdentifier']
+//            ];
+//        }
+//
+//        return $return;
     }
 
     public function getAllOpen(): array

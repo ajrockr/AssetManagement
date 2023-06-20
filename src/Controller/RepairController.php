@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Repair;
 use App\Form\RepairType;
 use App\Repository\AssetRepository;
+use App\Repository\RepairPartsRepository;
 use App\Repository\RepairRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,17 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/repair')]
 class RepairController extends AbstractController
 {
+    const STATUS_RESOLVED = 'status_resolved';
+    const STATUS_OPEN = 'status_open';
+    const STATUS_NOTSTARTED = 'status_not_started';
+    private array $parts;
+    public function __construct(
+        private readonly RepairPartsRepository $repairPartsRepository,
+        private readonly RepairRepository $repairRepository
+    )
+    {
+        $this->parts = $this->repairPartsRepository->getAllParts();
+    }
     #[Route('/', name: 'app_repair_index', methods: ['GET'])]
     public function index(RepairRepository $repairRepository): Response
     {
@@ -28,11 +40,13 @@ class RepairController extends AbstractController
                 'startedDate' => $repair['started_date'],
                 'technicianId' => $repair['technician'],
                 'issue' => $repair['issue'],
-                'partsNeeded' => $repair['parts_needed'],
+                'partsNeeded' => $this->convertPartIdsToName($repair['parts_needed']),
                 'status' => $repair['status'],
                 'lastModifiedDate' => $repair['modified_date']
             ];
+
         }
+
         return $this->render('repair/index.html.twig', [
             'repairs' => $returnArray,
         ]);
@@ -70,6 +84,7 @@ class RepairController extends AbstractController
             $repair->setIssue($repairData['issue']);
             $repair->setAssetId($repairData['assetId']);
             $repair->setStatus('Not Started');
+            $repair->setPartsNeeded($repairData['partsNeeded']);
         }
 
         if (null === ($asset = $assetRepository->findOneBy(['assettag' => $repair->getAssetUniqueIdentifier()]))) {
@@ -99,10 +114,17 @@ class RepairController extends AbstractController
     }
 
     #[Route('/{id}/show', name: 'app_repair_show', methods: ['GET'])]
-    public function show(Repair $repair): Response
+    public function show(Repair $repairEntity): Response
     {
+//        $getRepair = $repairRepository->getRepair($id);
+//        dd($getRepair);
+//        $parts = $this->convertPartIdsToName($getRepair['parts_needed']);
+//        $getRepair = array_merge($getRepair, $parts);
+        $repairParts = $this->convertPartIdsToName($repairEntity->getPartsNeeded());
+
         return $this->render('repair/show.html.twig', [
-            'repair' => $repair,
+            'repair' => $repairEntity,
+            'parts' => $repairParts
         ]);
     }
 
@@ -132,5 +154,31 @@ class RepairController extends AbstractController
         }
 
         return $this->redirectToRoute('app_repair_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Convert part IDs to part names
+     *
+     * @param array $parts
+     * @return array
+     */
+    private function convertPartIdsToName(array $parts = []): array
+    {
+        $partsArray = [];
+        foreach ($this->parts as $part) {
+            foreach ($parts as $partId) {
+                if (in_array($partId, $part)) {
+                    $partsArray[] = $part['name'];
+                }
+            }
+        }
+
+        return array_values($partsArray);
+    }
+
+    public function setResolved(int $id): Response
+    {
+        $this->repairRepository->findOneBy(['id' => $id])->setStatus(self::STATUS_RESOLVED);
+        return $this->redirectToRoute('app_repair_index');
     }
 }

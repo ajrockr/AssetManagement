@@ -239,14 +239,17 @@
 
                 if (hasRepair == "true") {
                     $("#needsRepairLabel").text("Has Repair");
-                    $("#asset_collection_needsrepair").click(function() {
-                        let url = "{{ path('app_repair_show', { id: 'repairId' }) }}";
-                        url = url.replace("repairId", repairId);
-                        window.location.replace(url);
-                    });
+                    $("#asset_collection_needsrepair").prop("disabled", true).prop("checked", true);
+
+                    {#let url = "{{ path('app_repair_show', { id: 'repairId' }) }}";#}
+                    {#url = url.replace("repairId", repairId);#}
+                    {#window.location.replace(url);#}
+
+                    // TODO: Add button to view repair
                 } else {
                     $("#needsRepairLabel").text("Needs Repair");
                     $("#asset_collection_needsrepair").prop("disabled", false).prop("checked", false);
+                    // $("#asset_collection_needsrepair").attr("onclick", "").unbind("click");
                 }
 
                 // When disabled, returns NULL post. no good

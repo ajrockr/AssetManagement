@@ -239,7 +239,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form): Response
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = []): Response
     {
         // Set up what is needed to render the page
         $users = $userRepository->findAll();
@@ -272,8 +272,6 @@ class AssetController extends AbstractController
             } elseif ($assetUniqueIdentifier == 'serialnumber') {
                 $asset->setSerialnumber($data['device']);
             }
-
-//            dd($asset);
 
             $assetRepository->save($asset, true);
             $deviceId = $asset->getId();
@@ -331,7 +329,8 @@ class AssetController extends AbstractController
             $repairData = [
                 'asset' => $data['device'],
                 'issue' => $data['notes'] ?? 'Issue not listed',
-                'assetId' => $deviceId
+                'assetId' => $deviceId,
+                'partsNeeded' => $neededParts
             ];
             $repairController->createRepair($assetRepository, $repairRepository, $repairData);
         }
