@@ -71,7 +71,6 @@ class AdminDashboardController extends AbstractDashboardController
 
             MenuItem::section('Site'),
             MenuItem::linkToRoute('Configuration', 'fa fa-gear', 'app_admin_site_config'),
-            MenuItem::linkToRoute('Utilities', 'fa fa-wrench', 'app_admin_utility'),
             MenuItem::linkToRoute('Plugins', 'fa fa-plug', 'admin'),
             MenuItem::linkToCrud('Alert Message', 'fa fa-solid fa-message', AlertMessage::class),
             MenuItem::subMenu('Users', 'fa fa-users')->setSubItems([

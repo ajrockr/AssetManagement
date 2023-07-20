@@ -49,7 +49,7 @@
                     <input id="assignAssetId" type="hidden" name="assetId" value=""/>
                     <div class="modal-header">
                         <h4 class="modal-title">Assign User</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button name="closeModal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body pl-2">
                         <div class="mb-3">
@@ -99,7 +99,7 @@
                         {{ form_widget(form.assetId) }}
                     </div>
                     <div class="modal-footer justify-content-between">
-{#                        <button type="button" class="btn" data-dismiss="modal">Close</button>#}
+                        {{ form_widget(form.clearLocation, {'label': 'Clear', 'attr': { 'class': 'btn btn-outline-secondary'}}) }}
                         {{ form_widget(form.Collect, {'label': 'Update', 'attr': { 'tabindex': 3, 'class': 'btn btn-outline-success'}}) }}
                     </div>
                     {{ form_end(form) }}
@@ -224,6 +224,7 @@
                 $("#asset_collection_user").val(assignedUserId).trigger("change");
                 document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
                 document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
+                $("#clearLocation").attr("value", storageSlot);
 
                 if (checkedOut != null) {
                     document.getElementById("asset_collection_checkout").checked = true;
@@ -258,9 +259,32 @@
                 //     $("asset_collection_location").prop( "disabled", true);
                 // });
                 if ({{ storageLocked }}) {
-                    $(":input").prop("disabled", true);
+                    $(":input").not("[name=moderationMenu]").not("[name=closeModal]").prop("disabled", true);
                 }
             });
+
+            function clear_form_elements(class_name) {
+                jQuery("#"+class_name).find(':input').each(function() {
+                    switch(this.type) {
+                        case 'password':
+                        case 'text':
+                        case 'textarea':
+                        case 'file':
+                        case 'select-one':
+                        case 'select-multiple':
+                        case 'date':
+                        case 'number':
+                        case 'tel':
+                        case 'email':
+                            jQuery(this).val('');
+                            break;
+                        case 'checkbox':
+                        case 'radio':
+                            this.checked = false;
+                            break;
+                    }
+                });
+            }
 
             $("#modal-checkin").on("hide.bs.modal", function(e) {
                 document.getElementById("asset_collection_userId").removeAttribute("value");
@@ -270,6 +294,7 @@
                 document.getElementById("asset_collection_needsrepair").checked = false;
                 document.getElementById("asset_collection_checkout").checked = false;
                 document.getElementById("asset_collection_processed").checked = false;
+                //clear_form_elements("modal-checkin");
             });
 
             // Start select2

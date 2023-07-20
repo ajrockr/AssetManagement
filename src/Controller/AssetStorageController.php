@@ -63,10 +63,9 @@ class AssetStorageController extends AbstractController
     public function showStorage(Request $request, StorageModerationController $storageModerationController, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, $id): Response
     {
         $storageLocked = $storageModerationController->isLocked($id);
-        $this->assetStorageRepository->getStorageData($id);
         $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
         $collectedAssets = $assetCollectionRepository->getAll();
-        $storage = $this->renderStorageView($this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData());
+        $storage = $this->renderStorageView($this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData(), $storageLocked);
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
         $users = $userRepository->getUsers();
@@ -100,6 +99,20 @@ class AssetStorageController extends AbstractController
             ];
         }
 
+        $form = $this->createForm(AssetCollectionType::class, $collectedAssets);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid() && !$storageLocked) {
+            if ($form->get('clearLocation')->isClicked()) {
+                $clearLocation = $form->get('location')->getViewData();
+                return $this->forward('App\Controller\StorageModerationController::clearLocation', ['location' => $clearLocation]);
+            }
+
+            return $this->forward('App\Controller\AssetController::checkIn', [
+                'form' => $form
+            ]);
+        }
+
         $repairParts = $repairPartsRepository->findAll();
         $parts = [];
         foreach ($repairParts as $repairPart) {
@@ -107,7 +120,6 @@ class AssetStorageController extends AbstractController
                 continue;
             }
             $parts[] = [
-                'id' => $repairPart->getId(),
                 'name' => $repairPart->getName(),
                 'value' => $repairPart->getName()
             ];
@@ -120,31 +132,6 @@ class AssetStorageController extends AbstractController
 
         if ($storageLocked) {
             $this->addFlash('warning', 'This storage has been locked, editing has been disabled.');
-        }
-
-        $form = $this->createForm(AssetCollectionType::class, $collectedAssets);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Iterate through submitted repair parts
-            $neededParts = [];
-            foreach ($parts as $part) {
-                foreach ($request->request->all() as $key => $val) {
-                    if ($part['value'] == $val) {
-                        $neededParts[] = $part['id'];
-                    }
-                }
-            }
-
-            // If storage is locked, don't forward request
-            if ($storageLocked) {
-                return $this->redirectToRoute('app_asset_storage_show');
-            }
-
-            return $this->forward('App\Controller\AssetController::checkIn', [
-                'form' => $form,
-                'neededParts' => $neededParts
-            ]);
         }
 
         return $this->render('asset_storage/show.html.twig', [
@@ -193,7 +180,7 @@ class AssetStorageController extends AbstractController
      * @param array|null $storageData
      * @return Response
      */
-    public function renderStorageView(?array $storageData): string
+    public function renderStorageView(?array $storageData, bool $storageLocked = false): string
     {
         // TODO: Create this HTML in the twig file
 //        if (null === $storageData) {
@@ -203,6 +190,7 @@ class AssetStorageController extends AbstractController
 //        }
 
         $html = '<div id="storageStart">';
+
         foreach ($storageData as $side) {
             $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
 

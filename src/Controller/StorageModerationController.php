@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\StorageLock;
-use App\Repository\AssetCollectionRepository;
-use App\Repository\AssetStorageRepository;
 use App\Repository\StorageLockRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\AssetStorageRepository;
+use App\Repository\AssetCollectionRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class StorageModerationController extends AbstractController
 {
@@ -21,26 +23,45 @@ class StorageModerationController extends AbstractController
     #[Route('/storage/moderation', name: 'app_storage_moderation')]
     public function index() {}
 
-    public function clearStorage() {}
+    #[Route('/asset/storage/moderation/clear/{id}', name: 'app_storage_moderation_clear')]
+    public function clearStorage(Request $request, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, int $id): Response
+    {
+        $locations = $assetStorageRepository->getStorageData($id);
+        $assetCollectionRepository->removeCollection($locations);
+
+        return $this->redirectToRoute('app_asset_storage_show', [
+            'id' => $id
+        ]);
+    }
+
+    public function clearLocation(Request $request, AssetCollectionRepository $assetCollectionRepository, $location): Response
+    {
+        $assetCollectionRepository->removeCollection($location);
+        return $this->redirect($request->headers->get('referer'));
+    }
 
     public function renderModerationButton(int $id): Response
     {
         $isLocked = $this->isLocked($id);
 
+        $lockUrl = $this->generateUrl('app_storage_moderation_lock', ['id' => $id]);
+        $unlockUrl = $this->generateUrl('app_storage_moderation_unlock', ['id' => $id]);
+        $clearUrl = $this->generateUrl('app_storage_moderation_clear', ['id' => $id]);
+
         $html = '<div class="dropdown">
-                    <button type="button" class="btn btn-secondary dropdown-toggle" id="moderationMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button name="moderationMenu" type="button" class="btn btn-secondary dropdown-toggle" id="moderationMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Moderation
                     </button>
                     <div class="dropdown-menu" aria-labelledby="moderationMenuButton">';
 
         // Lock/unlock storage
         if ($isLocked) {
-            $html .= '<a href="#" class="dropdown-item"><i class="fa fa-lock-open mr-2"></i>Unlock Storage</a>';
+            $html .= '<a href="' . $unlockUrl . '" class="dropdown-item"><i class="fa fa-lock-open mr-2"></i>Unlock Storage</a>';
         } else {
-            $html .= '<a href="#" class="dropdown-item"><i class="fa fa-lock mr-2"></i>Lock Storage</a>';
+            $html .= '<a href="' . $lockUrl . '" class="dropdown-item"><i class="fa fa-lock mr-2"></i>Lock Storage</a>';
         }
 
-        $html .= '<a href="#" class="dropdown-item"><i class="fa fa-toilet-paper-slash mr-2"></i>Clear Collected Items</a>';
+        $html .= '<a href="' . $clearUrl . '" class="dropdown-item' . ($this->isLocked($id) ? " disabled" : ""). '"><i class="fa fa-toilet-paper-slash mr-2"></i>Clear Collected Items</a>';
 
         $html .= '</div>
                 </div>';
@@ -65,7 +86,8 @@ class StorageModerationController extends AbstractController
      * @param int $id
      * @return void
      */
-    public function lockStorage(int $id): void
+    #[Route('/asset/storage/moderation/lock/{id}', name: 'app_storage_moderation_lock')]
+     public function lockStorage(Request $request, int $id): Response
     {
         if (!$this->storageLockRepository->findOneBy(['storageId' => $id])) {
             $lock = new StorageLock();
@@ -73,6 +95,10 @@ class StorageModerationController extends AbstractController
             $lock->setStorageId($id);
             $this->storageLockRepository->save($lock, true);
         }
+
+        return $this->redirectToRoute('app_asset_storage_show', [
+            'id' => $id
+        ]);
     }
 
     /**
@@ -81,10 +107,15 @@ class StorageModerationController extends AbstractController
      * @param int $id
      * @return void
      */
-    public function unlockStorage(int $id): void
+    #[Route('/asset/storage/moderation/unlock/{id}', name: 'app_storage_moderation_unlock')]
+    public function unlockStorage(Request $request, int $id): Response
     {
         if ($lock = $this->storageLockRepository->findOneBy(['storageId' => $id])) {
             $this->storageLockRepository->remove($lock, true);
         }
+
+        return $this->redirectToRoute('app_asset_storage_show', [
+            'id' => $id
+        ]);
     }
 }

@@ -1,40 +1,40 @@
 {# /templates/layout.html.twig #}
-
+{% set companyName = config("company_name") %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{% block title %}Asset Management{% endblock %}</title>
+    <title>{% block title %}{{ companyName }}{% endblock %}</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="{{ absolute_url(asset('3rdparty/adminlte/plugins/fontawesome-free/css/all.min.css')) }}">
+    <link rel="stylesheet" href="{{ absolute_url(asset('bundles/adminlte/plugins/fontawesome-free/css/all.min.css')) }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- IonIcons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('3rdparty/adminlte/css/adminlte.min.css') }}">
-    <link rel="stylesheet" href="{{ absolute_url(asset('3rdparty/adminlte/plugins/fontawesome-free/css/all.min.css')) }}">
+    <link rel="stylesheet" href="{{ asset('bundles/adminlte/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ absolute_url(asset('bundles/adminlte/plugins/fontawesome-free/css/all.min.css')) }}">
     <!-- Toastr -->
-    <link rel="stylesheet" href="{{ asset('3rdparty/adminlte/plugins/toastr/toastr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/adminlte/plugins/toastr/toastr.min.css') }}">
     {% block head_custom_css %}{% endblock %}
 
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
     {% block jquery_js %}
-        <script src="{{ asset('3rdparty/adminlte/plugins/jquery/jquery.min.js') }}"></script>
+        <script src="{{ asset('bundles/adminlte/plugins/jquery/jquery.min.js') }}"></script>
     {% endblock %}
     <!-- Bootstrap -->
     {% block bootstrap_js %}
-        <script src="{{ asset('3rdparty/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('bundles/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     {% endblock %}
     <!-- AdminLTE -->
-    <script src="{{ asset('3rdparty/adminlte/js/adminlte.js') }}"></script>
+    <script src="{{ asset('bundles/adminlte/js/adminlte.js') }}"></script>
     <!-- Toaster -->
-    <script src="{{ asset('3rdparty/adminlte/plugins/toastr/toastr.min.js') }}"></script>
+    <script src="{{ asset('bundles/adminlte/plugins/toastr/toastr.min.js') }}"></script>
     <!-- Flash Messages w/ Toastr -->
     <script type="text/javascript">
         $(document).ready(function() {
@@ -112,7 +112,7 @@
 {#                    <a href="#" class="dropdown-item">#}
 {#                        <!-- Message Start -->#}
 {#                        <div class="media">#}
-{#                            <img src="{{ asset('3rdparty/adminlte/img/user1-128x128.jpg') }}" alt="User Avatar" class="img-size-50 mr-3 img-circle">#}
+{#                            <img src="{{ asset('bundles/adminlte/img/user1-128x128.jpg') }}" alt="User Avatar" class="img-size-50 mr-3 img-circle">#}
 {#                            <div class="media-body">#}
 {#                                <h3 class="dropdown-item-title">#}
 {#                                    Brad Diesel#}
@@ -128,7 +128,7 @@
 {#                    <a href="#" class="dropdown-item">#}
 {#                        <!-- Message Start -->#}
 {#                        <div class="media">#}
-{#                            <img src="{{ asset('3rdparty/adminlte/img/user8-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">#}
+{#                            <img src="{{ asset('bundles/adminlte/img/user8-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">#}
 {#                            <div class="media-body">#}
 {#                                <h3 class="dropdown-item-title">#}
 {#                                    John Pierce#}
@@ -144,7 +144,7 @@
 {#                    <a href="#" class="dropdown-item">#}
 {#                        <!-- Message Start -->#}
 {#                        <div class="media">#}
-{#                            <img src="{{ asset('3rdparty/adminlte/img/user3-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">#}
+{#                            <img src="{{ asset('bundles/adminlte/img/user3-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">#}
 {#                            <div class="media-body">#}
 {#                                <h3 class="dropdown-item-title">#}
 {#                                    Nora Silvester#}
@@ -207,8 +207,8 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="{{  path('app_home') }}" class="brand-link">
-            <img src="{{ asset('3rdparty/adminlte/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-            <span class="navbar-brand brand-text font-weight-light">Asset Management</span>
+            <img src="{{ asset('bundles/adminlte/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="navbar-brand brand-text font-weight-light">{{ companyName }}</span>
         </a>
 
         <!-- Sidebar -->
@@ -396,14 +396,14 @@
         All rights reserved.
         Dashboard By <a href="https://adminlte.io">AdminLTE.io</a>
     </footer>
-
+</div>
 <!-- ./wrapper -->
     <!-- OPTIONAL SCRIPTS -->
     {% block optional_javascript %}
-    <script src="{{ asset('3rdparty/adminlte/plugins/chart.js/Chart.min.js') }}"></script>
+    <script src="{{ asset('bundles/adminlte/plugins/chart.js/Chart.min.js') }}"></script>
 
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="{{ asset('3rdparty/adminlte/js/pages/dashboard3.js') }}"></script>
+    <script src="{{ asset('bundles/adminlte/js/pages/dashboard3.js') }}"></script>
     {% endblock %}
 
 </body>

@@ -2,17 +2,5 @@
 {% extends '@!EasyAdmin/page/content.html.twig' %}
 
 {% block main %}
-    {% if errors|length > 0 %}
-        <div class="card border-warning mb-3">
-            <div class="card-header bg-warning text-white"><strong>Warning: Processing upload failed</strong></div>
-            <div class="card-body">
-                <ul class="m-0">
-                    {% for error in errors %}
-                    <li class="card-text">{{ error.message }} [<strong>{{ error.value|join(', ') }}</strong>]</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    {% endif %}
     {{ form(importUserForm) }}
 {% endblock %}

@@ -76,6 +76,7 @@ class AssetCollectionType extends AbstractType
                 ],
             ])
             ->add('Collect', SubmitType::class)
+            ->add('clearLocation', SubmitType::class)
         ;
     }
 

@@ -42,7 +42,7 @@ security:
         - { path: ^/user/changepassword, roles: ROLE_USER }
         - { path: ^/user/profile, roles: ROLE_USER }
         - { path: ^/logout, roles: ROLE_USER }
-        - { path: ^/, roles: ROLE_USER}
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

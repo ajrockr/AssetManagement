@@ -1,0 +1,14 @@
+[0;1;31m●[0m apache2.service
+     Loaded: masked (Reason: Unit apache2.service is masked.)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Thu 2023-06-01 11:25:23 UTC; 1h 25min ago
+
+Jun 01 11:25:23 assetmanagement apachectl[26653]: AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppress this message
+Jun 01 11:25:23 assetmanagement apachectl[26653]: (98)Address already in use: AH00072: make_sock: could not bind to address [::]:80
+Jun 01 11:25:23 assetmanagement apachectl[26653]: (98)Address already in use: AH00072: make_sock: could not bind to address 0.0.0.0:80
+Jun 01 11:25:23 assetmanagement apachectl[26653]: no listening sockets available, shutting down
+Jun 01 11:25:23 assetmanagement apachectl[26653]: AH00015: Unable to open logs
+Jun 01 11:25:23 assetmanagement apachectl[26650]: Action 'start' failed.
+Jun 01 11:25:23 assetmanagement apachectl[26650]: The Apache error log may have more information.
+Jun 01 11:25:23 assetmanagement systemd[1]: [0;1;39m[0;1;31m[0;1;39mapache2.service: Control process exited, code=exited, status=1/FAILURE[0m
+Jun 01 11:25:23 assetmanagement systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mapache2.service: Failed with result 'exit-code'.[0m
+Jun 01 11:25:23 assetmanagement systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start The Apache HTTP Server.[0m
