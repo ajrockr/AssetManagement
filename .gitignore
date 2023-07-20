@@ -2,6 +2,7 @@
 ###> symfony/framework-bundle ###
 /.DS_Store
 /.idea/
+/.env
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -10,6 +11,8 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+/config/plugins/iiq.yaml
 
 ###> phpunit/phpunit ###
 /phpunit.xml
