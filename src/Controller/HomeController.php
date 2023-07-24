@@ -19,9 +19,10 @@ class HomeController extends AbstractController
         private readonly Plugin $iiq
     )
     {
-        $this->iiq->setRequestUrl('/assets/manufacturers');
-        $this->iiq->setRequestMethod($this->iiq::HTTP_METHOD_GET);
-        dd($this->iiq->sendRequest());
+        // dd($this->iiq->getAssetById("ae9b69a2-2e23-442b-90dc-cb5fd0ddb43d"));
+        // dd($this->iiq->getAssetByTag("MOBILE-1978LT2"));
+        dd($this->iiq->searchForAsset("1978LT2"));
+        // dd($this->iiq->test());
     }
     #[Route('/', name: 'app_home')]
     public function index(): Response

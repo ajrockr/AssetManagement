@@ -2,11 +2,12 @@
 
 namespace App\Plugin\IIQ;
 
+use App\Plugin\IIQ\Asset;
 use App\Plugin\ApiRequest;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class Plugin extends ApiRequest
 {
@@ -18,10 +19,11 @@ class Plugin extends ApiRequest
     )
     {
         $this->config = $this->getConfig();
-        parent::__construct($this->client);
+        parent::__construct($this->client, $this->config);
     }
     private function getConfig(): array
     {
+        // TODO: Either put this in _ENV or sql db
         $config = Yaml::parseFile($this->params->get('kernel.project_dir') . '/config/plugins/iiq.yaml');
         if (!array_key_exists('plugin', $config)) {
             throw new InvalidConfigurationException('API configuration is invalid.');
@@ -34,22 +36,108 @@ class Plugin extends ApiRequest
         return $config;
     }
 
-    public function test(): void
+    public function getAssetStatusTypes(): ?array
     {
-        $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1NWEwNmZmOC1hMTkwLTQzMjItODM0NC01OWM2NThjOTg0ODUiLCJzY29wZSI6Imh0dHBzOi8vd2VzdGV4LmluY2lkZW50aXEuY29tIiwic3ViIjoiMzI1Yzg2MDMtYzI3ZC00NGM5LTk4ODgtYjZkMjRlYTJjNWY1IiwianRpIjoiM2VkYTE0NWUtMDAyNy1lZTExLWE5YmItMDAwZDNhZTUwNWYwIiwiaWF0IjoxNjg5ODU5MzA3LjE4MywiZXhwIjoxNzg0NTUzNzA3LjE5N30.VCP0nUEWiG8pmVsgEPm7nH3U44CxlmUI4cX5-4hF-so';
-        dd($this->client);
+        $request = $this->setRequestUrl('/assets/status/types')
+            ->sendRequest();
+
+        return ($request) ? $request->getResponse() : null;
     }
 
-    public function setRequestUrl(string $url): self
+    public function getAssetActivity(string $assetId): ?array
     {
-        $requestUrl = $this->config['plugin']['api_url'] . '/' . ltrim($url, '/');
-        parent::setRequestUrl($requestUrl);
-        return $this;
+        $request = $this->setRequestUrl('/assets/' . $assetId . '/activities')
+            ->sendRequest();
+        return ($request) ? $request->getResponse() : null;
     }
 
-    private function setAuthorization()
+    public function getAssetById(string $assetId): ?array
     {
-        $authorizations = 'Authorization: Bearer ' . $this->config['plugin']['api_token'];
+        $request = $this->setRequestUrl('/assets/' . $assetId)
+            ->sendRequest();
+        return ($request) ? $request->getResponse() : null;
+    }
+
+    public function getAssetByTag(string $assetTag): ?array
+    {
+        $request = $this->setRequestUrl('/assets/assettag/' . $assetTag)
+            ->sendRequest();
+            return ($request) ? $request->getResponse() : null;
+    }
+
+    public function searchForAsset(
+        string $query,
+        bool $uniqueByName = false,
+        bool $skipCustomFieldLoading = true,
+        bool $searchManufacturerName = false,
+        bool $searchModelName = false,
+        bool $searchAssetTag = true,
+        bool $searchSerial = true,
+        bool $searchRoom = false,
+        bool $searchOwner = false,
+        string $searchRoomLocationId = '',
+        bool $searchOnlineSystemsOnly = false): ?Asset
+    {
+        $request = $this->setRequestUrl('/assets/search')
+            ->setRequestMethod(parent::HTTP_METHOD_POST)
+            ->setRequestBodyAsJson([
+                'Query' => $query,
+                'UniqueByName' => $uniqueByName,
+                'SkipCustomFieldLoading' => $skipCustomFieldLoading,
+                'SearchManufacturerName' => $searchManufacturerName,
+                'SearchModelName' => $searchModelName,
+                'SearchAssetTag' => $searchAssetTag,
+                'SearchSerial' => $searchSerial,
+                'SearchRoom' => $searchRoom,
+                'SearchOwner' => $searchOwner,
+                'SearchRoomLocationId' => $searchRoomLocationId,
+                'SearchOnlineSystemsOnly' => $searchOnlineSystemsOnly
+            ])
+            ->sendRequest();
+
+        if ($request) {
+            $response = $request->getResponse()[0];
+            
+            $asset = new Asset;
+            $asset->setAssetId($response['AssetId'])
+                ->setAssetTag($response['AssetTag'])
+                ->setSerialNumber($response['SerialNumber'])
+                ->setModelName($response['Name'])
+                ->setSiteId($response['SiteId'])
+                ->setCreatedDate($response['CreatedDate'])
+                ->setModifiedDate($response['ModifiedDate'])
+                ->setAssetTypeId($response['AssetTypeId'])
+                ->setIsDeleted($response['IsDeleted'])
+                ->setOwnerId($response['OwnerId'])
+                ->setLocationId($response['LocationId'])
+                ->setHasOpenTickets($response['HasOpenTickets'])
+                ->setOpenTicketsCount($response['OpenTickets'])
+                ->setLastVerificationSuccessful($response['LastVerificationSuccessful'])
+                ->setProductId($response['ProductId'])
+                ->setAssetTypeName($response['AssetTypeName'])
+                ->setAssetTypeId($response['AssetTypeId'])
+                ->setStatusTypeId($response['StatusTypeId'])
+                ->setExternalId($response['ExternalId'])
+                ->setCanOwnerManage($response['CanOwnerManage'])
+                ->setCanSubmitTicket($response['CanSubmitTicket'])
+                ->setIsFavorite($response['IsFavorite'])
+                ->setModelId($response['ModelId'])
+                ->setIsReadOnly($response['IsReadOnly'])
+                ->setIsExternallyManaged($response['IsExternallyManaged'])
+                ->setAssetAuditPolicyStatusSortOrder($response['AssetAuditPolicyStatusSortOrder'])
+            ;
+
+            return $asset;
+        }
+
+        return null;
+    }
+
+    public function test(): ?array
+    {
+        $request = $this->setRequestUrl('/categories/of/issues')
+            ->sendRequest();
+        return ($request) ? $request->getResponse() : null;
     }
 }
 

@@ -6,9 +6,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ApiRequest
 {
+    private array $config;
     private string $url = '';
 
-    private $body = '';
+    private string|array|null $body = null;
+
+    private bool $bodyIsJson = false;
 
     private $method = self::HTTP_METHOD_GET;
 
@@ -17,68 +20,141 @@ class ApiRequest
     public const HTTP_METHOD_DELETE = 'DELETE';
     public const HTTP_METHOD_PUT = 'PUT';
 
-    private int $responseStatusCode;
-    private string $responseContentType;
-    private array $responseMessage;
+    private int $responseStatusCode = 0;
+    private string $responseContentType = '';
+    private array $responseMessage = [];
 
     public function __construct(
-        private readonly HttpClientInterface $client
+        private readonly HttpClientInterface $client,
+        array $config
     ) {
+        $this->config = $config;
     }
     
-    public function setRequestUrl(string $url): self
+    protected function setRequestUrl(string $url): self
     {
-        $this->url = $url;
+        $this->url = $this->config['plugin']['api_url'] . '/' . ltrim($url, '/');
         return $this;
     }
 
-    public function getRequestUrl(): string
+    protected function getRequestUrl(): string
     {
         return $this->url;
     }
 
-    public function setRequestBody($body): self
+    protected function setRequestBody(mixed $body): self
     {
         $this->body = $body;
         return $this;
     }
 
-    public function getRequestBody(): array
+    protected function setRequestBodyAsJson(array $body): self
+    {
+        $this->bodyIsJson = true;
+        $this->setRequestBody($body);
+        return $this;
+    }
+
+    protected function getRequestBody()
+    {
+        return $this->body;
+    }
+
+    protected function getRequest(): array
     {
         $body = [
             'url'       => $this->url,
             'method'    => $this->method,
-            'body'      => $this->body
         ];
+        if ($this->bodyIsJson) {
+            $body['json'] = $this->body;
+        } else {
+            $body['body'] = $this->body;
+        }
         return $body;
     }
 
-    public function setRequestMethod($method): self
+    protected function setRequestMethod($method): self
     {
         $this->method = $method;
         return $this;
     }
 
-    public function getRequestMethod(): string
+    protected function getRequestMethod(): string
     {
         return $this->method;
     }
 
-    public function sendRequest(): bool
+    protected function sendRequest(): ?object
     {
-        $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1NWEwNmZmOC1hMTkwLTQzMjItODM0NC01OWM2NThjOTg0ODUiLCJzY29wZSI6Imh0dHBzOi8vd2VzdGV4LmluY2lkZW50aXEuY29tIiwic3ViIjoiMzI1Yzg2MDMtYzI3ZC00NGM5LTk4ODgtYjZkMjRlYTJjNWY1IiwianRpIjoiM2VkYTE0NWUtMDAyNy1lZTExLWE5YmItMDAwZDNhZTUwNWYwIiwiaWF0IjoxNjg5ODU5MzA3LjE4MywiZXhwIjoxNzg0NTUzNzA3LjE5N30.VCP0nUEWiG8pmVsgEPm7nH3U44CxlmUI4cX5-4hF-so';
+        $options = [
+            'auth_bearer' => $this->config['plugin']['api_token'],
+        ];
+
+        if ($this->getRequestBody()) {
+            if ($this->bodyIsJson) {
+                $options['json'] = $this->getRequestBody();
+            } else {
+                $options['body'] = $this->getRequestBody();
+            }
+        }
+
         $response = $this->client->request(
             $this->getRequestMethod(),
             $this->getRequestUrl(),
-            [
-                'auth_bearer' => $token
-            ]
+            $options
         );
         
         $this->responseStatusCode = $response->getStatusCode();
         $this->responseContentType = $response->getHeaders()['content-type'][0];
         $this->responseMessage = $response->toArray();
 
-        return $this->responseStatusCode === 200 ? true : false;
+        return $this->responseStatusCode === 200 ? $this : null;
+    }
+
+    protected function getStatusCode(): int
+    {
+        return $this->responseStatusCode;
+    }
+
+    protected function getContentType(): string
+    {
+        return $this->responseContentType;
+    }
+
+    protected function getResponse(): array
+    {
+        return $this->getResponseItems();
+    }
+
+    /** The following might be specific to IIQ, will have to check */
+    protected function getResponseCount(): ?int
+    {
+        return (isset($this->responseMessage['Paging']['TotalRows'])) ? $this->responseMessage['Paging']['TotalRows'] : null;
+    }
+
+    protected function getTotalPageCount(): ?int
+    {
+        return (isset($this->responseMessage['Paging']['PageCount'])) ? $this->responseMessage['Paging']['PageCount'] : null;
+    }
+
+    protected function getPageSize(): ?int
+    {
+        return (isset($this->responseMessage['Paging']['PageSize'])) ? $this->responseMessage['Paging']['PageSize'] : null;
+    }
+
+    protected function getPageIndex(): ?int
+    {
+        return (isset($this->responseMessage['Paging']['PageIndex'])) ? $this->responseMessage['Paging']['PageIndex'] : null;
+    }
+
+    protected function getExecutionTime(): ?int
+    {
+        return (isset($this->responseMessage['ExecutionTime'])) ? $this->responseMessage['ExecutionTime'] : null;
+    }
+
+    protected function getResponseItems(): array
+    {
+        return isset($this->responseMessage['Items']) ? $this->responseMessage['Items'] : $this->responseMessage['Item'];
     }
 }
