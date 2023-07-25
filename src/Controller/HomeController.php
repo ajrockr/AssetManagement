@@ -21,8 +21,11 @@ class HomeController extends AbstractController
     {
         // dd($this->iiq->getAssetById("ae9b69a2-2e23-442b-90dc-cb5fd0ddb43d"));
         // dd($this->iiq->getAssetByTag("MOBILE-1978LT2"));
-        dd($this->iiq->searchForAsset("1978LT2"));
-        // dd($this->iiq->test());
+        // dd($this->iiq->searchForAsset("1978LT2"));
+        // dd($this->iiq->getParts());
+        // dd($this->iiq->getSuppliers());
+        // dd($this->iiq->getUsers());
+        dd($this->iiq->test());
     }
     #[Route('/', name: 'app_home')]
     public function index(): Response

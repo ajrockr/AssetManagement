@@ -2,9 +2,14 @@
 
 namespace App\Plugin\IIQ;
 
-use App\Plugin\IIQ\Asset;
 use App\Plugin\ApiRequest;
+use App\Plugin\IIQ\Entity\Part;
+use App\Plugin\IIQ\Entity\User;
+use App\Plugin\IIQ\Entity\Asset;
+use App\Plugin\IIQ\Entity\Model;
 use Symfony\Component\Yaml\Yaml;
+use App\Plugin\IIQ\Entity\Supplier;
+use App\Plugin\IIQ\Entity\Manufacturer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -76,7 +81,7 @@ class Plugin extends ApiRequest
         bool $searchRoom = false,
         bool $searchOwner = false,
         string $searchRoomLocationId = '',
-        bool $searchOnlineSystemsOnly = false): ?Asset
+        bool $searchOnlineSystemsOnly = false): ?array
     {
         $request = $this->setRequestUrl('/assets/search')
             ->setRequestMethod(parent::HTTP_METHOD_POST)
@@ -96,46 +101,223 @@ class Plugin extends ApiRequest
             ->sendRequest();
 
         if ($request) {
-            $response = $request->getResponse()[0];
-            
-            $asset = new Asset;
-            $asset->setAssetId($response['AssetId'])
-                ->setAssetTag($response['AssetTag'])
-                ->setSerialNumber($response['SerialNumber'])
-                ->setModelName($response['Name'])
-                ->setSiteId($response['SiteId'])
-                ->setCreatedDate($response['CreatedDate'])
-                ->setModifiedDate($response['ModifiedDate'])
-                ->setAssetTypeId($response['AssetTypeId'])
-                ->setIsDeleted($response['IsDeleted'])
-                ->setOwnerId($response['OwnerId'])
-                ->setLocationId($response['LocationId'])
-                ->setHasOpenTickets($response['HasOpenTickets'])
-                ->setOpenTicketsCount($response['OpenTickets'])
-                ->setLastVerificationSuccessful($response['LastVerificationSuccessful'])
-                ->setProductId($response['ProductId'])
-                ->setAssetTypeName($response['AssetTypeName'])
-                ->setAssetTypeId($response['AssetTypeId'])
-                ->setStatusTypeId($response['StatusTypeId'])
-                ->setExternalId($response['ExternalId'])
-                ->setCanOwnerManage($response['CanOwnerManage'])
-                ->setCanSubmitTicket($response['CanSubmitTicket'])
-                ->setIsFavorite($response['IsFavorite'])
-                ->setModelId($response['ModelId'])
-                ->setIsReadOnly($response['IsReadOnly'])
-                ->setIsExternallyManaged($response['IsExternallyManaged'])
-                ->setAssetAuditPolicyStatusSortOrder($response['AssetAuditPolicyStatusSortOrder'])
-            ;
+            $responses = $request->getResponse();
+            $assets = [];
 
-            return $asset;
+            foreach($responses as $response) {
+                $asset = new Asset;
+                $asset->setAssetId($response['AssetId'])
+                    ->setAssetTag($response['AssetTag'])
+                    ->setSerialNumber($response['SerialNumber'])
+                    ->setModelName($response['Name'])
+                    ->setSiteId($response['SiteId'])
+                    ->setCreatedDate($response['CreatedDate'])
+                    ->setModifiedDate($response['ModifiedDate'])
+                    ->setAssetTypeId($response['AssetTypeId'])
+                    ->setIsDeleted($response['IsDeleted'])
+                    ->setLocationId($response['LocationId'])
+                    ->setHasOpenTickets($response['HasOpenTickets'])
+                    ->setOpenTicketsCount($response['OpenTickets'])
+                    ->setLastVerificationSuccessful($response['LastVerificationSuccessful'])
+                    ->setProductId($response['ProductId'])
+                    ->setAssetTypeName($response['AssetTypeName'])
+                    ->setAssetTypeId($response['AssetTypeId'])
+                    ->setStatusTypeId($response['StatusTypeId'])
+                    ->setExternalId($response['ExternalId'])
+                    ->setCanOwnerManage($response['CanOwnerManage'])
+                    ->setCanSubmitTicket($response['CanSubmitTicket'])
+                    ->setIsFavorite($response['IsFavorite'])
+                    ->setModelId($response['ModelId'])
+                    ->setIsReadOnly($response['IsReadOnly'])
+                    ->setIsExternallyManaged($response['IsExternallyManaged'])
+                    ->setAssetAuditPolicyStatusSortOrder($response['AssetAuditPolicyStatusSortOrder'])
+                ;
+
+                if (isset($response['OwnerId'])) {
+                    $asset->setOwnerId($response['OwnerId']);
+                } elseif (isset($response['PreviousOwnerId'])) {
+                    $asset->setPreviousOwnerId($response['PreviousOwnerId']);
+                }
+                
+                $assets[] = $asset;
+            }
+
+            return $assets;
         }
 
         return null;
     }
 
-    public function test(): ?array
+    public function getModels(): ?array
     {
-        $request = $this->setRequestUrl('/categories/of/issues')
+        $request = $this->setRequestUrl('/assets/models/all/sites')
+            ->sendRequest();
+
+        if ($request) {
+            $responses = $request->getResponse();
+            $models = [];
+            foreach ($responses as $response) {
+                $model = new Model;
+                $model->setManufacturer($response['Manufacturer']['Name'])
+                    ->setModelId($response['ModelId'])
+                    ->setName($response['ModelName'])
+                    ->setType($response['AssetTypeName'])
+                    ->setTypeId($response['AssetTypeId'])
+                    ->setManufacturerId($response['ManufacturerId'])
+                    ->setCategoryId($response['CategoryId'])
+                    ->setCategoryName($response['Category']['Name'])
+                ;
+                $models[] = $model;
+            }
+
+            return $models;
+        }
+
+        return null;
+    }
+
+    public function getManufacturers(): ?array
+    {
+        $request = $this->setRequestUrl('/assets/manufacturers')
+            ->sendRequest();
+
+        if ($request) {
+            $responses = $request->getResponse();
+            $manufacturers = [];
+
+            foreach ($responses as $response) {
+                $manufacturer = new Manufacturer;
+                $manufacturer->setManufacturerId($response['ManufacturerId'])
+                    ->setName($response['Name'])
+                    ->setScope($response['Scope'])
+                ;
+
+                $manufacturers[] = $manufacturer;
+            }
+
+            return $manufacturers;
+        }
+
+        return null;
+    }
+    public function generateAssetTag(): ?string
+    {
+        $request = $this->setRequestUrl('/assets/generate-asset-tag')
+            ->sendRequest();
+        return ($request) ? $request->getResponse()['AssetTag'] : null;
+    }
+
+    public function assetsChanged(): ?array
+    {
+        $request = $this->setRequestUrl('/assets/changed')
+            ->sendRequest();
+        return ($request) ? $request->getResponse() : null;
+    }
+
+    public function getParts(): ?array
+    {
+        $request = $this->setRequestUrl('parts')
+            ->sendRequest();
+
+        if ($request) {
+            $responses = $request->getResponse();
+            $parts = [];
+
+            foreach ($responses as $response) {
+                $part = new Part;
+                $part->setPartId($response['PartId'])
+                    ->setName($response['Name'])
+                    ->setProductId($response['ProductId'])
+                    ->setPrice($response['StandardCostEach'])
+                    ->setQuanityOnHand($response['QuantityOnHand'])
+                    ->setStandardSupplierId($response['StandardSupplierId'])
+                ;
+
+                if (isset($response['StandardSupplier']['Name'])) {
+                    $part->setSupplierName($response['StandardSupplier']['Name']);
+                }
+
+                $parts[] = $part;
+            }
+
+            return $parts;
+        }
+
+        return null;
+    }
+
+    public function getSuppliers(): ?array
+    {
+        $request = $this->setRequestUrl('parts/suppliers')
+            ->sendRequest();
+
+        if ($request) {
+            $responses = $request->getResponse();
+            $suppliers = [];
+
+            foreach($responses as $response) {
+                $supplier = new Supplier;
+                $supplier->setName($response['Name'])
+                    ->setPartSupplierId($response['PartSupplierId'])
+                ;
+
+                $suppliers[] = $supplier;
+            }
+
+            return $suppliers;
+        }
+
+        return null;
+    }
+
+    public function getUsers(): ?array
+    {
+        $request = $this->setRequestUrl('/users')
+            ->setRequestBodyAsJson([
+                'Paging' => [
+                    'PageSize' => 50,
+                ],
+            ])
+            ->sendRequest();
+
+        if ($request) {
+            $responses = $request->getResponse();
+            $users = [];
+
+            foreach ($responses as $response) {
+                $user = new User;
+                $user->setUserId($response['UserId'])
+                    ->setIsDeleted($response['IsDeleted'])
+                    ->setCreatedDate($response['CreatedDate'])
+                    ->setModifiedDate($response['ModifiedDate'])
+                    ->setLocationName($response['LocationName'])
+                    ->setName($response['Name'])
+                    ->setFirstName($response['FirstName'])
+                    ->setLastName($response['LastName'])
+                    ->setEmail($response['Email'])
+                    ->setUsername($response['Username'])
+                    ->setRoleId($response['RoleId'])
+                    ->setRole($response['Role']['Name'])
+                    ->setIsEmailVerified($response['IsEmailVerified'])
+                ;
+
+                if (isset($response['SchoolIdNumber'])) {
+                    $user->setSchoolIdNumber($response['SchoolIdNumber']);
+                }
+
+                $users[] = $user;
+            }
+
+            return $users;
+        }
+
+        return null;
+    }
+
+    public function test()
+    {
+        $request = $this->setRequestUrl('assets/of/2a1561e5-34ff-4fcf-87de-2a146f0e1c01?$s=10000&$o=SerialNumber&$d=Ascending')
+            ->setRequestMethod(parent::HTTP_METHOD_POST)
             ->sendRequest();
         return ($request) ? $request->getResponse() : null;
     }

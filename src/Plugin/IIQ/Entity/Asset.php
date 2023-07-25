@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Plugin\IIQ;
+namespace App\Plugin\IIQ\Entity;
+use App\Plugin\AssetInterface;
 
-class Asset
+class Asset implements AssetInterface
 {
     /**
      * @var string|null
@@ -128,6 +129,8 @@ class Asset
      * @var bool|null
      */
     private ?bool $lastVerificationSuccessful = null;
+
+    private ?string $previousOwnerId = null;
 
     /**
      * Get the value of assetId
@@ -625,6 +628,26 @@ class Asset
     public function setLastVerificationSuccessful($lastVerificationSuccessful): self
     {
         $this->lastVerificationSuccessful = $lastVerificationSuccessful;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of previousOwnerId
+     */ 
+    public function getPreviousOwnerId()
+    {
+        return $this->previousOwnerId;
+    }
+
+    /**
+     * Set the value of previousOwnerId
+     *
+     * @return  self
+     */ 
+    public function setPreviousOwnerId($previousOwnerId)
+    {
+        $this->previousOwnerId = $previousOwnerId;
 
         return $this;
     }
