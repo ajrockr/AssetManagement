@@ -345,6 +345,20 @@ class AssetController extends AbstractController
         return $this->redirect($request->headers->get('referer'));
     }
 
-    // TODO: Idea is to take the data from AssetStorage::storageData and render it in a human readable view
-    public function renderStorageView() {}
+    // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign 
+    public function checkInFromScan()
+    {
+
+        /**
+         * 
+         * 1) Generate form
+         *      a) Scan User Unique Identifier
+         * 2) Return user information and generate new form
+         *      a) Form will be for asset unique identifier
+         * 3) Scan/enter/generate asset unique identifier
+         * 4) Query alread assigned locations for desired storage and determine next available location
+         * 5) Confirm with user to assign asset to determined location
+         * 
+         */
+    }
 }

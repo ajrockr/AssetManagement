@@ -3,6 +3,18 @@
 {% block header_title %}Distribution{% endblock %}
 {% block header_breadcrumb %}Distribution{% endblock %}
 {% block body_content %}
+    {# Checkout buttons #}
+    <div class="container-fluid">
+        <a href="{{ path('app_asset_distribution') }}" class="btn btn-app">
+            <i class="fas fa-right-from-bracket"></i>
+            Distribute Asset
+        </a>
+        <a href="{{ path('app_distribute_revoke') }}" class="btn btn-app">
+            <i class="fas fa-rectangle-list"></i>
+            Distribution History/Revoke
+        </a>
+    </div>
+    {# End checkout buttons #}
     <div class="dataTables_wrapper dt-bootstrap4 container-fluid">
         <table id="assetTable" class="table table-bordered table-hover table-striped dataTable" aria-describedby="assetTable_info" style="width:100%;">
             <thead>
@@ -10,6 +22,7 @@
                 <th class="all">Location</th>
                 <th class="all">Asset Tag</th>
                 <th class="all">Serial Number</th>
+                <th class="all">User ID</th>
                 <th class="all">Last Name</th>
                 <th class="all">First Name</th>
                 <th class="all" id="notesColumn">Notes</th>
@@ -26,6 +39,7 @@
                             <td class="text-center">{{ asset.location }}</td>
                             <td class="text-center">{{ asset.assetTag }}</td>
                             <td class="text-center">{{ asset.serialNumber }}</td>
+                            <td class="text-center">{{ asset.userUniqueIdentifier }}</td>
                             <td class="text-center">{{ asset.userSurname }}</td>
                             <td class="text-center">{{ asset.userFirstName }}</td>
                             <td class="text-center">
@@ -42,7 +56,7 @@
                 {% endfor %}
             </tbody>
         </table><br />
-        <a href="{{ path('app_distribute_revoke') }}">Revoke a distribution</a>
+        {# <a href="{{ path('app_distribute_revoke') }}">Revoke a distribution</a> #}
     </div>
 {% endblock %}
 {% block head_custom_css %}
@@ -78,6 +92,8 @@
             $('.dataTables_filter input[type="search"]').css(
                 {'width': '350px', 'display': 'inline-block'}
             );
+
+            $('.dataTables_filter input').focus();
 
             $('.dataTables_filter input[type="search"]').
                 attr('placeholder', 'Search assets ....').

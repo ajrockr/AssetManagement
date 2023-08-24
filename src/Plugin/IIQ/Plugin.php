@@ -316,9 +316,19 @@ class Plugin extends ApiRequest
 
     public function test()
     {
+        $currentMaxExecutionTime = ini_get('max_execution_time');
+        $currentMemoryLimit = ini_get('memory_limit');
+        ini_set('max_execution_time', $currentMaxExecutionTime * 2);
+        ini_set('memory_limit', '2048M');
+        
         $request = $this->setRequestUrl('assets/of/2a1561e5-34ff-4fcf-87de-2a146f0e1c01?$s=10000&$o=SerialNumber&$d=Ascending')
             ->setRequestMethod(parent::HTTP_METHOD_POST)
             ->sendRequest();
+
+        ini_set('max_execution_time', $currentMaxExecutionTime);
+        ini_set('memory_limit', $currentMemoryLimit);
+
+        dd($request->getExecutionTime());
         return ($request) ? $request->getResponse() : null;
     }
 }

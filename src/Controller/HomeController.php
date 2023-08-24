@@ -25,7 +25,7 @@ class HomeController extends AbstractController
         // dd($this->iiq->getParts());
         // dd($this->iiq->getSuppliers());
         // dd($this->iiq->getUsers());
-        dd($this->iiq->test());
+        // dd($this->iiq->test());
     }
     #[Route('/', name: 'app_home')]
     public function index(): Response

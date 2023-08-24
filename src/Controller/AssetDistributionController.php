@@ -4,21 +4,23 @@ namespace App\Controller;
 
 use App\Entity\AssetCollection;
 use App\Entity\AssetDistribution;
-use App\Repository\AssetCollectionRepository;
-use App\Repository\AssetDistributionRepository;
-use App\Repository\AssetRepository;
 use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\AssetRepository;
+use App\Repository\AssetCollectionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\AssetDistributionRepository;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AssetDistributionController extends AbstractController
 {
-    #[Route('/asset/distribution', name: 'app_asset_distribution')]
-    public function index(AssetDistributionRepository $assetDistributionRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, UserRepository $userRepository): Response
+    private array $assetData = [];
+
+    public function __construct(AssetDistributionRepository $assetDistributionRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, UserRepository $userRepository)
     {
-        $returnArray = [];
         $assetsCollected = $assetCollectionRepository->findAll();
 
         foreach ($assetsCollected as $assetCollected) {
@@ -31,19 +33,64 @@ class AssetDistributionController extends AbstractController
                 'userId' => $assetCollected->getCollectedFrom(),
                 'userFirstName' => $assignedUser->getFirstname(),
                 'userSurname' => $assignedUser->getSurname(),
-                'location' => $assetCollected->getCollectionLocation()
+                'location' => $assetCollected->getCollectionLocation(),
+                'userUniqueIdentifier' => $assignedUser->getUserUniqueId()
             ];
 
             // If asset has already been distributed
             if (null !== $assetDistributionRepository->findOneBy(['deviceId' => $assetCollected->getDeviceID()])) {
-                $returnArray[] = array_merge($assetData, ['sentToDistribution' => 1]);
+                $this->assetData[] = array_merge($assetData, ['sentToDistribution' => 1]);
             } else {
-                $returnArray[] = $assetData;
+                $this->assetData[] = $assetData;
+            }
+        }
+    }
+
+    #[Route('/asset/distribution', name: 'app_asset_distribution')]
+    public function index(): Response {
+        return $this->render('asset_distribution/index.html.twig', [
+            'collectedAssets' => $this->assetData
+        ]);
+    }
+
+    #[Route('/asset/distribution/search')]
+    public function searchAction(string|int $requestString): array
+    {
+        $results = [];
+        foreach ($this->assetData as $array) {
+            if (in_array($requestString, $array)) {
+                $results[] = $array;
             }
         }
 
-        return $this->render('asset_distribution/index.html.twig', [
-            'collectedAssets' => $returnArray
+        return $results;
+    }
+
+    #[Route('/asset/distribution/test', name: 'app_asset_distribution_test')]
+    public function test(Request $request, AssetDistributionRepository $assetDistributionRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, UserRepository $userRepository): Response
+    {
+        $form = $this->createFormBuilder()
+            ->add('Search', SearchType::class, [
+                'label' => false,
+                'attr' => [
+                    'placeholder' => 'Search...',
+                    'class' => ''
+                ]
+            ])
+            // ->add('Search', SubmitType::class)
+            ->getForm()
+        ;
+
+        $searchResults = [];
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $searchResults = $this->searchAction($form->getData()['q']);
+        }
+
+        return $this->render('asset_distribution/search.html.twig', [
+            'searchForm' => $form->createView(),
+            'searchResults' => $searchResults
         ]);
     }
 
@@ -66,7 +113,8 @@ class AssetDistributionController extends AbstractController
         $assetDistributionRepository->save($distributeEntity, true);
         $this->addFlash('success', 'Sent asset for distribution.');
 
-        return $this->redirectToRoute('app_asset_distribution');
+        // return $this->redirectToRoute('app_asset_distribution');
+        return $this->redirect($request->headers->get('referer'));
     }
 
     #[Route('/asset/distribution/roulette', name: 'app_asset_distribution_roulette')]
