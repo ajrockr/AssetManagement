@@ -184,6 +184,7 @@ class AssetDistributionController extends AbstractController
                 'distributedBySurname' => $distUserInfo->getSurname(),
                 'userFirstName' => $userInfo->getFirstname(),
                 'userSurname' => $userInfo->getSurname(),
+                'userUniqueIdentifier' => $userInfo->getUserUniqueId(),
                 'notes' => $distribution->getNotes()
             ];
         }

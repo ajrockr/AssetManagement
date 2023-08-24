@@ -1,10 +1,10 @@
 {% extends 'layout.html.twig' %}
 {% block title %}Asset Distribution{% endblock %}
-{% block header_title %}Distribution{% endblock %}
+{% block header_title %}Revoke Distribution <button data-toggle="collapse" href="#collapsableLinks" aria-expanded="false" aria-controls="collapsableLinks" class="btn btn-flat"><i class="fa-solid fa-ellipsis"></i></button>{% endblock %}
 {% block header_breadcrumb %}Distribution{% endblock %}
 {% block body_content %}
     {# Checkout buttons #}
-    <div class="container-fluid">
+    <div class="collapse container-fluid shadow pt-2 mb-5 bg-white rounded" id="collapsableLinks">
         <a href="{{ path('app_asset_distribution') }}" class="btn btn-app">
             <i class="fas fa-right-from-bracket"></i>
             Distribute Asset
@@ -12,6 +12,10 @@
         <a href="{{ path('app_distribute_revoke') }}" class="btn btn-app">
             <i class="fas fa-rectangle-list"></i>
             Distribution History/Revoke
+        </a>
+        <a href="{{ path('app_asset_distribution_roulette') }}" class="btn btn-app">
+            <i class="fas fa-diagram-next"></i>
+            Roulette
         </a>
     </div>
     {# End checkout buttons #}
@@ -24,6 +28,7 @@
                 <th class="all">Distributed By</th>
                 <th class="all">Asset Tag</th>
                 <th class="all">Serial Number</th>
+                <th class="all">User ID</th>
                 <th class="all">Last Name</th>
                 <th class="all">First Name</th>
                 <th class="all" id="notesColumn">Notes</th>
@@ -40,6 +45,7 @@
                         <td class="text-center">{{ asset.distributedBySurname }}, {{ asset.distributedByFirstName }}</td>
                         <td class="text-center">{{ asset.assetTag }}</td>
                         <td class="text-center">{{ asset.serialNumber }}</td>
+                        <td class="text-center">{{ asset.userUniqueIdentifier }}</td>
                         <td class="text-center">{{ asset.userSurname }}</td>
                         <td class="text-center">{{ asset.userFirstName }}</td>
                         <td class="text-center">{{ asset.notes }}</td>
