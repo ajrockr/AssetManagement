@@ -382,13 +382,13 @@ class AssetController extends AbstractController
 
         // Form 3) Enter in asset info
         $collectionForm = $this->createFormBuilder()
-            ->add('Storage', ChoiceType::class, [
+            ->add('storage', ChoiceType::class, [
                 'choices' => $storagesFormArray
             ])
-            ->add('User', ChoiceType::class, [
+            ->add('user', ChoiceType::class, [
                 'choices' => $usersFormArray
             ])
-            ->add('Asset', TextType::class)
+            ->add('asset', TextType::class)
             ->getForm()
         ;
 
