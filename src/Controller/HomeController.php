@@ -16,7 +16,7 @@ class HomeController extends AbstractController
         private readonly AssetRepository $assetRepository,
         private readonly AssetStorageRepository $assetStorageRepository,
         private readonly AssetCollectionRepository $assetCollectionRepository,
-        private readonly Plugin $iiq
+        // private readonly Plugin $iiq
     )
     {
         // dd($this->iiq->getAssetById("ae9b69a2-2e23-442b-90dc-cb5fd0ddb43d"));

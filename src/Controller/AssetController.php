@@ -15,6 +15,8 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -346,7 +348,8 @@ class AssetController extends AbstractController
     }
 
     // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign 
-    public function checkInFromScan()
+    #[Route('/collection/test', name: 'app_asset_collection_test')]
+    public function checkInFromScan(AssetStorageRepository $assetStorageRepository, UserRepository $userRepository)
     {
 
         /**
@@ -360,5 +363,37 @@ class AssetController extends AbstractController
          * 5) Confirm with user to assign asset to determined location
          * 
          */
+        
+        // Form 1) Select which cart
+        $storages = $assetStorageRepository->findAll();
+
+        $storagesFormArray = [];
+        foreach ($storages as $storage) {
+            $storagesFormArray[$storage->getName() . ' (' . $storage->getDescription() . ')'] = $storage->getId();
+        }
+
+        // Form 2) Fetch all users
+        $users = $userRepository->findAll();
+
+        $usersFormArray = [];
+        foreach ($users as $user) {
+            $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname()] = $user->getId();
+        }
+
+        // Form 3) Enter in asset info
+        $collectionForm = $this->createFormBuilder()
+            ->add('Storage', ChoiceType::class, [
+                'choices' => $storagesFormArray
+            ])
+            ->add('User', ChoiceType::class, [
+                'choices' => $usersFormArray
+            ])
+            ->add('Asset', TextType::class)
+            ->getForm()
+        ;
+
+        return $this->render('asset_collection/collectionForm.html.twig', [
+            'collectionForm' => $collectionForm->createView(),
+        ]);
     }
 }
