@@ -46,7 +46,7 @@
             background-color: #04AA6D;
         }
     </style> #}
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
@@ -229,11 +229,18 @@
         }
 
         .form-step select {
-            border: 1px solid #000;
+            border: 1px solid #aaa;
             height: 2rem;
             border-radius: 5px;
             width: 100%;
             background-color: #fff;
+            text-align: center;
+            font-size: 1em;
+            padding: 1px;
+            box-sizing: border-box;
+            cursor: pointer;
+            display: block;
+            height: 28px;
         }
 
         body {
@@ -284,8 +291,9 @@
                 <section id="step-1" class="form-step text-center">
                     <h2 class="font-normal">Select Storage</h2>
                     <!-- Step 1 input fields -->
-                    <div class="mt-3">
-                        {{ form_widget(collectionForm.storage) }}
+                    <div class="mt-3 input-storage">
+                        <label for="form_storage">Select Storage Unit</label>
+                        {{ form_widget(collectionForm.storage, { 'attr': { 'id': 'form_storage' } }) }}
                     </div>
                     <div class="mt-3">
                         <button class="button btn-navigate-form-step" type="button" step_number="2">Next</button>
@@ -295,8 +303,9 @@
                 <section id="step-2" class="form-step d-none text-center">
                     <h2 class="font-normal">User Assignment</h2>
                     <!-- Step 2 input fields -->
-                    <div class="mt-3">
-                        {{ form_widget(collectionForm.user) }}
+                    <div class="mt-3 input-user">
+                        <label for="form_user">Assign User</label>
+                        {{ form_widget(collectionForm.user, { 'attr': { 'style': 'width:100%', 'id': 'form_user' } }) }}
                     </div>
                     <div class="mt-3">
                         <button class="button btn-navigate-form-step" type="button" step_number="1">Prev</button>
@@ -308,19 +317,36 @@
                     <h2 class="font-normal">Asset Collection</h2>
                     <!-- Step 3 input fields -->
                     <div class="mt-3">
-                        {{ form_widget(collectionForm.asset) }}
+                        <div class="form-group">
+                            <label for="form_asset_tag">Asset Tag</label>
+                            {{ form_widget(collectionForm.asset_tag, { 'attr': { 'id': 'form_asset_tag' } }) }}
+                        </div>
+                        <div class="form-group">
+                            <label for="form_asset_serial">Asset Serial</label>
+                            {{ form_widget(collectionForm.asset_serial, { 'attr': { 'id': 'form_asset_serial' } }) }}
+                        </div>
+                        make, model
                     </div>
                     <div class="mt-3">
                         <button class="button btn-navigate-form-step" type="button" step_number="2">Prev</button>
-                        <button class="button submit-btn" type="submit">Save</button>
+                        <button class="button submit-btn" type="submit">Collect</button>
                     </div>
                 </section>
             {{ form_end(collectionForm) }}
         </div>
     </div>
 </div>
-
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script type="text/javascript">
+        /**
+         * Select2 Configuration
+         */
+        $(document).ready(function() {
+            $('#form_user').select2({
+                'placeholder': 'Select a user...',
+            });
+        });
         /**
         * Define a function to navigate betweens form steps.
         * It accepts one parameter. That is - step number.

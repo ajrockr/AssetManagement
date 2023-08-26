@@ -377,7 +377,7 @@ class AssetController extends AbstractController
 
         $usersFormArray = [];
         foreach ($users as $user) {
-            $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname()] = $user->getId();
+            $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getUserUniqueId() . ')'] = $user->getId();
         }
 
         // Form 3) Enter in asset info
@@ -388,7 +388,8 @@ class AssetController extends AbstractController
             ->add('user', ChoiceType::class, [
                 'choices' => $usersFormArray
             ])
-            ->add('asset', TextType::class)
+            ->add('asset_tag', TextType::class)
+            ->add('asset_serial', TextType::class)
             ->getForm()
         ;
 
