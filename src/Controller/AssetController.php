@@ -349,7 +349,7 @@ class AssetController extends AbstractController
 
     // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign 
     #[Route('/collection/test', name: 'app_asset_collection_test')]
-    public function checkInFromScan(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
+    public function checkInForm(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
     {
 
         /**
