@@ -15,7 +15,9 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -384,7 +386,8 @@ class AssetController extends AbstractController
             }
         }
 
-        // Form 3) Enter in asset info
+        // Set up forms
+        $storageFullForm = null;
         $collectionForm = $this->createFormBuilder()
             ->add('storage', ChoiceType::class, [
                 'choices' => $storagesFormArray
@@ -408,11 +411,34 @@ class AssetController extends AbstractController
             // Get collected assets
             $assignedAssets = $assetCollectionRepository->getCollectedAssetSlots();
             
-            dd(array_intersect($storageData, $assignedAssets));
+            $openStorageSlots = array_map('intval', array_diff($storageData, $assignedAssets));
+
+            if (count($openStorageSlots) == 0) {
+                // return no open slots, ask user to place asset aside?
+                dd('Storage is full, place asset aside?');
+
+                $storageFullForm = $this->createFormBuilder()
+                    ->add('storage_full_place_aside', CheckboxType::class)
+                    ->add('Collect', SubmitType::class)
+                    ->getForm()
+                ;
+            }
+
+            // pseudo for now, allow this to be changed in config
+            $config['storage_collection_sort_slots_order'] = 'asc';
+            if ($config['storage_collection_sort_slots_order'] === 'desc') {
+                rsort($openStorageSlots);
+            } else {
+                // If 'desc' is not the config value or 'asc' is defined, default to ascending
+                sort($openStorageSlots);
+            }
+
+            $nextOpenSlot = reset($openStorageSlots);
         }
 
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
+            'storageFullForm' => (null === $storageFullForm) ? '' : $storageFullForm->createView(),
         ]);
     }
 }

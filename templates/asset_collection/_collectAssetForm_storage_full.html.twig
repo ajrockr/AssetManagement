@@ -1,0 +1,24 @@
+{# asset_collect/_collectAssetForm_storage_full.html.twig #}
+{# asset_collection/_collectAssetForm.html.twig #}
+<div class="container">
+    <div class="form-box">
+        <h1>Asset Collection</h1>
+        <div id="multi-step-form-container">
+            {# {{ form_start(storageFullForm) }} #}
+                <!-- Step 1 Content -->
+                <section id="step-1" class="form-step text-center">
+                    <h2 class="font-normal">Select Storage</h2>
+                    <!-- Step 1 input fields -->
+                    <div class="mt-3 input-storage">
+                        <label for="form_storage">Select Storage Unit</label>
+                        {# {{ form_widget(storageFullForm.storage_full_place_aside) }}
+                        {{ form_widget(storageFullForm.collect) }} #}
+                    </div>
+                    <div class="mt-3">
+                        <button class="button btn-navigate-form-step" type="button" step_number="2">Next</button>
+                    </div>
+                </section>
+            {# {{ form_end(storageFullForm) }} #}
+        </div>
+    </div>
+</div>
