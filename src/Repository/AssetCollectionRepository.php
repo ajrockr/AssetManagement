@@ -39,6 +39,21 @@ class AssetCollectionRepository extends ServiceEntityRepository
         }
     }
 
+    public function getCollectedAssetSlots(): array
+    {
+        $results =  $this->createQueryBuilder('ac')
+            ->select('ac.collectionLocation')
+            ->getQuery()
+            ->getArrayResult()
+        ;
+
+        foreach ($results as $result) {
+            $return[] = $result['collectionLocation'];
+        }
+
+        return $return;
+    }
+
     public function getAll(): array
     {
         $assets = $this->createQueryBuilder('ac')

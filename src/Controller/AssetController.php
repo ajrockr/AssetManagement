@@ -349,7 +349,7 @@ class AssetController extends AbstractController
 
     // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign 
     #[Route('/collection/test', name: 'app_asset_collection_test')]
-    public function checkInFromScan(AssetStorageRepository $assetStorageRepository, UserRepository $userRepository)
+    public function checkInFromScan(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
     {
 
         /**
@@ -377,7 +377,11 @@ class AssetController extends AbstractController
 
         $usersFormArray = [];
         foreach ($users as $user) {
-            $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getUserUniqueId() . ')'] = $user->getId();
+            if ($uid = $user->getUserUniqueId()) {
+                $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getUserUniqueId() . ')'] = $user->getId();
+            } else {
+                $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname()] = $user->getId();
+            }
         }
 
         // Form 3) Enter in asset info
@@ -392,6 +396,20 @@ class AssetController extends AbstractController
             ->add('asset_serial', TextType::class)
             ->getForm()
         ;
+
+        $collectionForm->handleRequest($request);
+
+        if ($collectionForm->isSubmitted() && $collectionForm->isValid()) {
+            $data = $collectionForm->getData();
+
+            // Get storage data
+            $storageData = $assetStorageRepository->getStorageData($data['storage']);
+            
+            // Get collected assets
+            $assignedAssets = $assetCollectionRepository->getCollectedAssetSlots();
+            
+            dd(array_intersect($storageData, $assignedAssets));
+        }
 
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
