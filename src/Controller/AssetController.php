@@ -243,7 +243,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = []): Response
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): Response|bool
     {
         // Set up what is needed to render the page
         $users = $userRepository->findAll();
@@ -251,7 +251,21 @@ class AssetController extends AbstractController
 
         // Set up for the database insertion
         $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
-        $data = $form->getData();
+        
+        if (is_array($form)) {
+            $data = [
+                'device' => $form['asset_tag'],
+                'serial' => $form['asset_serial'],
+                'user' => $form['user'],
+                'location' => $form['location'],
+                'checkout' => false,
+                'processed' => false,
+                'notes' => '',
+                'needsrepair' => false,
+            ];
+        } else {
+            $data = $form->getData();
+        }
 
         $loggedInUserId = $this->getUser()->getId();
 
@@ -346,12 +360,17 @@ class AssetController extends AbstractController
         } else {
             $this->addFlash('warning', 'Something went wrong, could not update asset (' . $data['device'] . ') in slot ' . $data['location'] . '.');
         }
+
+        if ($return) {
+            return true;
+        }
+
         return $this->redirect($request->headers->get('referer'));
     }
 
     // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign 
     #[Route('/collection/test', name: 'app_asset_collection_test')]
-    public function checkInForm(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
+    public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
     {
 
         /**
@@ -402,6 +421,8 @@ class AssetController extends AbstractController
 
         $collectionForm->handleRequest($request);
 
+        $nextOpenSlot = null;
+
         if ($collectionForm->isSubmitted() && $collectionForm->isValid()) {
             $data = $collectionForm->getData();
 
@@ -434,11 +455,16 @@ class AssetController extends AbstractController
             }
 
             $nextOpenSlot = reset($openStorageSlots);
+
+            $data['location'] = $nextOpenSlot;
+            
+            $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
         }
 
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
             'storageFullForm' => (null === $storageFullForm) ? '' : $storageFullForm->createView(),
+            'nextOpenSlot' => (null === $nextOpenSlot) ? '' : $nextOpenSlot,
         ]);
     }
 }

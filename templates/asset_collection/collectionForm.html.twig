@@ -1,10 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if storageFullForm is empty %}
-        {% include 'asset_collection/_collectAssetForm.html.twig' %}
-    {% else %}
+    {% if storageFullForm is not empty %}
         {% include 'asset_collection/_collectAssetForm_storage_full.html.twig' %}
+    {% elseif nextOpenSlot is not empty %}
+        {% include 'asset_collection/_collectAssetCompleted.html.twig' %}
+    {% else %}
+        {% include 'asset_collection/_collectAssetForm.html.twig' %}
     {% endif %}
 {% endblock %}
 
