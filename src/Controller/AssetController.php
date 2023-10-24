@@ -251,7 +251,7 @@ class AssetController extends AbstractController
 
         // Set up for the database insertion
         $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
-        
+
         if (is_array($form)) {
             $data = [
                 'device' => $form['asset_tag'],
@@ -368,13 +368,13 @@ class AssetController extends AbstractController
         return $this->redirect($request->headers->get('referer'));
     }
 
-    // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign 
+    // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign
     #[Route('/collection/test', name: 'app_asset_collection_test')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
     {
 
         /**
-         * 
+         *
          * 1) Generate form
          *      a) Scan User Unique Identifier
          * 2) Return user information and generate new form
@@ -382,9 +382,9 @@ class AssetController extends AbstractController
          * 3) Scan/enter/generate asset unique identifier
          * 4) Query alread assigned locations for desired storage and determine next available location
          * 5) Confirm with user to assign asset to determined location
-         * 
+         *
          */
-        
+
         // Form 1) Select which cart
         $storages = $assetStorageRepository->findAll();
 
@@ -415,7 +415,9 @@ class AssetController extends AbstractController
                 'choices' => $usersFormArray
             ])
             ->add('asset_tag', TextType::class)
-            ->add('asset_serial', TextType::class)
+            ->add('asset_serial', TextType::class, [
+                'required' => false
+            ])
             ->getForm()
         ;
 
@@ -428,10 +430,10 @@ class AssetController extends AbstractController
 
             // Get storage data
             $storageData = $assetStorageRepository->getStorageData($data['storage']);
-            
+
             // Get collected assets
             $assignedAssets = $assetCollectionRepository->getCollectedAssetSlots();
-            
+
             $openStorageSlots = array_map('intval', array_diff($storageData, $assignedAssets));
 
             if (count($openStorageSlots) == 0) {
@@ -457,7 +459,7 @@ class AssetController extends AbstractController
             $nextOpenSlot = reset($openStorageSlots);
 
             $data['location'] = $nextOpenSlot;
-            
+
             $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
         }
 
