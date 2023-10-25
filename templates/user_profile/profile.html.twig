@@ -1,26 +1,34 @@
-{% extends 'layout.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}User Profile{% endblock %}
-{% block header_title %}{{ app.user.firstname }} {{ app.user.surname }} Profile{% endblock %}
-{% block header_breadcrumb %}User Profile{% endblock %}
-{% block body_content %}
+{% block body %}
+<div class="container">
     {% if app.user %}
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
+        <div class="card">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('notice') %}
+                <div class="alert alert-notice">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card-header">
+                <span class="card-title">
+                    <img src="{{ app.user.avatar }}" class="bg-info rounded-circle me-1" style="width:3%;" alt="User Image">
+                    {{ app.user.firstname }} {{ app.user.surname }} :: User Profile
+                </span>
             </div>
-        {% endfor %}
-        {% for message in app.flashes('error') %}
-            <div class="alert alert-error">
-                {{ message }}
+            <div class="card-body">
+                {{ form(userProfileForm) }}
             </div>
-        {% endfor %}
-        {% for message in app.flashes('notice') %}
-            <div class="alert alert-notice">
-                {{ message }}
-            </div>
-        {% endfor %}
-        {{ form(userProfileForm) }}
+        </div>
     {% endif %}
+</div>
 {% endblock %}
-{% block optional_javascript %}{% endblock %}

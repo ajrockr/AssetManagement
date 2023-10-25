@@ -11,18 +11,36 @@
         {% endblock %}
     </head>
     <body>
-        {# Flash Messages & Alerts #}
+        {# begin:flash messages #}
         {% include('flash_messages.html.twig') %}
         {% include('alerts/alert.twig') %}
+        {# end:flash messages #}
 
-        {# Top Navigation #}
+        {# begin:navigation #}
         {% include('_top_navigation.html.twig') %}
+        {# end:navigation #}
 
-        {# Begin Body #}
-        <main>
-            {% block body %}{% endblock %}
+        {# begin:body #}
+        <main class="px-4 h-100 flex-shrink-0 mb-4">
+            <div class="container">
+                <div class="card">
+                    <div class="card-body">
+                        {% block body %}{% endblock %}
+                    </div>
+                </div>
+            </div>
         </main>
-        {# JavaScript #}
+        {# end:body #}
+
+        {# begin:footer #}
+        <footer class="page-footer mt-auto font-small bg-body-tertiary py-2 align-middle">
+            <div class="container">
+                <span class="text-body-secondary">Place sticky footer content here.</span>
+            </div>
+        </footer>
+        {# end:footer #}
+
+        {# begin:javascript #}
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
             <script type="text/javascript">
@@ -104,5 +122,6 @@
                 })()
             </script>
         {% endblock %}
+        {# end:javascript #}
     </body>
 </html>

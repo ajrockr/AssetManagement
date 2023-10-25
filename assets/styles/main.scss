@@ -8,11 +8,23 @@ $font-family_1: 'Roboto', sans-serif;
 html,body {
 	font-family: $font-family_1;
 	width: 100vw;
-	height: 100vh;
+	// height: 100vh;
+  max-height: 100vh;
 	margin: 0;
 	padding: 0;
 	border: 0;
 	outline: 0;
+  overflow: hidden;
+  padding-top: 40px;
+}
+
+html {
+  position: relative;
+}
+
+footer {
+  bottom: 0;
+  width: 100%;
 }
 
 #stepper {

@@ -1,25 +1,22 @@
-{% extends 'layout.html.twig' %}
-{% block title %}Asset Distribution{% endblock %}
-{% block header_title %}Revoke Distribution <button data-toggle="collapse" href="#collapsableLinks" aria-expanded="false" aria-controls="collapsableLinks" class="btn btn-flat"><i class="fa-solid fa-ellipsis"></i></button>{% endblock %}
-{% block header_breadcrumb %}Distribution{% endblock %}
-{% block body_content %}
+{% extends 'base.html.twig' %}
+
+{% block body %}
     {# Checkout buttons #}
-    <div class="collapse container-fluid shadow pt-2 mb-5 bg-white rounded" id="collapsableLinks">
-        <a href="{{ path('app_asset_distribution') }}" class="btn btn-app">
-            <i class="fas fa-right-from-bracket"></i>
-            Distribute Asset
-        </a>
-        <a href="{{ path('app_distribute_revoke') }}" class="btn btn-app">
-            <i class="fas fa-rectangle-list"></i>
-            Distribution History/Revoke
-        </a>
-        <a href="{{ path('app_asset_distribution_roulette') }}" class="btn btn-app">
-            <i class="fas fa-diagram-next"></i>
-            Roulette
-        </a>
-    </div>
+    <a href="{{ path('app_asset_distribution') }}" class="btn btn-app">
+        <i class="fas fa-right-from-bracket"></i>
+        Distribute Asset
+    </a>
+    <a href="{{ path('app_distribute_revoke') }}" class="btn btn-app">
+        <i class="fas fa-rectangle-list"></i>
+        Distribution History/Revoke
+    </a>
+    <a href="{{ path('app_asset_distribution_roulette') }}" class="btn btn-app">
+        <i class="fas fa-diagram-next"></i>
+        Roulette
+    </a>
     {# End checkout buttons #}
-    <div class="dataTables_wrapper dt-bootstrap4 container-fluid">
+
+    <div class="dataTables_wrapper dt-bootstrap5 container-fluid">
         <table id="assetTable" class="table table-bordered table-hover table-striped dataTable" aria-describedby="assetTable_info" style="width:100%;">
             <thead>
             <tr>
@@ -27,7 +24,7 @@
                 <th class="all">Distributed At</th>
                 <th class="all">Distributed By</th>
                 <th class="all">Asset Tag</th>
-                <th class="all">Serial Number</th>
+                <th class="all">S/N</th>
                 <th class="all">User ID</th>
                 <th class="all">Last Name</th>
                 <th class="all">First Name</th>
@@ -49,7 +46,7 @@
                         <td class="text-center">{{ asset.userSurname }}</td>
                         <td class="text-center">{{ asset.userFirstName }}</td>
                         <td class="text-center">{{ asset.notes }}</td>
-                        <td class="text-center"><button type="submit" class="btn btn-outline-secondary">Revoke</button></td>
+                        <td class="text-center align-middle"><button type="submit" class="btn btn-sm btn-outline-secondary">Revoke</button></td>
                     </form>
                 </tr>
             {% endfor %}
@@ -57,35 +54,44 @@
         </table>
     </div>
 {% endblock %}
-{% block head_custom_css %}
-    <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
+{% block stylesheets %}
+    {{ parent() }}
     <style>
         .sentToDistribution {
             background-color: #ff9c9c !important;
         }
     </style>
 {% endblock %}
-{% block head_custom_javascript %}
-    <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('datatables') }}
     <script type="text/javascript">
         $(document).ready(function() {
             // Set the DataTable
             var table = $('#assetTable').DataTable({
-                "scrollX": true,
-                "paging": true,
-                "lengthChange": true,
-                "iDisplayLength": 25,
-                "searching": true,
-                "ordering": true,
-                "order": [[1, 'desc']],
-                "columnDefs": [
-                    {orderable: false, targets: 7}
+                scrollX: '100vw',
+                scrollCollapse: true,
+                scrollY: '68vh',
+                paging: true,
+                pagingType: "numbers",
+                lengthChange: true,
+                iDisplayLength: 25,
+                searching: true,
+                ordering: true,
+                processing: true,
+                columnDefs: [
+                    {orderable: false, targets: 6}
                 ],
-                "info": true,
-                "autoWidth": true,
-                "responsive": true,
-                "autoFill": true,
-                "colReorder": true,
+                info: true,
+                autoWidth: true,
+                responsive: true,
+                autoFill: true,
+                stateSave: true,
+                colReorder: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
             });
 
             $('.dataTables_filter input[type="search"]').css(
