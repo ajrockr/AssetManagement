@@ -2,9 +2,9 @@
 
 {% block body %}
     {# Testing Button #}
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assetCheckinSelectStorageModal">
+    {# <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assetCheckinSelectStorageModal">
         Launch
-    </button>
+    </button> #}
     {# End Testing Button #}
 
     {# This will be set to true if the form was submitted #}
@@ -148,10 +148,30 @@
              */
             const assetCheckedIn = $('input:hidden[name=assetCheckedIn]').val();
             const assetCheckinCompleteModal = $('#assetCheckinCompleteModal');
+            const assetCheckinModal = $('#assetCheckinSelectStorageModal');
 
             if  (assetCheckedIn == 'true') {
                 assetCheckinCompleteModal.modal('show');
             }
+
+            var urlExists = function(url, callback) {
+                if ( ! $.isFunction(callback)) {
+                    throw Error('Not a valid callback');
+                }
+
+                $.ajax({
+                    type: 'HEAD',
+                    url: url,
+                    success: $.proxy(callback, this, true),
+                    error: $.proxy(callback, this, false)
+                });
+            };
+
+            urlExists('/checkin', function(success) {
+                if (success) {
+                    assetCheckinModal.modal('show');
+                }
+            });
         });
     </script>
 {% endblock %}
