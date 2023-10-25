@@ -1,78 +1,114 @@
-<nav class="navbar navbar-expand-lg fixed-top" data-bs-theme="auto">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ path('app_home') }}">Asset Management</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav me-auto mb-2 mb-log-0">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDistribution" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="nav-icon fas fa-arrow-right-from-bracket"></i>
-                        Distribution
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDistribution">
-                        <li>
-                            <a href="{{ path('app_asset_distribution') }}" class="dropdown-item">
-                                <i class="far fa-circle nav-icon"></i>
-                                Distribute
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ path('app_asset_distribution_roulette') }}" class="dropdown-item">
-                                <i class="far fa-circle nav-icon"></i>
-                                Roulette
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarAssetStorage" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="nav-icon fas fa-th"></i>
-                        Storages
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarAssetStorage">
-                        {{ render(controller(
+<nav class="navbar navbar-expand-lg" data-bs-theme="auto">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="{{ path('app_home') }}">Asset Management</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav me-auto mb-2 mb-log-0">
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDistribution" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="nav-icon fas fa-arrow-right-from-bracket"></i>
+						Distribution
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDistribution">
+						<li>
+							<a href="{{ path('app_asset_distribution') }}" class="dropdown-item">
+								<i class="far fa-circle nav-icon"></i>
+								Distribute
+							</a>
+						</li>
+						<li>
+							<a href="{{ path('app_asset_distribution_roulette') }}" class="dropdown-item">
+								<i class="far fa-circle nav-icon"></i>
+								Roulette
+							</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarAssetStorage" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="nav-icon fas fa-th"></i>
+						Storages
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarAssetStorage">
+						{{ render(controller(
                             'App\\Controller\\AssetStorageController::renderNav'
                         )) }}
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ path('app_asset_index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-cubes"></i>
-                        Assets
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ path('app_repair_index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-toolbox"></i>
-                        Repairs
-                    </a>
+					</ul>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_asset_index') }}" class="nav-link">
+						<i class="nav-icon fas fa-cubes"></i>
+						Assets
+					</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_repair_index') }}" class="nav-link">
+						<i class="nav-icon fas fa-toolbox"></i>
+						Repairs</a>
+				</li>
+			</a>
+			<li class="nav-item">
+				<a href="{{ path('app_report_index') }}" class="nav-link">
+					<i class="nav-icon fas fa-file-lines"></i>
+					Reports
+				</a>
+			</li>
+        </ul>
+        <ul class="navbar-nav ml-auto mb-2 mb-log-0">
+            {# Spacer #}
+            <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                <hr class="d-lg-none my-2 text-white-50">
+            </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
                 </a>
-                <li class="nav-item">
-                    <a href="{{ path('app_report_index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-file-lines"></i>
-                        Reports
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <button class="btn btn-dark shadow" id="btnSwitch">Toggle Mode</button>
-                </li>
-            </ul>
-        </div>
-    </div>
-        {# <div class="container">
-            <span class="navbar-text">
-                {% if app.user %}
-                    <div class="">
-                        <div class="image">
-                            <img src="{{ app.user.avatar }}" style="width:40px;" class="img-circle elevation-2" alt="User Image">
-                        </div>
-                        <div class="info">
-                            <a href="{{ path('app_user_profile') }}" class="d-block text-decoration-none">{{ app.user.firstname }} {{ app.user.surname }}</a>
-                        </div>
-                    </div>
-                {% endif %}
-            </span>
-        </div> #}
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a href="#" class="dropdown-item" data-bs-theme-value="dark">
+                            <i class="fa-regular fa-moon"></i>
+                            Dark
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-item" data-bs-theme-value="light">
+                            <i class="fa-solid fa-sun"></i>
+                            Light
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {# Spacer #}
+            <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                <hr class="d-lg-none my-2 text-white-50">
+            </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <span class="dropdown-item">
+                            <img src="{{ app.user.avatar }}" class="bg-info rounded-circle me-1" style="width:15%;" alt="User Image">
+                            {{ app.user.firstname }} {{ app.user.surname }}
+                        </span>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a href="#" class="dropdown-item">Profile</a></li>
+                    <li><a href="#" class="dropdown-item">Settings</a></li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li><a href="#" class="dropdown-item">Admin</a></li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a href="#" class="dropdown-item">Sign Out</a></li>
+                </ul>
+            </li>
+		</ul>
+	</div>
 </nav>
