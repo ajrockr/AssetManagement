@@ -189,6 +189,14 @@ run_composer_install() {
     composer install --no-dev --optimize-autoloader --prefer-source
 }
 
+modify_project_env() {
+    ENV_FILE=".env"
+    cp "$ENV_FILE" "${$ENV_FILE}.bak"
+    sed -i 's/DATABASE_URL="mysql://${mysql_user}:${mysql_password}@127.0.0.1:3306/${db_name}?serverVersion=8&charset=utf8mb4' "$ENV_FILE"
+
+    echo "Modified .env file"
+}
+
 # Main script execution
 install_packages
 check_php_version
@@ -198,6 +206,7 @@ prompt_for_nginx_site
 install_composer
 secure_mysql
 configure_nginx_site
+modify_project_env
 copy_files_to_webroot
 run_composer_install
 
@@ -206,5 +215,7 @@ systemctl start nginx
 systemctl enable nginx
 systemctl start php-fpm
 systemctl enable php-fpm
+systemctl start mysqld || systemctl start mysql
+systemctl enable mysqld || systemctl enable mysql
 
 # End of the script
