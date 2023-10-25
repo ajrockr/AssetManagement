@@ -1,4 +1,4 @@
-h1 {
+/* h1 {
     text-align: center;
 }
 h2 {
@@ -190,7 +190,7 @@ ul.form-stepper li a .form-stepper-circle {
     cursor: pointer;
     display: block;
     height: 28px;
-}
+} */
 
 #stepper {
     display: flex;
