@@ -22,7 +22,7 @@
 
         {# begin:body #}
         <main class="px-4 h-100 flex-shrink-0 mb-4">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="card">
                     <div class="card-body">
                         {% block body %}{% endblock %}
@@ -33,9 +33,16 @@
         {# end:body #}
 
         {# begin:footer #}
-        <footer class="page-footer mt-auto font-small bg-body-tertiary py-2 align-middle">
-            <div class="container">
-                <span class="text-body-secondary">Place sticky footer content here.</span>
+        <footer class="page-footer mt-auto font-small bg-body-tertiary py-2 pt-3 align-middle">
+            <div class="container-fluid align-middle">
+                <div class="row w-100">
+                    <div class="col">
+                        Asset Management <div class="vr mx-2"></div><a href="https://github.com/ajrockr/AssetManagement"><i class="fa-brands fa-github"></i></a>
+                    </div>
+                    <div class="col text-end">
+                        <small>Version 1.0.0 DEV</small>
+                    </div>
+                </div>
             </div>
         </footer>
         {# end:footer #}

@@ -7,6 +7,12 @@
             </button>
             <div class="collapse navbar-collapse flex-grow-0" id="navbarNavDropdown">
                 <ul class="navbar-nav text-center align-middle me-auto">
+                    <li class="nav-item">
+                        <a href="{{ path('app_asset_collection_test') }}" class="nav-link">
+                            <i class="fa-regular fa-square-check"></i>
+                            Check In
+                        </a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDistribution" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="nav-icon fas fa-arrow-right-from-bracket"></i>
@@ -15,14 +21,17 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDistribution">
                             <li>
                                 <a href="{{ path('app_asset_distribution') }}" class="dropdown-item">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    Distribute
+                                    <i class="fas fa-right-from-bracket"></i> Distribute
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ path('app_asset_distribution_roulette') }}" class="dropdown-item">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    Roulette
+                                        <i class="fas fa-diagram-next"></i> Roulette
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path('app_distribute_revoke') }}" class="dropdown-item">
+                                    <i class="fas fa-rectangle-list"></i> History / Revoke
                                 </a>
                             </li>
                         </ul>
@@ -56,8 +65,6 @@
                         Reports
                     </a>
                 </li>
-            {# </ul>
-            <ul class="navbar-nav ml-auto mb-2 mb-log-0"> #}
                 {# Spacer #}
                 <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                     <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
