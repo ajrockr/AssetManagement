@@ -53,7 +53,7 @@ class AssetStorageController extends AbstractController
             return $this->redirectToRoute('app_asset_storage_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('asset_storage/new.html.twig', [
+        return $this->render('asset_storage/new.html.twig', [
             'asset_storage' => $assetStorage,
             'form' => $form,
         ]);
@@ -198,7 +198,7 @@ class AssetStorageController extends AbstractController
                 $html .= '<div id="storageContainerRow" class="row no-gutters storageRows">';
 
                 foreach ($row as $id=>$slot) {
-                    $html .= '  
+                    $html .= '
                     <div id="slot-'.$slot.'" class="col-sm p-0 storageCell">
                         <a href="javascript:void(0);" class="text-decoration-none my-asset-collection-btn" role="button" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="' . $slot . '" id="href-slot-' . $slot . '">
                             <span data-bs-toggle="modal" data-bs-target="#modal-checkin" data-slot="'.$slot.'" id="slotNumber-'. $slot . '">' . $slot . '</span>

@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\SiteConfig;
+use App\Event\AssetCollectedEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,7 +11,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class KernelRequestSubscriber implements EventSubscriberInterface
 {
@@ -35,7 +38,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
 
         // Get current route
         $route = $event->getRequest()->attributes->get('_route');
-    
+
         // If maintenance mode & notCli & not app_login route & not ROLE_ADMIN, we are in maintenance mode. Redirect to login
         if( ($isMaintenance == "1" && !$isCli && ($route != "app_login" || $route != "admin")) && !$this->security->isGranted('ROLE_USER')) {
             $event->setResponse(new RedirectResponse(

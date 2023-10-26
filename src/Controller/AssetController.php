@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
+use App\EventSubscriber\AssetCollectedSubscriber;
 use App\Form\AssetType;
 use App\Entity\AssetCollection;
 use App\Form\AssetCollectionType;
+use App\Event\AssetCollectedEvent;
 use App\Repository\UserRepository;
 use App\Repository\AssetRepository;
 use App\Repository\RepairRepository;
@@ -16,19 +18,25 @@ use App\Repository\AssetCollectionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_SUPER_ADMIN')")]
 #[Route('/asset')]
 class AssetController extends AbstractController
 {
+    private int $lastSlotCollected;
+
+    public function __construct(
+        protected readonly EventDispatcherInterface $eventDispatcher
+    ) {}
+
     #[Route('/', name: 'app_asset_index', methods: ['GET'])]
     public function index(AssetRepository $assetRepository, UserRepository $userRepository): Response
     {
@@ -101,20 +109,11 @@ class AssetController extends AbstractController
             return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('asset/new.html.twig', [
+        return $this->render('asset/new.html.twig', [
             'asset' => $asset,
             'form' => $form,
         ]);
     }
-
-//    #[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
-//    #[Route('/{id}', name: 'app_asset_show', methods: ['GET'])]
-//    public function show(Asset $asset): Response
-//    {
-//        return $this->render('asset/show.html.twig', [
-//            'asset' => $asset,
-//        ]);
-//    }
 
     #[Security("is_granted('ROLE_ASSET_EDIT') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
@@ -131,7 +130,7 @@ class AssetController extends AbstractController
             return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('asset/edit.html.twig', [
+        return $this->render('asset/edit.html.twig', [
             'asset' => $asset,
             'form' => $form,
         ]);
@@ -245,7 +244,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): Response|bool
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): bool
     {
         // Set up what is needed to render the page
         $users = $userRepository->findAll();
@@ -271,7 +270,7 @@ class AssetController extends AbstractController
 
         $loggedInUserId = $this->getUser()->getId();
 
-        // TODO: Add the date field to the form
+        // TODO Add the date field to the form
         $date = null;
 
         $device = null;
@@ -300,6 +299,7 @@ class AssetController extends AbstractController
         }
 
         $action = false;
+        // Device already collected, update the record
         if ($assetCollection = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
                 ->setCollectedBy($loggedInUserId)
@@ -310,6 +310,7 @@ class AssetController extends AbstractController
                 ->setProcessed($data['processed'])
                 ->setCollectionNotes($data['notes']);
             $action = 'update';
+        // Device not collected, create the collection record
         } else {
             $assetCollection = new AssetCollection();
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
@@ -323,12 +324,16 @@ class AssetController extends AbstractController
             $action = 'create';
         }
 
+        // Persist the collection record
         try {
             $assetCollectionRepository->save($assetCollection, true);
         } catch(\Exception $e) {
             // Failed, get out of here with Flash Message
-            $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
-            return $this->redirect($request->headers->get('referer'));
+            // TODO commenting out for testing
+            // $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
+            // return $this->redirect($request->headers->get('referer'));
+            // TODO I'm returning bool here for testing, this might break other parts of the site for now
+            return false;
         }
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,
@@ -340,7 +345,8 @@ class AssetController extends AbstractController
             try {
                 $assetRepository->save($asset, true);
             } catch(\Exception $e) {
-                $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
+                // TODO commenting out for testing
+                // $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
             }
         }
 
@@ -355,22 +361,25 @@ class AssetController extends AbstractController
             $repairController->createRepair($assetRepository, $repairRepository, $repairData);
         }
 
-        if ($action == 'update') {
-            $this->addFlash('success', 'Asset (' . $data['device'] . ') assigned to slot (' . $data['location'] . ')');
-        } elseif ($action == 'create') {
-            $this->addFlash('success', 'Asset (' . $data['device'] . ') has been updated on slot (' . $data['location'] . ')');
-        } else {
-            $this->addFlash('warning', 'Something went wrong, could not update asset (' . $data['device'] . ') in slot ' . $data['location'] . '.');
-        }
+        // TODO again, do I just make this return bool. No flash messages, no nothing...?
+        // if ($action == 'update') {
+        //     $this->addFlash('success', 'Asset (' . $data['device'] . ') assigned to slot (' . $data['location'] . ')');
+        // } elseif ($action == 'create') {
+        //     $this->addFlash('success', 'Asset (' . $data['device'] . ') has been updated on slot (' . $data['location'] . ')');
+        // } else {
+        //     $this->addFlash('warning', 'Something went wrong, could not update asset (' . $data['device'] . ') in slot ' . $data['location'] . '.');
+        // }
 
-        if ($return) {
-            return true;
-        }
+        // if ($return) {
+        //     return true;
+        // }
 
-        return $this->redirect($request->headers->get('referer'));
+        // TODO I'm returning bool here for testing, this might break other parts of the site for now
+
+        return true;
+        // return $this->redirect($request->headers->get('referer'));
     }
 
-    // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign
     #[Route('/collection/collect', name: 'app_asset_collection_collect')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, array $requestingPathParams = []): Response
     {
@@ -485,8 +494,9 @@ class AssetController extends AbstractController
             $data['location'] = $nextOpenSlot;
 
             $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
-
             // TODO set a flash message
+            $this->addFlash('assetCollected', $nextOpenSlot);
+
             return $this->redirectToRoute($requestingPath, [
                 $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
             ]);
@@ -498,5 +508,15 @@ class AssetController extends AbstractController
             'nextOpenSlot' => (null === $nextOpenSlot) ? '' : $nextOpenSlot,
             'requestingPath' => $requestingPath
         ]);
+    }
+
+    public function setLastSlotCollected(int $slotNumber): void
+    {
+        $this->lastSlotCollected = $slotNumber;
+    }
+
+    public function getLastSlotCollected(): int
+    {
+        return $this->lastSlotCollected;
     }
 }

@@ -11,28 +11,19 @@
         {% endblock %}
     </head>
     <body>
-        {% set currentController = app.request.attributes.get('_controller') %}
-        {# {% set currentPath = path(app.request.attributes.get('_route'),
-                       app.request.attributes.get('_route_params')) %} #}
-        {% set currentPath = app.request.attributes.get('_route') %}
-        {% set currentPathParams = app.request.attributes.get('_route_params') %}
 
-        {# {{ dump(currentPathParams) }} #}
-
-        {# begin:flash messages #}
-        {% include('flash_messages.html.twig') %}
+        {# include:flash messages #}
+        {# {% include('flash_messages.html.twig') %} #}
         {% include('alerts/alert.twig') %}
         {# end:flash messages #}
 
         {# include:collectionForm #}
-        {# {% include('asset_collection/collectionForm.html.twig') %} #}
+        {# Because we are calling this method from anywhere on the site, we need to know what route it was called from #}
+        {% set currentPath = app.request.attributes.get('_route') %}
+        {% set currentPathParams = app.request.attributes.get('_route_params') %}
         {{ render(controller(
             'App\\Controller\\AssetController::checkInForm', {'requestingPath': currentPath, 'requestingPathParams': currentPathParams})
         ) }}
-
-        {% if nextOpenSlot is defined %}
-            {{ dump(nextOpenSlot) }}
-        {% endif %}
 
         {# include:navigation #}
         {% include('_top_navigation.html.twig') %}
@@ -171,28 +162,12 @@
                     if  (assetCheckedIn == 'true') {
                         assetCheckinCompleteModal.modal('show');
                     }
-
-                    var urlExists = function(url, callback) {
-                        if ( ! $.isFunction(callback)) {
-                            throw Error('Not a valid callback');
-                        }
-
-                        $.ajax({
-                            type: 'HEAD',
-                            url: url,
-                            success: $.proxy(callback, this, true),
-                            error: $.proxy(callback, this, false)
-                        });
-                    };
-
-                    urlExists('/checkin', function(success) {
-                        if (success) {
-                            assetCheckinModal.modal('show');
-                        }
-                    });
                 });
             </script>
         {% endblock %}
         {# end:javascript #}
+
+        {# Asset Collected Modal #}
+        {% include('alerts/assetCollected.html.twig') %}
     </body>
 </html>

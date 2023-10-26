@@ -1,0 +1,28 @@
+{% set assetCollectedFlashBag = app.flashes('assetCollected') %}
+{% if assetCollectedFlashBag|length > 0 %}
+    {% for label, nextOpenSlot in assetCollectedFlashBag %}
+        <div class="modal fade" id="assetCheckinCompletedModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        {% if nextOpenSlot is defined %}
+                            <div class="display-1">{{ nextOpenSlot }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        {# <button class="btn btn-primary" data-bs-target="#assetCheckinSelectStorage" data-bs-toggle="modal">Add Another</button> #}
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            {{ encore_entry_script_tags('app') }}
+            {{ encore_entry_script_tags('select2') }}
+            $(document).ready(function() {
+                const assetCheckinCompleteModal = $('#assetCheckinCompletedModal');
+                assetCheckinCompleteModal.modal('show');
+            });
+        </script>
+    {% endfor %}
+{% endif %}
