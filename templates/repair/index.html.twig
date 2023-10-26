@@ -1,8 +1,5 @@
-{% extends 'layout.html.twig' %}
-{% block title %}Repairs{% endblock %}
-{% block header_breadcrumb %}Repairs{% endblock %}
-{% block header_title %}Repairs{% endblock %}
-{% block body_content %}
+{% extends 'base.html.twig' %}
+{% block body %}
 <div class="dataTables_wrapper dt-bootstrap4">
     <div class="row">
         <div class="col-sm-12">
@@ -31,9 +28,9 @@
                         <td>{{ repair.partsNeeded ? repair.partsNeeded|join(', ') : '' }}</td>
                         <td>{{ repair.status }}</td>
                         <td>{{ repair.lastModifiedDate ? repair.lastModifiedDate|date('Y-m-d H:i:s') : '' }}</td>
-                        <td>
-                            <a href="{{ path('app_repair_show', {'id': repair.id}) }}">show</a>
-                            <a href="{{ path('app_repair_edit', {'id': repair.id}) }}">edit</a>
+                        <td class="align-middle text-center">
+                            {# <a role="button" class="btn btn-sm btn-secondary" href="{{ path('app_repair_show', {'id': repair.id}) }}">Show</a> #}
+                            <a role="button" class="btn btn-sm btn-secondary" href="{{ path('app_repair_edit', {'id': repair.id}) }}">Edit</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -45,39 +42,39 @@
 
     <a href="{{ path('app_repair_new') }}">Create new</a>
 {% endblock %}
-{% block head_custom_css %}
-    <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
-{% endblock %}
-{% block head_custom_javascript %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('datatables') }}
     <!-- Popper Js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 
-    <script src="{{ asset('bundles/hierarchy-select/hierarchy-select.min.js') }}"></script>
+    {# <script src="{{ asset('bundles/hierarchy-select/hierarchy-select.min.js') }}"></script> #}
     <!-- DataTables  & Plugins -->
-    <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+    {# <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script> #}
     <script type="text/javascript">
         $(document).ready(function() {
             // Set the DataTable
             var table = $('#repairTable').DataTable({
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                "scrollX": true,
-                "paging": true,
-                "lengthChange": true,
-                "iDisplayLength": 25,
-                "searching": true,
-                "ordering": true,
-                "columnDefs": [
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                scrollX: true,
+                paging: true,
+                lengthChange: true,
+                iDisplayLength: 25,
+                searching: true,
+                ordering: true,
+                columnDefs: [
                     {orderable: false, targets: 8}
                 ],
-                "info": true,
-                "autoWidth": true,
-                "responsive": true,
-                "autoFill": true,
-                "colReorder": true,
+                info: true,
+                autoWidth: true,
+                responsive: true,
+                autoFill: true,
+                colReorder: true,
             });
 
-            table.buttons().container()
-                .appendTo($('.col-sm-12:eq(0)', table.table().container()));
+            // table.buttons().container()
+            //     .appendTo($('.col-sm-12:eq(0)', table.table().container()));
         });
     </script>
 {% endblock %}

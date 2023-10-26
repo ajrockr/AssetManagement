@@ -1,10 +1,7 @@
-{% extends 'layout.html.twig' %}
-{% block title %}Repairs{% endblock %}
-{% block header_breadcrumb %}Repairs{% endblock %}
-{% block header_title %}Repairs{% endblock %}
-{% block body_content %}
+{% extends 'base.html.twig' %}
+
+{% block body %}
     {{ include('repair/_form.html.twig', {'button_label': 'Update'}) }}
 
     <a href="{{ path('app_repair_index') }}">back to list</a>
 {% endblock %}
-{% block optional_javascript %}{% endblock %}

@@ -112,7 +112,7 @@
                             <li><a href="{{ path('app_user_profile') }}" class="dropdown-item">Profile</a></li>
                             <li><a href="#" class="dropdown-item">Settings</a></li>
                             {% if is_granted('ROLE_ADMIN') %}
-                                <li><a href="#" class="dropdown-item">Admin</a></li>
+                                <li><a href="{{ path('admin') }}" class="dropdown-item">Admin</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a href="#" class="dropdown-item">Sign Out</a></li>
