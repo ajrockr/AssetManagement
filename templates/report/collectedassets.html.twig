@@ -1,9 +1,6 @@
-{% extends 'layout.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Reports{% endblock %}
-{% block header_title %}Assets Collected{% endblock %}
-{% block header_breadcrumb %}Report{% endblock %}
-{% block body_content %}
+{% block body %}
     <div class="dataTables_wrapper dt-bootstrap4">
         <div class="row">
             <div class="col-sm-12">
@@ -42,41 +39,39 @@
     </div>
 {% endblock %}
 
-{% block head_custom_css %}
-    <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('bundles/hierarchy-select/hierarchy-select.min.css') }}" rel="stylesheet"/>
+{% block stylesheets %}
+    {{ parent() }}
+    {# <link href="{{ asset('bundles/DataTables/datatables.min.css') }}" rel="stylesheet"/> #}
+    {# <link href="{{ asset('bundles/hierarchy-select/hierarchy-select.min.css') }}" rel="stylesheet"/> #}
 {% endblock %}
-{% block head_custom_javascript %}
+{% block javascripts %}
+    {{ parent() }}
     <!-- Popper Js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 
-    <script src="{{ asset('bundles/hierarchy-select/hierarchy-select.min.js') }}"></script>
+    {# <script src="{{ asset('bundles/hierarchy-select/hierarchy-select.min.js') }}"></script> #}
     <!-- DataTables  & Plugins -->
-    <script charset="utf8" src="{{ asset('bundles/DataTables/datatables.min.js') }}"></script>
+    {{ encore_entry_script_tags('datatables') }}
     <script type="text/javascript">
         $(document).ready(function() {
             // Set the DataTable
             var table = $('#assetTable').DataTable({
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                "scrollX": true,
-                "paging": true,
-                "lengthChange": true,
-                "iDisplayLength": 25,
-                "searching": true,
-                "ordering": true,
-                "columnDefs": [
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                scrollX: true,
+                paging: true,
+                lengthChange: true,
+                iDisplayLength: 25,
+                searching: true,
+                ordering: true,
+                columnDefs: [
                     {orderable: false, targets: 7}
                 ],
-                "info": true,
-                "autoWidth": true,
-                "responsive": true,
-                "autoFill": true,
-                "colReorder": true,
+                info: true,
+                autoWidth: true,
+                responsive: true,
+                autoFill: true,
+                colReorder: true,
             });
-
-            table.buttons().container()
-                .appendTo($('.col-sm-12:eq(0)', table.table().container()));
         });
     </script>
 {% endblock %}
-{% block optional_javascript %}{% endblock %}
