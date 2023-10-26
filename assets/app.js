@@ -21,13 +21,11 @@ const $ = require('jquery');
 // create jQuery global
 global.$ = global.jQuery = $
 
-// https://stackoverflow.com/questions/63082529/how-to-properly-introduce-a-light-dark-mode-in-bootstrap
-// document.getElementById('btnSwitch').addEventListener('click',()=>{
-//     if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-//         document.documentElement.setAttribute('data-bs-theme','light')
-//     }
-//     else {
-//         document.documentElement.setAttribute('data-bs-theme','dark')
-//     }
-// })
+import zoomPlugin from 'chartjs-plugin-zoom';
+import { Colors } from 'chart.js';
 
+document.addEventListener('chartjs:init', function (event) {
+    const Chart = event.detail.Chart;
+    Chart.register(zoomPlugin);
+    Chart.register(Colors);
+});

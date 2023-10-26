@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Plugin\IIQ\Plugin;
-use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
+use Symfony\UX\Chartjs\Model\Chart;
 use App\Repository\AssetStorageRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\AssetCollectionRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
@@ -28,14 +30,44 @@ class HomeController extends AbstractController
         // dd($this->iiq->test());
     }
     #[Route('/', name: 'app_home')]
-    public function index(): Response
+    public function index(ChartBuilderInterface $chartBuilder): Response
     {
+        $totalAssetsCount = $this->getTotalAssetsCount();
+        $totalCollectedAssetsCount = $this->getCollectedAssetsCount();
+        $totalDecommissionedAssetsCount = $this->getDecommissionedAssetsCount();
+        $totalStoragesCount = $this->getStorageCount();
+        $storageSizes = $this->getStorageSizes();
+
+        $assetsTotalChart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
+        $assetsTotalChart->setData([
+            'labels' => ['Total Assets', 'Assets Collected', 'Assets Decommissioned'],
+            'datasets' => [
+                [
+                    'label' => 'Asset Counts',
+                    'data' => [$totalAssetsCount, $totalCollectedAssetsCount, $totalDecommissionedAssetsCount],
+                    'backgroundColor' => [
+                        '#20c997',
+                        '#0d6efd',
+                        '#dc3545'
+                    ]
+                ]
+            ]
+        ]);
+        $assetsTotalChart->setOptions([
+            'responsive' => true,
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'top'
+                ],
+                'colors' => [
+                    'enabled' => true
+                ]
+            ]
+        ]);
+
         return $this->render('home/index2.html.twig', [
-            'totalAssetsCount' => $this->getTotalAssetsCount(),
-            'totalCollectedAssetsCount' => $this->getCollectedAssetsCount(),
-            'totalDecommissionedAssetsCount' => $this->getDecommissionedAssetsCount(),
-            'totalStoragesCount' => $this->getStorageCount(),
-            'storageSizes' => $this->getStorageSizes()
+            'assetsTotalChart' => $assetsTotalChart,
         ]);
     }
 
