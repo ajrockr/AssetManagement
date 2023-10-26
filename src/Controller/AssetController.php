@@ -374,17 +374,8 @@ class AssetController extends AbstractController
     #[Route('/collection/collect', name: 'app_asset_collection_collect')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, array $requestingPathParams = []): Response
     {
-        /**
-         *
-         * 1) Generate form
-         *      a) Scan User Unique Identifier
-         * 2) Return user information and generate new form
-         *      a) Form will be for asset unique identifier
-         * 3) Scan/enter/generate asset unique identifier
-         * 4) Query alread assigned locations for desired storage and determine next available location
-         * 5) Confirm with user to assign asset to determined location
-         *
-         */
+        // TODO also, select2 styling is weird on different pages. make sure that is uniform
+        // TODO can I deny someone from accessing this through the browser?
 
         // Form 1) Select which cart
         $storages = $assetStorageRepository->findAll();
