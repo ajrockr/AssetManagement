@@ -1,114 +1,106 @@
-    {# This will be set to true if the form was submitted #}
-    {% if nextOpenSlot is not empty %}
-        <input type="hidden" name="assetCheckedIn" value="true"/>
-    {% else %}
-        <input type="hidden" name="assetCheckedIn" value="false"/>
-    {% endif %}
+{{ form_start(collectionForm, { 'attr': { 'enctype': 'multipart/form-data' }}) }}
+    {{ form_widget(collectionForm.requestingPath) }}
+    {{ form_widget(collectionForm.requestingPathParamKey) }}
+    {{ form_widget(collectionForm.requestingPathParamVal) }}
 
-    {{ form_start(collectionForm, { 'attr': { 'id': 'userAccountSetupForm', 'name': 'userAccountSetupForm', 'enctype': 'multipart/form-data' }}) }}
-        {{ form_widget(collectionForm.requestingPath) }}
-        {{ form_widget(collectionForm.requestingPathParamKey) }}
-        {{ form_widget(collectionForm.requestingPathParamVal) }}
-
-        <div class="modal fade" id="assetCheckinSelectStorageModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header text-center">
-                        <div id="stepper">
-                            <span class="stepIndicator active">Select Storage</span>
-                            <span class="stepIndicator">Select User</span>
-                            <span class="stepIndicator">Select Asset</span>
-                        </div>
-                        {# TODO figure the close button placement #}
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <h2 class="font-normal">Select Storage</h2>
-                        <div class="mt-3 input-storage">
-                            <label for="form_storage" class="form-label">Select Storage Unit</label>
-                            {{ form_widget(collectionForm.storage, { 'attr': { 'id': 'form_storage', 'class': 'form-select' } }) }}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" data-bs-target="#assetCheckinSelectUsereModal" data-bs-toggle="modal">Next</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="assetCheckinSelectUsereModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div id="stepper">
-                            <span class="stepIndicator">Select Storage</span>
-                            <span class="stepIndicator active">Select User</span>
-                            <span class="stepIndicator">Select Asset</span>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="selectUserBody">
-                        <h2 class="font-normal">User Assignment</h2>
-                        <div class="mt-3 input-user">
-                            <label for="form_user" class="form-label">Assign User</label>
-                            {{ form_widget(collectionForm.user, { 'attr': { 'style': 'width:100%', 'id': 'form_user' } }) }}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectStorageModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
-                        <button class="btn btn-primary" data-bs-target="#assetCheckinSelectAssetModal" data-bs-toggle="modal" data-bs-dismiss="modal">Next</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="assetCheckinSelectAssetModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div id="stepper">
-                            <span class="stepIndicator">Select Storage</span>
-                            <span class="stepIndicator">Select User</span>
-                            <span class="stepIndicator active">Select Asset</span>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h2 class="font-normal">Asset Collection</h2>
-                        <!-- Step 3 input fields -->
-                        <div class="mt-3">
-                            <div class="form-floating mb-3">
-                                {{ form_widget(collectionForm.asset_tag, { 'attr': { 'id': 'form_asset_tag', 'class': 'form-control' } }) }}
-                                <label for="form_asset_tag">Asset Tag</label>
-                            </div>
-                            <div class="form-floating">
-                                {{ form_widget(collectionForm.asset_serial, { 'attr': { 'id': 'form_asset_serial', 'class': 'form-control' } }) }}
-                                <label for="form_asset_serial">Asset Serial</label>
-                            </div>
-                            {# make, model #}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectUsereModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
-                        <button type="submit" class="btn btn-primary">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {{ form_end(collectionForm) }}
-    <div class="modal fade" id="assetCheckinCompleteModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
+    <div class="modal fade" id="assetCheckinSelectStorageModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header text-center">
+                    <div id="stepper">
+                        <span class="stepIndicator active">Select Storage</span>
+                        <span class="stepIndicator">Select User</span>
+                        <span class="stepIndicator">Select Asset</span>
+                    </div>
+                    {# TODO figure the close button placement #}
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <h1 class="display-2">Storage Slot Assigned</h1>
-                    <h1 class="display-1" id="nextOpenSlot">{{ nextOpenSlot }}</h1>
+
+                <div class="modal-body">
+                    <h2 class="font-normal">Select Storage</h2>
+                    <div class="mt-3 input-storage">
+                        <label for="form_storage" class="form-label">Select Storage Unit</label>
+                        {{ form_widget(collectionForm.storage, { 'attr': { 'id': 'form_storage', 'class': 'form-select' } }) }}
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    {# <a role="button" class="btn btn-primary" href="{{ path('app_asset_collection_test', {'show': 1}) }}">Collect Another</a> #}
-                    <button class="btn btn-primary" data-bs-target="#assetCheckinSelectStorageModal" data-bs-toggle="modal" data-bs-dismiss="modal">Collect Another</button>
+                    <button class="btn btn-primary" data-bs-target="#assetCheckinSelectUsereModal" data-bs-toggle="modal">Next</button>
                 </div>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="assetCheckinSelectUsereModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div id="stepper">
+                        <span class="stepIndicator">Select Storage</span>
+                        <span class="stepIndicator active">Select User</span>
+                        <span class="stepIndicator">Select Asset</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="selectUserBody">
+                    <h2 class="font-normal">User Assignment</h2>
+                    <div class="mt-3 input-user">
+                        <label for="form_user" class="form-label">Assign User</label>
+                        {{ form_widget(collectionForm.user, { 'attr': { 'style': 'width:100%', 'id': 'form_user' } }) }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectStorageModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
+                    <button class="btn btn-primary" data-bs-target="#assetCheckinSelectAssetModal" data-bs-toggle="modal" data-bs-dismiss="modal">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="assetCheckinSelectAssetModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div id="stepper">
+                        <span class="stepIndicator">Select Storage</span>
+                        <span class="stepIndicator">Select User</span>
+                        <span class="stepIndicator active">Select Asset</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h2 class="font-normal">Asset Collection</h2>
+                    <!-- Step 3 input fields -->
+                    <div class="mt-3">
+                        <div class="form-floating mb-3">
+                            {{ form_widget(collectionForm.asset_tag, { 'attr': { 'id': 'form_asset_tag', 'class': 'form-control' } }) }}
+                            <label for="form_asset_tag">Asset Tag</label>
+                        </div>
+                        <div class="form-floating">
+                            {{ form_widget(collectionForm.asset_serial, { 'attr': { 'id': 'form_asset_serial', 'class': 'form-control' } }) }}
+                            <label for="form_asset_serial">Asset Serial</label>
+                        </div>
+                        {# make, model #}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectUsereModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{ form_end(collectionForm) }}
+
+{{ encore_entry_script_tags('app') }}
+{{ encore_entry_script_tags('select2') }}
+<script type="text/javascript">
+    {# Asset Collection Modal #}
+    $(document).ready(function() {
+        /**
+        * Select2 Configuration
+        */
+        // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+        $('#form_user').select2({
+            dropdownParent: $('#assetCheckinSelectUsereModal'),
+            theme: 'bootstrap-5'
+        });
+    });
+</script>

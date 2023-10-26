@@ -16,9 +16,8 @@
                 </div>
             </div>
         </div>
+        {{ encore_entry_script_tags('app') }}
         <script type="text/javascript">
-            {{ encore_entry_script_tags('app') }}
-            {{ encore_entry_script_tags('select2') }}
             $(document).ready(function() {
                 const assetCheckinCompleteModal = $('#assetCheckinCompletedModal');
                 assetCheckinCompleteModal.modal('show');

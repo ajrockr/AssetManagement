@@ -381,7 +381,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/collection/collect', name: 'app_asset_collection_collect')]
-    public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, array $requestingPathParams = []): Response
+    public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
     {
         // TODO also, select2 styling is weird on different pages. make sure that is uniform
         // TODO can I deny someone from accessing this through the browser?
@@ -407,11 +407,9 @@ class AssetController extends AbstractController
         }
 
         // TODO what happens when there is more than one?
-        $countRequestingPathParams = count($requestingPathParams);
-        if ($countRequestingPathParams === 0) {
-            $pathParamKey = null;
-            $pathParamVal = null;
-        } elseif ($countRequestingPathParams === 1) {
+        $pathParamKey = null;
+        $pathParamVal = null;
+        if (is_countable($requestingPathParams) && count($requestingPathParams) > 0) {
             foreach ($requestingPathParams as $key=>$val) {
                 $pathParamKey = $key;
                 $pathParamVal = $val;
@@ -505,8 +503,6 @@ class AssetController extends AbstractController
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
             'storageFullForm' => (null === $storageFullForm) ? '' : $storageFullForm->createView(),
-            'nextOpenSlot' => (null === $nextOpenSlot) ? '' : $nextOpenSlot,
-            'requestingPath' => $requestingPath
         ]);
     }
 

@@ -8,25 +8,32 @@
         <link rel="icon" href="data:image/svg+xml">
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
         {% endblock %}
     </head>
     <body>
 
         {# include:flash messages #}
+        {# TODO fix later #}
         {# {% include('flash_messages.html.twig') %} #}
         {% include('alerts/alert.twig') %}
         {# end:flash messages #}
 
         {# include:collectionForm #}
-        {# Because we are calling this method from anywhere on the site, we need to know what route it was called from #}
-        {% set currentPath = app.request.attributes.get('_route') %}
-        {% set currentPathParams = app.request.attributes.get('_route_params') %}
-        {{ render(controller(
-            'App\\Controller\\AssetController::checkInForm', {'requestingPath': currentPath, 'requestingPathParams': currentPathParams})
-        ) }}
+        {% block asset_collection_form %}
+            {# Because we are calling this method from anywhere on the site, we need to know what route it was called from #}
+            {% set currentPath = app.request.attributes.get('_route') %}
+            {% set currentPathParams = app.request.attributes.get('_route_params') %}
+            {{ render(controller(
+                'App\\Controller\\AssetController::checkInForm', {'requestingPath': currentPath, 'requestingPathParams': currentPathParams})
+            ) }}
+        {% endblock %}
 
         {# include:navigation #}
-        {% include('_top_navigation.html.twig') %}
+        {% block top_navigation %}
+            {% include('_top_navigation.html.twig') %}
+        {% endblock %}
 
         {# begin:body #}
         <main class="px-4 h-100 flex-shrink-0 mb-4">
@@ -41,24 +48,25 @@
         {# end:body #}
 
         {# begin:footer #}
-        <footer class="page-footer mt-auto font-small bg-body-tertiary py-2 pt-3 align-middle">
-            <div class="container-fluid align-middle">
-                <div class="row w-100">
-                    <div class="col">
-                        Asset Management <div class="vr mx-2"></div><a href="https://github.com/ajrockr/AssetManagement"><i class="fa-brands fa-github"></i></a>
-                    </div>
-                    <div class="col text-end">
-                        <small>Version 1.0.0 DEV</small>
+        {% block footer %}
+            <footer class="page-footer mt-auto font-small bg-body-tertiary py-2 pt-3 align-middle">
+                <div class="container-fluid align-middle">
+                    <div class="row w-100">
+                        <div class="col">
+                            Asset Management <div class="vr mx-2"></div><a href="https://github.com/ajrockr/AssetManagement"><i class="fa-brands fa-github"></i></a>
+                        </div>
+                        <div class="col text-end">
+                            <small>Version 1.0.0 DEV</small>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </footer>
+            </footer>
+        {% endblock %}
         {# end:footer #}
 
         {# begin:javascript #}
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
-            {{ encore_entry_script_tags('select2') }}
             <script type="text/javascript">
                 /*!
                  * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
@@ -136,33 +144,6 @@
                     }
                 })
                 })()
-
-                {# Asset Collection Modal #}
-                $(document).ready(function() {
-                    /**
-                    * Select2 Configuration
-                    */
-                    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
-                    $('#form_user').select2({
-                        placeholder: {
-                            id: '-1',
-                            text: 'Select a user...'
-                        },
-                        dropdownParent: $('#assetCheckinSelectUsereModal'),
-                        theme: 'bootstrap-5'
-                    });
-
-                    /**
-                    * If the form was submitted, we will show the completed modal
-                    */
-                    const assetCheckedIn = $('input:hidden[name=assetCheckedIn]').val();
-                    const assetCheckinCompleteModal = $('#assetCheckinCompleteModal');
-                    const assetCheckinModal = $('#assetCheckinSelectStorageModal');
-
-                    if  (assetCheckedIn == 'true') {
-                        assetCheckinCompleteModal.modal('show');
-                    }
-                });
             </script>
         {% endblock %}
         {# end:javascript #}
