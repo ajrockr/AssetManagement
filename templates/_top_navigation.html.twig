@@ -8,7 +8,7 @@
             <div class="collapse navbar-collapse flex-grow-0" id="navbarNavDropdown">
                 <ul class="navbar-nav text-center align-middle me-auto">
                     <li class="nav-item">
-                        <a href="{{ path('app_asset_collection_test') }}" class="nav-link">
+                        <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#assetCheckinSelectStorageModal">
                             <i class="fa-regular fa-square-check"></i>
                             Check In
                         </a>
@@ -101,20 +101,24 @@
                         </svg>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <span class="dropdown-item">
-                                <img src="{{ app.user.avatar }}" class="bg-info rounded-circle me-1" style="width:15%;" alt="User Image">
-                                {{ app.user.firstname }} {{ app.user.surname }}
-                            </span>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a href="{{ path('app_user_profile') }}" class="dropdown-item">Profile</a></li>
-                        <li><a href="#" class="dropdown-item">Settings</a></li>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li><a href="#" class="dropdown-item">Admin</a></li>
+                        {% if app.user %}
+                            <li>
+                                <span class="dropdown-item">
+                                    <img src="{{ app.user.avatar }}" class="bg-info rounded-circle me-1" style="width:15%;" alt="User Image">
+                                    {{ app.user.firstname }} {{ app.user.surname }}
+                                </span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="{{ path('app_user_profile') }}" class="dropdown-item">Profile</a></li>
+                            <li><a href="#" class="dropdown-item">Settings</a></li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li><a href="#" class="dropdown-item">Admin</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item">Sign Out</a></li>
+                        {% else %}
+                            <li><a href="{{ path('app_login') }}">Login</a></li>
                         {% endif %}
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a href="#" class="dropdown-item">Sign Out</a></li>
                     </ul>
                 </li>
             </ul>

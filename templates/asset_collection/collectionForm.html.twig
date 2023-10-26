@@ -1,12 +1,3 @@
-{% extends 'base.html.twig' %}
-
-{% block body %}
-    {# Testing Button #}
-    {# <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assetCheckinSelectStorageModal">
-        Launch
-    </button> #}
-    {# End Testing Button #}
-
     {# This will be set to true if the form was submitted #}
     {% if nextOpenSlot is not empty %}
         <input type="hidden" name="assetCheckedIn" value="true"/>
@@ -15,6 +6,10 @@
     {% endif %}
 
     {{ form_start(collectionForm, { 'attr': { 'id': 'userAccountSetupForm', 'name': 'userAccountSetupForm', 'enctype': 'multipart/form-data' }}) }}
+        {{ form_widget(collectionForm.requestingPath) }}
+        {{ form_widget(collectionForm.requestingPathParamKey) }}
+        {{ form_widget(collectionForm.requestingPathParamVal) }}
+
         <div class="modal fade" id="assetCheckinSelectStorageModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
@@ -117,61 +112,3 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            /**
-             * Select2 Configuration
-             */
-            $.fn.modal.Constructor.prototype.enforceFocus = function() {};
-            $('#form_user').select2({
-                placeholder: {
-                    id: '-1',
-                    text: 'Select a user...'
-                },
-                dropdownParent: $('#assetCheckinSelectUsereModal'),
-                theme: 'bootstrap-5'
-            });
-
-            /**
-             * If the form was submitted, we will show the completed modal
-             */
-            const assetCheckedIn = $('input:hidden[name=assetCheckedIn]').val();
-            const assetCheckinCompleteModal = $('#assetCheckinCompleteModal');
-            const assetCheckinModal = $('#assetCheckinSelectStorageModal');
-
-            if  (assetCheckedIn == 'true') {
-                assetCheckinCompleteModal.modal('show');
-            }
-
-            var urlExists = function(url, callback) {
-                if ( ! $.isFunction(callback)) {
-                    throw Error('Not a valid callback');
-                }
-
-                $.ajax({
-                    type: 'HEAD',
-                    url: url,
-                    success: $.proxy(callback, this, true),
-                    error: $.proxy(callback, this, false)
-                });
-            };
-
-            urlExists('/checkin', function(success) {
-                if (success) {
-                    assetCheckinModal.modal('show');
-                }
-            });
-        });
-    </script>
-{% endblock %}

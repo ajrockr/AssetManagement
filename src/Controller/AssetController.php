@@ -3,25 +3,27 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
+use App\Form\AssetType;
 use App\Entity\AssetCollection;
 use App\Form\AssetCollectionType;
-use App\Form\AssetType;
-use App\Repository\AssetCollectionRepository;
+use App\Repository\UserRepository;
 use App\Repository\AssetRepository;
-use App\Repository\AssetStorageRepository;
 use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use App\Repository\AssetStorageRepository;
+use App\Repository\AssetCollectionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_SUPER_ADMIN')")]
 #[Route('/asset')]
@@ -369,10 +371,9 @@ class AssetController extends AbstractController
     }
 
     // TODO: Idea is to scan a userid barcode, return user information, scan/enter asset uid, pick next available storage slot to assign, return that slot number and assign
-    #[Route('/collection/test', name: 'app_asset_collection_test')]
-    public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository)
+    #[Route('/collection/collect', name: 'app_asset_collection_collect')]
+    public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, array $requestingPathParams = []): Response
     {
-
         /**
          *
          * 1) Generate form
@@ -405,9 +406,22 @@ class AssetController extends AbstractController
             }
         }
 
+        // TODO what happens when there is more than one?
+        $countRequestingPathParams = count($requestingPathParams);
+        if ($countRequestingPathParams === 0) {
+            $pathParamKey = null;
+            $pathParamVal = null;
+        } elseif ($countRequestingPathParams === 1) {
+            foreach ($requestingPathParams as $key=>$val) {
+                $pathParamKey = $key;
+                $pathParamVal = $val;
+            }
+        }
+
         // Set up forms
         $storageFullForm = null;
         $collectionForm = $this->createFormBuilder()
+            ->setAction($this->generateUrl('app_asset_collection_collect'))
             ->add('storage', ChoiceType::class, [
                 'choices' => $storagesFormArray
             ])
@@ -417,6 +431,21 @@ class AssetController extends AbstractController
             ->add('asset_tag', TextType::class)
             ->add('asset_serial', TextType::class, [
                 'required' => false
+            ])
+            ->add('requestingPath', HiddenType::class, [
+                'attr' => [
+                    'value' => $requestingPath
+                ]
+            ])
+            ->add('requestingPathParamKey', HiddenType::class, [
+                'attr' => [
+                    'value' => $pathParamKey
+                ]
+            ])
+            ->add('requestingPathParamVal', HiddenType::class, [
+                'attr' => [
+                    'value' => $pathParamVal
+                ]
             ])
             ->getForm()
         ;
@@ -428,6 +457,9 @@ class AssetController extends AbstractController
         if ($collectionForm->isSubmitted() && $collectionForm->isValid()) {
             $data = $collectionForm->getData();
 
+            $requestingPath = $data['requestingPath'];
+            $requestingPathParams[$data['requestingPathParamKey']] = $data['requestingPathParamVal'];
+
             // Get storage data
             $storageData = $assetStorageRepository->getStorageData($data['storage']);
 
@@ -438,6 +470,7 @@ class AssetController extends AbstractController
 
             if (count($openStorageSlots) == 0) {
                 // return no open slots, ask user to place asset aside?
+                // TODO fix this
                 dd('Storage is full, place asset aside?');
 
                 $storageFullForm = $this->createFormBuilder()
@@ -461,12 +494,18 @@ class AssetController extends AbstractController
             $data['location'] = $nextOpenSlot;
 
             $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
+
+            // TODO set a flash message
+            return $this->redirectToRoute($requestingPath, [
+                $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
+            ]);
         }
 
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
             'storageFullForm' => (null === $storageFullForm) ? '' : $storageFullForm->createView(),
             'nextOpenSlot' => (null === $nextOpenSlot) ? '' : $nextOpenSlot,
+            'requestingPath' => $requestingPath
         ]);
     }
 }

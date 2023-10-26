@@ -11,14 +11,31 @@
         {% endblock %}
     </head>
     <body>
+        {% set currentController = app.request.attributes.get('_controller') %}
+        {# {% set currentPath = path(app.request.attributes.get('_route'),
+                       app.request.attributes.get('_route_params')) %} #}
+        {% set currentPath = app.request.attributes.get('_route') %}
+        {% set currentPathParams = app.request.attributes.get('_route_params') %}
+
+        {# {{ dump(currentPathParams) }} #}
+
         {# begin:flash messages #}
         {% include('flash_messages.html.twig') %}
         {% include('alerts/alert.twig') %}
         {# end:flash messages #}
 
-        {# begin:navigation #}
+        {# include:collectionForm #}
+        {# {% include('asset_collection/collectionForm.html.twig') %} #}
+        {{ render(controller(
+            'App\\Controller\\AssetController::checkInForm', {'requestingPath': currentPath, 'requestingPathParams': currentPathParams})
+        ) }}
+
+        {% if nextOpenSlot is defined %}
+            {{ dump(nextOpenSlot) }}
+        {% endif %}
+
+        {# include:navigation #}
         {% include('_top_navigation.html.twig') %}
-        {# end:navigation #}
 
         {# begin:body #}
         <main class="px-4 h-100 flex-shrink-0 mb-4">
@@ -50,6 +67,7 @@
         {# begin:javascript #}
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            {{ encore_entry_script_tags('select2') }}
             <script type="text/javascript">
                 /*!
                  * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
@@ -127,6 +145,52 @@
                     }
                 })
                 })()
+
+                {# Asset Collection Modal #}
+                $(document).ready(function() {
+                    /**
+                    * Select2 Configuration
+                    */
+                    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+                    $('#form_user').select2({
+                        placeholder: {
+                            id: '-1',
+                            text: 'Select a user...'
+                        },
+                        dropdownParent: $('#assetCheckinSelectUsereModal'),
+                        theme: 'bootstrap-5'
+                    });
+
+                    /**
+                    * If the form was submitted, we will show the completed modal
+                    */
+                    const assetCheckedIn = $('input:hidden[name=assetCheckedIn]').val();
+                    const assetCheckinCompleteModal = $('#assetCheckinCompleteModal');
+                    const assetCheckinModal = $('#assetCheckinSelectStorageModal');
+
+                    if  (assetCheckedIn == 'true') {
+                        assetCheckinCompleteModal.modal('show');
+                    }
+
+                    var urlExists = function(url, callback) {
+                        if ( ! $.isFunction(callback)) {
+                            throw Error('Not a valid callback');
+                        }
+
+                        $.ajax({
+                            type: 'HEAD',
+                            url: url,
+                            success: $.proxy(callback, this, true),
+                            error: $.proxy(callback, this, false)
+                        });
+                    };
+
+                    urlExists('/checkin', function(success) {
+                        if (success) {
+                            assetCheckinModal.modal('show');
+                        }
+                    });
+                });
             </script>
         {% endblock %}
         {# end:javascript #}
