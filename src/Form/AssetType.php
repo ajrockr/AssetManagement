@@ -16,6 +16,7 @@ class AssetType extends AbstractType
     public function __construct(private readonly SiteConfigRepository $siteConfigRepository) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // TODO move all the field configs to the twig template
         $assetUniqueIdentifier = $this->siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $builder
             ->add('serialnumber', TextType::class, [
@@ -23,14 +24,16 @@ class AssetType extends AbstractType
                 'label' => 'Serial Number',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => [ 'class' => 'form-floating mb-3' ]
             ])
             ->add('assettag', TextType::class, [
                 'required' => 'assettag' == $assetUniqueIdentifier,
                 'label' => 'Asset Tag',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('purchasedate', DateType::class, [
                 'required' => false,
@@ -39,14 +42,16 @@ class AssetType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control js-datepicker'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('purchasedfrom', TextType::class, [
                 'required' => false,
                 'label' => 'Purchased From',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('warrantystartdate', DateType::class, [ // TODO: Allow warrantystart/end to also be null
                 'required' => false,
@@ -55,7 +60,8 @@ class AssetType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('warrantyenddate', DateType::class, [
                 'required' => false,
@@ -65,28 +71,32 @@ class AssetType extends AbstractType
                 'error_bubbling' => true,
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('condition', TextType::class, [
                 'required' => false,
                 'label' => 'Condition',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('make', TextType::class, [
                 'required' => false,
                 'label' => 'Make',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('model', TextType::class, [
                 'required' => false,
                 'label' => 'Model',
                 'attr' => [
                     'class' => 'form-control'
-                ]
+                ],
+                'row_attr' => ['class' => 'form-floating mb-3']
             ])
             ->add('decomisioned', CheckboxType::class, [
                 'label' => 'Decommissioned',
@@ -99,7 +109,8 @@ class AssetType extends AbstractType
                 ],
                 'attr' => [
                     'class' => 'form-check-input'
-                ]
+                ],
+                // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
         ;
     }

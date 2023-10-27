@@ -1,7 +1,14 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
     <div class="row">
-        <div class="col-sm-12 col-lg-2">
+        <div class="col-sm-12 col-lg-2 text-start">
             <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
         </div>
+        <div class="col text-end">
+            {% if app.request.attributes.get('_route') == 'app_asset_edit' %}
+                {% include 'asset/_delete_form.html.twig' %}
+            {% endif %}
+        </div>
+    </div>
+
 {{ form_end(form) }}
