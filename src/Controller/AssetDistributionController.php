@@ -66,34 +66,6 @@ class AssetDistributionController extends AbstractController
         return $results;
     }
 
-    #[Route('/asset/distribution/test', name: 'app_asset_distribution_test')]
-    public function test(Request $request, AssetDistributionRepository $assetDistributionRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, UserRepository $userRepository): Response
-    {
-        $form = $this->createFormBuilder()
-            ->add('Search', SearchType::class, [
-                'label' => false,
-                'attr' => [
-                    'placeholder' => 'Search...',
-                    'class' => ''
-                ]
-            ])
-            // ->add('Search', SubmitType::class)
-            ->getForm()
-        ;
-
-        $searchResults = [];
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $searchResults = $this->searchAction($form->getData()['q']);
-        }
-
-        return $this->render('asset_distribution/search.html.twig', [
-            'searchForm' => $form->createView(),
-            'searchResults' => $searchResults
-        ]);
-    }
-
     #[Route('/asset/distribute', name: 'app_distribute_handle')]
     public function distributeAsset(Request $request, AssetDistributionRepository $assetDistributionRepository): Response
     {
