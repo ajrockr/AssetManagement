@@ -15,19 +15,20 @@ use Symfony\Component\Routing\Annotation\Route;
 class ReportController extends AbstractController
 {
     #[Route('/', name: 'app_report_index')]
-    public function index(): Response
+    public function index(AssetRepository $assetRepository): Response
     {
+        $assetRepository->getCount();
         return $this->render('report/index.html.twig', [
             'controller_name' => 'ReportController',
         ]);
     }
 
     #[Route('/collectedassets', name: 'app_report_collectedassets')]
-    public function collectedAssets(Request $request, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository): Response
+    public function collectedAssets(AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository): Response
     {
         $collectedAssets = $assetCollectionRepository->findAll();
-	$reportArray = [];
-	$assignedTo = [];
+        $reportArray = [];
+        $assignedTo = [];
 
         foreach ($collectedAssets as $collectedAsset) {
             $user = $userRepository->findOneBy(['id' => $collectedAsset->getCollectedFrom()]);
@@ -37,23 +38,23 @@ class ReportController extends AbstractController
             if ($asset->getAssignedTo() !== $collectedAsset->getCollectedFrom()) {
                 $diffUser = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
                 $assignedTo = [
-                    'assignedToFirstName' => $diffUser->getFirstname(),
-                    'assignedToSurName' => $diffUser->getSurname(),
-                    'assignedToTitle' => $diffUser->getTitle(),
-                    'assignedToType' => $diffUser->getType(),
-                    'assignedToEmail' => $diffUser->getEmail(),
-                    'assignedToUniqueId' => $diffUser->getUserUniqueId()
+                    'assignedToFirstName'     => $diffUser->getFirstname(),
+                    'assignedToSurName'       => $diffUser->getSurname(),
+                    'assignedToTitle'         => $diffUser->getTitle(),
+                    'assignedToType'          => $diffUser->getType(),
+                    'assignedToEmail'         => $diffUser->getEmail(),
+                    'assignedToUniqueId'      => $diffUser->getUserUniqueId()
                 ];
             }
 
             $collectedFrom = [
-                'collectedFromFirstName' => $user->getFirstname(),
-                'collectedFromSurName' => $user->getSurname(),
-                'collectedFromTitle' => $user->getTitle(),
-                'collectedFromType' => $user->getType(),
-                'collectedFromEmail' => $user->getEmail(),
-                'collectedFromUniqueId' => $user->getUserUniqueId(),
-                'collectedDeviceAssetTag' => $asset->getAssettag(),
+                'collectedFromFirstName'      => $user->getFirstname(),
+                'collectedFromSurName'        => $user->getSurname(),
+                'collectedFromTitle'          => $user->getTitle(),
+                'collectedFromType'           => $user->getType(),
+                'collectedFromEmail'          => $user->getEmail(),
+                'collectedFromUniqueId'       => $user->getUserUniqueId(),
+                'collectedDeviceAssetTag'     => $asset->getAssettag(),
                 'collectedDeviceSerialNumber' => $asset->getSerialnumber()
             ];
 

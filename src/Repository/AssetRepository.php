@@ -39,28 +39,15 @@ class AssetRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Asset[] Returns an array of Asset objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getCount(): int
+    {
+        $query = $this->createQueryBuilder('asset');
+        $query->select($query->expr()->count('asset.id'))
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
 
-//    public function findOneBySomeField($value): ?Asset
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        dd($query);
+        return 0;
+    }
 }
