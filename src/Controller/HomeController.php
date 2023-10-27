@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+/**
+ * HomeController
+ */
 class HomeController extends AbstractController
 {
     private array $colorScheme = [
@@ -26,6 +29,11 @@ class HomeController extends AbstractController
             "#d63031","#feca57","#5f27cd","#54a0ff","#01a3a4"
     ];
 
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct(
         private readonly AssetRepository $assetRepository,
         private readonly AssetStorageRepository $assetStorageRepository,
@@ -37,6 +45,13 @@ class HomeController extends AbstractController
         // Shuffle the colors for charts
         shuffle($this->colorScheme);
     }
+
+    /**
+     * index
+     *
+     * @param  mixed $chartBuilder
+     * @return Response
+     */
     #[Route('/', name: 'app_home')]
     public function index(ChartBuilderInterface $chartBuilder): Response
     {
@@ -47,6 +62,11 @@ class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * generateAssetTotalChart
+     *
+     * @return Chart
+     */
     private function generateAssetTotalChart(): Chart
     {
         $totalAssetsCount = $this->getTotalAssetsCount();
@@ -81,6 +101,11 @@ class HomeController extends AbstractController
         return $assetsTotalChart;
     }
 
+    /**
+     * generateStorageSizesChart
+     *
+     * @return Chart
+     */
     private function generateStorageSizesChart(): Chart
     {
         $storageSizes = $this->getStorageSizes();
@@ -117,6 +142,11 @@ class HomeController extends AbstractController
         return $storageSizeChart;
     }
 
+    /**
+     * generateReparirsPerMonthChart
+     *
+     * @return Chart
+     */
     private function generateReparirsPerMonthChart(): Chart
     {
         $repairsPerMonth = $this->getRepairsPerMonth();
@@ -145,11 +175,21 @@ class HomeController extends AbstractController
         return $repairsPerMonthChart;
     }
 
+    /**
+     * getStorageCount
+     *
+     * @return int
+     */
     private function getStorageCount(): int
     {
         return count($this->assetStorageRepository->findAll());
     }
 
+    /**
+     * getRepairsPerMonth
+     *
+     * @return array
+     */
     private function getRepairsPerMonth(): array
     {
         $repairDates = $this->repairRepository->getCountAndCreatedDate();
@@ -167,6 +207,11 @@ class HomeController extends AbstractController
         return $months;
     }
 
+    /**
+     * getStorageSizes
+     *
+     * @return array
+     */
     private function getStorageSizes(): array
     {
         $storages = $this->assetStorageRepository->findAll();
@@ -178,16 +223,31 @@ class HomeController extends AbstractController
         return $returnArray;
     }
 
+    /**
+     * getTotalAssetsCount
+     *
+     * @return int
+     */
     private function getTotalAssetsCount(): int
     {
         return count($this->assetRepository->findAll());
     }
 
+    /**
+     * getCollectedAssetsCount
+     *
+     * @return int
+     */
     private function getCollectedAssetsCount(): int
     {
         return count($this->assetCollectionRepository->findAll());
     }
 
+    /**
+     * getDecommissionedAssetsCount
+     *
+     * @return int
+     */
     private function getDecommissionedAssetsCount(): int
     {
         return count($this->assetRepository->findBy(['decomisioned' => true]));
