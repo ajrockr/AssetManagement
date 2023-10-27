@@ -2,12 +2,33 @@
 
 {% block body %}
     <div class="container">
-        <div class="row cols-1 row-cols-md-3 g-4" style="width: 60vw;">
+        <div class="row g-4 justify-contenet-center" style="width: 80vw;">
             <div class="col">
-                <div class="card" style="width:500px;">
+                <div class="card">
+                    <div class="card-header align-middle">
+                        <h5><strong>Statistics</strong></h5>
+                    </div>
+                    <div class="card-body">
+                        Total Users: {{ userCount }}<br />
+                        Total Storages: {{ storageCount }}<br />
+                        Asset Count: {{ assetCount }}<br />
+                        Collected Assets: {{ collectedAssetCount }}<br />
+                        Total Repairs: {{ repairCount }}
+                        <br /><br />
+                        <strong>Active Users</strong><br />
+                        {% if activeUsers|length > 0 %}
+                            {% for user in activeUsers %}
+                                {{ user.username }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col text-start"><strong>Asset Counts</strong></div>
+                            <div class="col text-start"><h5><strong>Asset Counts</strong></h5></div>
                             <div class="col text-end">
                                 <a href="#" class="text-decoration-none">
                                     <i class="fa-solid fa-file-lines"></i> Report
@@ -21,41 +42,47 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card" style="width:500px;">
-                    <div class="card-header">
-                        <div class="row"> text-start
-                            <div class="col text-start"><strong>Storage Sizes</strong></div>
-                            <div class="col text-end">
-                                <a href="#" class="text-decoration-none">
-                                    <i class="fa-solid fa-file-lines"></i>
-                                    Report
-                                </a>
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col text-start"><h5><strong>Storage Sizes</strong></h5></div>
+                                    <div class="col text-end">
+                                        <a href="#" class="text-decoration-none">
+                                            <i class="fa-solid fa-file-lines"></i>
+                                            Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {# TODO numbers aren't adding up #}
+                                {{ render_chart(storageSizeChart) }}
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        {# TODO numbers aren't adding up #}
-                        {{ render_chart(storageSizeChart) }}
-                    </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card" style="width:500px;">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col text-start"><strong>Repairs Per Month</strong></div>
-                            <div class="col text-end">
-                                <a href="#" class="text-decoration-none">
-                                    <i class="fa-solid fa-file-lines"></i>
-                                    Report
-                                </a>
+                <div class="row mt-3">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col text-start"><h5><strong>Repairs Per Month</strong></h5></div>
+                                    <div class="col text-end">
+                                        <a href="#" class="text-decoration-none">
+                                            <i class="fa-solid fa-file-lines"></i>
+                                            Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {{ render_chart(repairsPerMonthChart) }}
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        {{ render_chart(repairsPerMonthChart) }}
-                    </div>
-                </div>
+                </row>
             </div>
         </div>
     </div>

@@ -3,29 +3,32 @@
 namespace App\EventSubscriber;
 
 use App\Entity\SiteConfig;
-use App\Event\AssetCollectedEvent;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment;
 
 class KernelRequestSubscriber implements EventSubscriberInterface
 {
     private EntityManagerInterface $entityManager;
     private Security $security;
     private UrlGeneratorInterface $urlGenerator;
+    private UserRepository $userRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security, UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        Security $security,
+        UrlGeneratorInterface $urlGenerator,
+        UserRepository $userRepository
+    ) {
         $this->entityManager = $entityManager;
         $this->security = $security;
         $this->urlGenerator = $urlGenerator;
+        $this->userRepository = $userRepository;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -45,6 +48,9 @@ class KernelRequestSubscriber implements EventSubscriberInterface
                 $this->urlGenerator->generate('app_login')
             ));
         }
+
+        $userId = $this->security->getUser()->getId();
+        $this->userRepository->setLastActiveTime($userId, new \DateTimeImmutable('now'));
     }
 
     public static function getSubscribedEvents(): array

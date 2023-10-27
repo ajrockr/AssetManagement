@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -146,18 +147,55 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * setPendingStatus
      *
-     * @param  mixed $id
-     * @param  mixed $pending
+     * @param  int $id
+     * @param  bool $pending
      * @return void
      */
-    public function setPendingStatus(int $id, bool $pending = true)
+    public function setPendingStatus(int $id, bool $pending = true): void
     {
-        return $this->createQueryBuilder('u')
+        $this->createQueryBuilder('u')
+            ->update()
             ->set('u.pending', $pending)
             ->where('u.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->execute()
         ;
+    }
+
+    /**
+     * setLastActiveTime
+     *
+     * @param  int $id
+     * @param  DateTimeImmutable $time
+     * @return void
+     */
+    public function setLastActiveTime(int $id, DateTimeImmutable $time): void
+    {
+        $this->createQueryBuilder('user')
+            ->update()
+            ->set('user.lastActivity', ':datetime')
+            ->where('user.id = :userId')
+            ->setParameter('datetime', $time)
+            ->setParameter('userId', $id)
+            ->getQuery()
+            ->execute()
+        ;
+    }
+
+    public function getLastActiveTime(?int $id = null)
+    {
+        $query = $this->createQueryBuilder('user')
+            ->select('user.lastActivity, user.id, user.username, user.surname, user.firstname');
+
+        if ($id) {
+            $query->where('user.id = :userId')
+                ->setParameter('userId', $id);
+        }
+
+        $query->andWhere('user.lastActivity IS NOT NULL');
+
+        return $query->getQuery()
+        ->getArrayResult();
     }
 }

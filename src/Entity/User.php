@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 
 // @todo Make avatar, allow setting from Google/Microsoft
@@ -89,16 +90,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $type = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $lastActivity = null;
+
+    /**
+     * getId
+     *
+     * @return int
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * getUsername
+     *
+     * @return string
+     */
     public function getUsername(): ?string
     {
         return $this->username;
     }
 
+    /**
+     * setUsername
+     *
+     * @param  mixed $username
+     * @return self
+     */
     public function setUsername(string $username): self
     {
         $this->username = $username;
@@ -128,6 +148,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    /**
+     * setRoles
+     *
+     * @param  mixed $roles
+     * @return self
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -143,6 +169,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
+    /**
+     * setPassword
+     *
+     * @param  mixed $password
+     * @return self
+     */
     public function setPassword(?string $password): self
     {
         $this->password = $password;
@@ -159,11 +191,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
+    /**
+     * getEmail
+     *
+     * @return string
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * setEmail
+     *
+     * @param  mixed $email
+     * @return self
+     */
     public function setEmail(string $email): self
     {
         $this->email = $email;
@@ -171,11 +214,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getLocation
+     *
+     * @return string
+     */
     public function getLocation(): ?string
     {
         return $this->location;
     }
 
+    /**
+     * setLocation
+     *
+     * @param  mixed $location
+     * @return self
+     */
     public function setLocation(?string $location): self
     {
         $this->location = $location;
@@ -183,11 +237,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getDepartment
+     *
+     * @return string
+     */
     public function getDepartment(): ?string
     {
         return $this->department;
     }
 
+    /**
+     * setDepartment
+     *
+     * @param  mixed $department
+     * @return self
+     */
     public function setDepartment(?string $department): self
     {
         $this->department = $department;
@@ -195,11 +260,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getPhone
+     *
+     * @return string
+     */
     public function getPhone(): ?string
     {
         return $this->phone;
     }
 
+    /**
+     * setPhone
+     *
+     * @param  mixed $phone
+     * @return self
+     */
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
@@ -207,11 +283,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getExtension
+     *
+     * @return string
+     */
     public function getExtension(): ?string
     {
         return $this->extension;
     }
 
+    /**
+     * setExtension
+     *
+     * @param  mixed $extension
+     * @return self
+     */
     public function setExtension(?string $extension): self
     {
         $this->extension = $extension;
@@ -219,11 +306,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getTitle
+     *
+     * @return string
+     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
+    /**
+     * setTitle
+     *
+     * @param  mixed $title
+     * @return self
+     */
     public function setTitle(?string $title): self
     {
         $this->title = $title;
@@ -231,11 +329,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getHomepage
+     *
+     * @return string
+     */
     public function getHomepage(): ?string
     {
         return $this->homepage;
     }
 
+    /**
+     * setHomepage
+     *
+     * @param  mixed $homepage
+     * @return self
+     */
     public function setHomepage(?string $homepage): self
     {
         $this->homepage = $homepage;
@@ -243,11 +352,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getManager
+     *
+     * @return string
+     */
     public function getManager(): ?string
     {
         return $this->manager;
     }
 
+    /**
+     * setManager
+     *
+     * @param  mixed $manager
+     * @return self
+     */
     public function setManager(?string $manager): self
     {
         $this->manager = $manager;
@@ -255,11 +375,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getGoogleId
+     *
+     * @return string
+     */
     public function getGoogleId(): ?string
     {
         return $this->googleId;
     }
 
+    /**
+     * setGoogleId
+     *
+     * @param  mixed $googleId
+     * @return self
+     */
     public function setGoogleId(?string $googleId): self
     {
         $this->googleId = $googleId;
@@ -267,11 +398,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getMicrosoftId
+     *
+     * @return string
+     */
     public function getMicrosoftId(): ?string
     {
         return $this->microsoftId;
     }
 
+    /**
+     * setMicrosoftId
+     *
+     * @param  mixed $microsoftId
+     * @return self
+     */
     public function setMicrosoftId(?string $microsoftId): self
     {
         $this->microsoftId = $microsoftId;
@@ -279,23 +421,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getDateCreated(): ?\DateTimeImmutable
+    /**
+     * getDateCreated
+     *
+     * @return DateTimeImmutable
+     */
+    public function getDateCreated(): ?DateTimeImmutable
     {
         return $this->dateCreated;
     }
 
-    public function setDateCreated(?\DateTimeImmutable $dateCreated): self
+    /**
+     * setDateCreated
+     *
+     * @param  mixed $dateCreated
+     * @return self
+     */
+    public function setDateCreated(?DateTimeImmutable $dateCreated): self
     {
         $this->dateCreated = $dateCreated;
 
         return $this;
     }
 
+    /**
+     * getSurname
+     *
+     * @return string
+     */
     public function getSurname(): ?string
     {
         return $this->surname;
     }
 
+    /**
+     * setSurname
+     *
+     * @param  mixed $surname
+     * @return self
+     */
     public function setSurname(?string $surname): self
     {
         $this->surname = $surname;
@@ -303,11 +467,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getFirstname
+     *
+     * @return string
+     */
     public function getFirstname(): ?string
     {
         return $this->firstname;
     }
 
+    /**
+     * setFirstname
+     *
+     * @param  mixed $firstname
+     * @return self
+     */
     public function setFirstname(?string $firstname): self
     {
         $this->firstname = $firstname;
@@ -315,11 +490,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * isEnabled
+     *
+     * @return bool
+     */
     public function isEnabled(): ?bool
     {
         return $this->enabled;
     }
 
+    /**
+     * setEnabled
+     *
+     * @param  mixed $enabled
+     * @return self
+     */
     public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
@@ -327,11 +513,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * isPending
+     *
+     * @return bool
+     */
     public function isPending(): ?bool
     {
         return $this->pending;
     }
 
+    /**
+     * setPending
+     *
+     * @param  mixed $pending
+     * @return self
+     */
     public function setPending(?bool $pending): self
     {
         $this->pending = $pending;
@@ -339,11 +536,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getAvatar
+     *
+     * @return string
+     */
     public function getAvatar(): ?string
     {
         return $this->avatar;
     }
 
+    /**
+     * setAvatar
+     *
+     * @param  mixed $avatar
+     * @return self
+     */
     public function setAvatar(?string $avatar): self
     {
         $this->avatar = $avatar;
@@ -351,11 +559,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getUserUniqueId
+     *
+     * @return string
+     */
     public function getUserUniqueId(): ?string
     {
         return $this->userUniqueId;
     }
 
+    /**
+     * setUserUniqueId
+     *
+     * @param  mixed $userUniqueId
+     * @return self
+     */
     public function setUserUniqueId(?string $userUniqueId): self
     {
         $this->userUniqueId = $userUniqueId;
@@ -363,14 +582,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * getType
+     *
+     * @return string
+     */
     public function getType(): ?string
     {
         return $this->type;
     }
 
+    /**
+     * setType
+     *
+     * @param  mixed $type
+     * @return self
+     */
     public function setType(?string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * getLastActivity
+     *
+     * @return DateTimeImmutable
+     */
+    public function getLastActivity(): ?DateTimeImmutable
+    {
+        return $this->lastActivity;
+    }
+
+    /**
+     * setLastActivity
+     *
+     * @param  mixed $lastActivity
+     * @return self
+     */
+    public function setLastActivity(?DateTimeImmutable $lastActivity): self
+    {
+        $this->lastActivity = $lastActivity;
 
         return $this;
     }

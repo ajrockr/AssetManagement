@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use DateInterval;
+use DateTimeImmutable;
+use App\Repository\UserRepository;
 use App\Repository\AssetRepository;
 use Symfony\UX\Chartjs\Model\Chart;
+use App\Repository\RepairRepository;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
-use App\Repository\RepairRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -40,6 +43,7 @@ class HomeController extends AbstractController
         private readonly AssetCollectionRepository $assetCollectionRepository,
         private readonly RepairRepository $repairRepository,
         private readonly ChartBuilderInterface $chartBuilder,
+        private readonly UserRepository $userRepository,
     )
     {
         // Shuffle the colors for charts
@@ -55,10 +59,17 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(ChartBuilderInterface $chartBuilder): Response
     {
+        $this->getActiveUsers();
         return $this->render('home/index.html.twig', [
             'assetsTotalChart' => $this->generateAssetTotalChart(),
             'storageSizeChart' => $this->generateStorageSizesChart(),
             'repairsPerMonthChart' => $this->generateReparirsPerMonthChart(),
+            'userCount' => $this->getUserCount(),
+            'storageCount' => $this->getStorageCount(),
+            'assetCount' => $this->getTotalAssetsCount(),
+            'collectedAssetCount' => $this->getCollectedAssetsCount(),
+            'repairCount' => $this->getRepairCount(),
+            'activeUsers' => $this->getActiveUsers(),
         ]);
     }
 
@@ -99,6 +110,27 @@ class HomeController extends AbstractController
         ]);
 
         return $assetsTotalChart;
+    }
+
+    private function getActiveUsers(): array
+    {
+        $activityTimes = $this->userRepository->getLastActiveTime();
+
+        $activeUsers = [];
+        $date = new DateTimeImmutable('now');
+        $intervalTime = $date->sub(DateInterval::createFromDateString('2 minutes'));
+
+        foreach ($activityTimes as $activityTime) {
+            if ($activityTime['lastActivity'] > $intervalTime) {
+                dump('trigger');
+                $activeUsers[] = [
+                    'userId' => $activityTime['id'],
+                    'username' => $activityTime['username']
+                ];
+            }
+        }
+
+        return $activeUsers;
     }
 
     /**
@@ -176,16 +208,6 @@ class HomeController extends AbstractController
     }
 
     /**
-     * getStorageCount
-     *
-     * @return int
-     */
-    private function getStorageCount(): int
-    {
-        return count($this->assetStorageRepository->findAll());
-    }
-
-    /**
      * getRepairsPerMonth
      *
      * @return array
@@ -252,4 +274,25 @@ class HomeController extends AbstractController
     {
         return count($this->assetRepository->findBy(['decomisioned' => true]));
     }
+
+    /**
+     * getStorageCount
+     *
+     * @return int
+     */
+    private function getStorageCount(): int
+    {
+        return count($this->assetStorageRepository->findAll());
+    }
+
+    private function getUserCount(): int
+    {
+        return count($this->userRepository->findAll());
+    }
+
+    private function getRepairCount(): int
+    {
+        return $this->repairRepository->getCount();
+    }
+
 }
