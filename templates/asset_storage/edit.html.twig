@@ -4,9 +4,16 @@
 <div class="container">
 	<div class="card">
 		<div class="card-header align-middle text-end">
-			<a href="{{ path('app_asset_storage_index') }}" role="button" class="btn btn-sm">
-				<i class="fa-solid fa-x"></i>
-			</a>
+            <div class="row align-middle">
+                <div class="col text-start align-middle">
+                    <h4>Edit storage</h6>
+                </div>
+                <div class="col text-end">
+                    <a href="{{ path('app_asset_storage_index') }}" role="button" class="btn btn-sm">
+                        <i class="fa-solid fa-x"></i>
+                    </a>
+                </div>
+            </div>
 		</div>
 		<div class="card-body">
             {{ include('asset_storage/_form.html.twig', {'button_label': 'Update'}) }}
