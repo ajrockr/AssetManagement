@@ -1,15 +1,62 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="card" style="width:500px;">
-        <div class="card-header text-justify">
-            <div class="row w-100">
-            <div class="col-md-9">Asset Counts</div>
-            <div class="col-md-3 text-end"><a href="#" class="text-decoration-none"><i class="fa-solid fa-file-lines"></i> Report</a></div>
+    <div class="container">
+        <div class="row cols-1 row-cols-md-3 g-4" style="width: 60vw;">
+            <div class="col">
+                <div class="card" style="width:500px;">
+                    <div class="card-header text-justify">
+                        <div class="row w-100">
+                            <div class="col-md-9">Asset Counts</div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="text-decoration-none">
+                                    <i class="fa-solid fa-file-lines"></i> Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ render_chart(assetsTotalChart) }}
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="card-body">
-            {{ render_chart(assetsTotalChart) }}
+            <div class="col">
+                <div class="card" style="width:500px;">
+                    <div class="card-header text-justify">
+                        <div class="row w-100">
+                            <div class="col-md-9">Storage Sizes</div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="text-decoration-none">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ dump(storageSizeChart) }}
+                        {{ render_chart(storageSizeChart) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card" style="width:500px;">
+                    <div class="card-header text-justify">
+                        <div class="row w-100">
+                            <div class="col-md-9">Repairs Per Month</div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="text-decoration-none">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ render_chart(repairsPerMonthChart) }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

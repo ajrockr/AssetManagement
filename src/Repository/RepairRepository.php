@@ -139,4 +139,27 @@ class RepairRepository extends ServiceEntityRepository
 
         return $return;
     }
+
+    /**
+     * getCount
+     *
+     * @return int
+     */
+    public function getCount(): int
+    {
+        return $this->createQueryBuilder('repair')
+            ->select('count(repair.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    public function getCountAndCreatedDate(): array
+    {
+        return $this->createQueryBuilder('repair')
+            ->select('repair.createdDate')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
