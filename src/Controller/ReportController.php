@@ -15,9 +15,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ReportController extends AbstractController
 {
     #[Route('/', name: 'app_report_index')]
-    public function index(AssetRepository $assetRepository): Response
+    public function index(AssetRepository $assetRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
-        $assetRepository->getCount();
+        $collectedAssetTotal = $assetCollectionRepository->getCount();
+        $assetTotal = $assetRepository->getCount();
+        $userCount = $userRepository->getUserCount();
         return $this->render('report/index.html.twig', [
             'controller_name' => 'ReportController',
         ]);

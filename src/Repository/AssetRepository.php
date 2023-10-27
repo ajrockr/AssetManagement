@@ -39,15 +39,37 @@ class AssetRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCount(): int
+    /**
+     * getCount
+     *
+     * @param  mixed $decommissioned
+     * @return int
+     */
+    public function getCount(bool $decommissioned = false): int
     {
-        $query = $this->createQueryBuilder('asset');
-        $query->select($query->expr()->count('asset.id'))
+        if ($decommissioned) {
+            return $this->createQueryBuilder('asset')
+                ->select('count(asset.id)')
+                ->where('decomisioned = true')
+                ->getQuery()
+                ->getSingleScalarResult()
+            ;
+        }
+
+        return $this->createQueryBuilder('asset')
+            ->select('count(asset.id)')
             ->getQuery()
             ->getSingleScalarResult()
         ;
+    }
 
-        dd($query);
-        return 0;
+    /**
+     * getDecommissionedCount
+     *
+     * @return int
+     */
+    public function getDecommissionedCount(): int
+    {
+        return $this->getCount(true);
     }
 }

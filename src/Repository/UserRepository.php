@@ -56,15 +56,36 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
-    public function getUserCount(): int
+    /**
+     * getUserCount
+     *
+     * @param  mixed $department
+     * @return int
+     */
+    public function getUserCount(?string $department = null): int
     {
-        return $this->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
+        if ($department) {
+            return $this->createQueryBuilder('user')
+                ->select('COUNT(user.id)')
+                ->where('user.department = :department')
+                ->setParameter('department', $department)
+                ->getQuery()
+                ->getSingleScalarResult()
+            ;
+        }
+
+        return $this->createQueryBuilder('user')
+            ->select('COUNT(user.id)')
             ->getQuery()
             ->getSingleScalarResult()
         ;
     }
 
+    /**
+     * getLastCreatedUser
+     *
+     * @return array
+     */
     public function getLastCreatedUser(): array
     {
         return $this->createQueryBuilder('u')
@@ -78,9 +99,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function adminImportUsers(array $users)
     {
-        
+
     }
 
+    /**
+     * getUsers
+     *
+     * @return array
+     */
     public function getUsers(): array
     {
         $users = $this->createQueryBuilder('u')
@@ -117,6 +143,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $return;
     }
 
+    /**
+     * setPendingStatus
+     *
+     * @param  mixed $id
+     * @param  mixed $pending
+     * @return void
+     */
     public function setPendingStatus(int $id, bool $pending = true)
     {
         return $this->createQueryBuilder('u')

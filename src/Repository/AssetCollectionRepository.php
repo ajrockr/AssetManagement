@@ -39,10 +39,15 @@ class AssetCollectionRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * getCollectedAssetSlots
+     *
+     * @return array
+     */
     public function getCollectedAssetSlots(): array
     {
-        $results =  $this->createQueryBuilder('ac')
-            ->select('ac.collectionLocation')
+        $results =  $this->createQueryBuilder('getAllCollectedAssets')
+            ->select('getAllCollectedAssets.collectionLocation')
             ->getQuery()
             ->getArrayResult()
         ;
@@ -54,12 +59,17 @@ class AssetCollectionRepository extends ServiceEntityRepository
         return $return;
     }
 
-    public function getAll(): array
+    /**
+     * getAllCollectedAssets
+     *
+     * @return array
+     */
+    public function getAllCollectedAssets(): array
     {
-        $assets = $this->createQueryBuilder('ac')
-            ->select('ac')
-            ->addSelect('a.assettag', 'a.serialnumber')
-            ->innerJoin('App\Entity\Asset', 'a', 'WHERE', 'a.id = ac.DeviceID')
+        $assets = $this->createQueryBuilder('assetcollection')
+            ->select('assetcollection')
+            ->addSelect('asset.assettag', 'asset.serialnumber')
+            ->innerJoin('App\Entity\Asset', 'asset', 'WHERE', 'asset.id = assetcollection.DeviceID')
             ->getQuery()
             ->getArrayResult()
         ;
@@ -84,15 +94,46 @@ class AssetCollectionRepository extends ServiceEntityRepository
         return $return;
     }
 
+    /**
+     * getAll
+     * Alias for getAllCollectedAssets
+     *
+     * @return array
+     */
+    public function getAll(): array
+    {
+        return $this->getAllCollectedAssets();
+    }
+
+    /**
+     * removeCollection
+     *
+     * @param  mixed $locations
+     * @return void
+     */
     public function removeCollection(int|array $locations)
     {
         $conditions = preg_filter('/^/', 'ac.collectionLocation = ', $locations);
-        $qb = $this->createQueryBuilder('ac');
+        $qb = $this->createQueryBuilder('assetcollection');
         $delete = $qb->delete()
             ->where(
                 $qb->expr()->orX()->addMultiple($conditions)
             )
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * getCount
+     *
+     * @return int
+     */
+    public function getCount(): int
+    {
+        return $this->createQueryBuilder('assetcollection')
+            ->select('count(assetcollection.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
     }
 }
