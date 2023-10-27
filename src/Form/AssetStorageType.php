@@ -17,7 +17,13 @@ class AssetStorageType extends AbstractType
             ->add('name')
             ->add('description')
             ->add('location')
-            ->add('storageData', TextareaType::class)
+            ->add('storageData', TextareaType::class, [
+                'label' => 'Storage Data (JSON)',
+                'help' => 'A JSON array',
+                'attr' => [
+                    'class' => 'tinymce',
+                ],
+            ])
         ;
 
         $builder->get('storageData')

@@ -11,8 +11,6 @@
         "@symfony/webpack-encore": "^4.0.0",
         "chartjs-plugin-zoom": "^2.0.1",
         "core-js": "^3.23.0",
-        "prettier": "^3.0.3",
-        "prettier-plugin-twig-melody": "^0.4.6",
         "regenerator-runtime": "^0.13.9",
         "sass": "^1.69.4",
         "sass-loader": "^13.0.0",

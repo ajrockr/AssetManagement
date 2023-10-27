@@ -1,11 +1,9 @@
-{# <ul class="nav nav-treeview"> #}
-    {% for item in items %}
-        <li class="nav-item">
-            {# <a href="{{ path('app_asset_storage_show', {id: item.id}) }}" class="nav-link"> #}
-            <a href="{{ path('app_asset_storage_show', {id: item.id}) }}" class="dropdown-item">
-                <i class="far fa-circle nav-icon"></i>
-                {{ item.name }} ({{ item.description }}) {#<p></p>#}
-            </a>
-        </li>
-    {% endfor %}
-{# </ul> #}
+{% for item in items %}
+    <li class="nav-item">
+        {# <a href="{{ path('app_asset_storage_show', {id: item.id}) }}" class="nav-link"> #}
+        <a href="{{ path('app_asset_storage_show', {id: item.id}) }}" class="dropdown-item">
+            <i class="far fa-circle nav-icon"></i>
+            {{ item.name }} ({{ item.description }}) {#<p></p>#}
+        </a>
+    </li>
+{% endfor %}

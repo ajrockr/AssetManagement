@@ -15,7 +15,14 @@
         {{ form_widget(form.storageData, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;', 'placeholder': 'Storage JSON String' } }) }}
         {{ form_label(form.storageData) }}
     </div>
-    <div class="btn-group" role="buttons">
-        <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    <div class="row" role="buttons">
+        <div class="col text-start">
+            <button class="btn btn-success">{{ button_label|default('Save') }}</button>
+        </div>
+        <div class="col text-end">
+            {% if app.request.attributes.get('_route') == 'app_asset_storage_edit' %}
+                {% include 'asset_storage/_delete_form.html.twig' %}
+            {% endif %}
+        </div>
     </div>
 {{ form_end(form) }}

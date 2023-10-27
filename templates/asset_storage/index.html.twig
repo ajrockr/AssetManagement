@@ -1,37 +1,43 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Location</th>
-{#                <th>StorageData</th>#}
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for asset_storage in asset_storages %}
-            <tr>
-                <td>{{ asset_storage.id }}</td>
-                <td>{{ asset_storage.name }}</td>
-                <td>{{ asset_storage.description }}</td>
-                <td>{{ asset_storage.location }}</td>
-{#                <td>{{ asset_storage.storageData ? asset_storage.storageData|json_encode : '' }}</td>#}
-                <td>
-                    <a href="{{ path('app_asset_storage_show', {'id': asset_storage.id}) }}">show</a>
-                    <a href="{{ path('app_asset_storage_edit', {'id': asset_storage.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_asset_storage_new') }}">Create new</a>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="align-middle text-center">Name</th>
+                            <th class="align-middle text-center">Description</th>
+                            <th class="align-middle text-center">Location</th>
+                            <th class="align-middle text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset_storage in asset_storages %}
+                            <tr>
+                                <td class="align-middle text-center">
+                                    <a href="{{ path('app_asset_storage_show', {'id': asset_storage.id}) }}" class="text-decoration-none">{{ asset_storage.name }}</a>
+                                    <small>(Id: {{ asset_storage.id }})</small>
+                                </td>
+                                <td class="align-middle text-center">{{ asset_storage.description }}</td>
+                                <td class="align-middle text-center">{{ asset_storage.location }}</td>
+                                <td class="align-middle text-center">
+                                    <a href="{{ path('app_asset_storage_show', {'id': asset_storage.id}) }}" role="button" class="btn btn-sm btn-secondary">Go to</a>
+                                    <a href="{{ path('app_asset_storage_edit', {'id': asset_storage.id}) }}" role="button" class="btn btn-sm btn-warning">Edit</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6">no records found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="{{ path('app_asset_storage_new') }}" role="button" class="btn btn-success">Create new</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}

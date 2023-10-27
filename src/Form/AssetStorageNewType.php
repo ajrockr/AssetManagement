@@ -20,7 +20,11 @@ class AssetStorageNewType extends AbstractType
             ->add('description')
             ->add('location')
             ->add('storageData', TextAreaType::class, [
-                'attr' => [ 'class' => 'tinymce']
+                'label' => 'Storage Data',
+                'help' => 'A JSON array',
+                'attr' => [
+                    'class' => 'tinymce',
+                ],
             ])
             ->add('Save', SubmitType::class)
         ;
