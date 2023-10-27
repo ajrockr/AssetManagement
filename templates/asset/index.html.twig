@@ -4,6 +4,7 @@
             <div class="dataTables_wrapper dt-bootstrap4 text-center">
                 <div class="row text-center">
                     <div class="col-sm-12 text-center">
+                        <div class="top-wrapper"></div>
                         <table id="assetTable" class="table table-bordered table-striped table-hover dataTable dtr-inline display" aria-describedby="assetTable_info">
                             <thead>
                                 <tr>
@@ -53,6 +54,7 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <div class="bottom-wrapper mt-2 w-100 text-center justify-content-center align-items-center d-flex flex-column"></div>
                     </div>
                 </div>
             </div>
@@ -195,6 +197,7 @@
                     [10, 25, 50, -1],
                     [10, 25, 50, 'All']
                 ],
+                // dom: '<"bottom-wrapper"lfrtip>'
             });
 
             // Set values of modal body on open
