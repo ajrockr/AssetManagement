@@ -18,7 +18,7 @@
                         <strong>Active Users</strong><br />
                         {% if activeUsers|length > 0 %}
                             {% for user in activeUsers %}
-                                {{ user.username }}
+                                {{ user.username }}{% if loop.last == false and activeUsers|length > 1 %},&nbsp;{% endif %}
                             {% endfor %}
                         {% endif %}
                     </div>
