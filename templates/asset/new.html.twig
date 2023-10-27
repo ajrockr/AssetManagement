@@ -1,11 +1,17 @@
-{% extends 'layout.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Assets{% endblock %}
-{% block header_title %}New Asset{% endblock %}
-{% block header_breadcrumb %}Asset{% endblock %}
-{% block body_content %}
-    {{ include('asset/_form.html.twig') }}
+{% block body %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-end">
+                <a href="{{ path('app_asset_index') }}" role="button" class="btn btn-sm">
+                    <i class="fa-solid fa-x"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {{ include('asset/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_asset_index') }}">back to list</a>
 {% endblock %}
-{% block optional_javascript %}{% endblock %}

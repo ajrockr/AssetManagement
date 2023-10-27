@@ -1,5 +1,44 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.serialnumber, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.serialnumber) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.assettag, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.assettag) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.purchasedate, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.purchasedate) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.purchasedfrom, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.purchasedfrom) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.warrantystartdate, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.warrantystartdate) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.warrantyenddate, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.warrantyenddate) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.condition, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.condition) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.make, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.make) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.model, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.model) }}
+    </div>
+    <div class="mb-3 form-check">
+        {{ form_widget(form.decomisioned, { 'choice_attr': { 'class': 'form-check-input' } }) }}
+        {{ form_label(form.decomisioned, null, { 'label_attr': { 'class': 'form-check-label' } }) }}
+    </div>
     <div class="row">
         <div class="col-sm-12 col-lg-2 text-start">
             <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
