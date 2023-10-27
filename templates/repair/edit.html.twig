@@ -1,7 +1,23 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {{ include('repair/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_repair_index') }}">back to list</a>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col text-start">
+                        <h4>Edit repair</h6>
+                    </div>
+                    <div class="col text-end">
+                        <a href="{{ path('app_repair_index') }}" role="button" class="btn btn-sm">
+                            <i class="fa-solid fa-x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {{ include('repair/_form.html.twig', {'button_label': 'Update'}) }}
+            </div>
+        </div>
+    </div>
 {% endblock %}

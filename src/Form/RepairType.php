@@ -44,50 +44,23 @@ class RepairType extends AbstractType
         $builder
             ->add('assetId', HiddenType::class)
             ->add('assetUniqueIdentifier', TextType::class, [
-                'attr' => [
-                    'class' => 'form-control'
-                ],
                 'label' => 'Asset'
             ])
             ->add('techId', EntityType::class, [
+                'label' => 'Technician',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Select a Technician'
-                ],
                 'class' => User::class,
                 'choice_label' => 'username',
                 'choices' => $this->getValidTechnicians()
             ])
             ->add('issue', TextareaType::class, [
                 'attr' => [
-                    'class' => 'form-control',
-                    'rows' => 5
+                    'rows' => 5,
+                    'class' => 'tinymce'
                 ]
-            ])
-            ->add('partsNeeded', ChoiceType::class, [
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control'
-                ],
-                'choices' => [
-                    $this->repairParts
-                ],
-                'choice_attr' => function($opt, $k, $v) {
-                    if ($k == $opt) {
-                        return ['checked' => 'checked'];
-                    }
-                    return [];
-                },
-                'multiple' => true,
-                'expanded' => true,
             ])
             ->add('actionsPerformed')
             ->add('status', ChoiceType::class, [
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Select Parts'
-                ],
                 // TODO: Make this based off config
                 'choices' => [
                     'Not Started' => 'status_nostart',
@@ -102,6 +75,38 @@ class RepairType extends AbstractType
             ])
             ->add('usersFollowing')
         ;
+
+        if (sizeof($this->repairParts) === 0) {
+            $builder
+                ->add('partsNeeded', TextType::class, [
+                    'required' => false,
+                    'disabled' => true,
+                    'attr' => [
+                        'class' => 'disabled',
+                        'value' => 'No parts available'
+                    ],
+                    'empty_data' => []
+                ])
+            ;
+        } else {
+            $builder
+                ->add('partsNeeded', ChoiceType::class, [
+                    'required' => false,
+                    'placeholder' => 'No parts available',
+                    'choices' => [
+                        $this->repairParts
+                    ],
+                    'choice_attr' => function ($opt, $k, $v) {
+                        if ($k == $opt) {
+                            return ['checked' => 'checked'];
+                        }
+                        return [];
+                    },
+                    'multiple' => true,
+                    'expanded' => true,
+                ])
+            ;
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

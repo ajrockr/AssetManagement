@@ -1,4 +1,40 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.assetUniqueIdentifier, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.assetUniqueIdentifier) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.techId, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.techId) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.issue, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;' } }) }}
+        {{ form_label(form.issue) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.partsNeeded, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.partsNeeded) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.actionsPerformed, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.actionsPerformed) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.status, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.status) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.usersFollowing, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.usersFollowing) }}
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-lg-2 text-start">
+            <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+        </div>
+        <div class="col text-end">
+            {% if app.request.attributes.get('_route') == 'app_repair_edit' %}
+                <a href="#" role="button" class="btn btn-success">Resolve</a>
+            {% endif %}
+        </div>
+    </div>
 {{ form_end(form) }}
