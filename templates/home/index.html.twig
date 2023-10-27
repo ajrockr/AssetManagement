@@ -1,106 +1,66 @@
-{% extends 'layout.html.twig' %}
-{% block body_content %}
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header border-0">
-                <div class="d-flex justify-content-between">
-                    <h3 class="card-title">Assets</h3>
-                    <a href="javascript:void(0);">View Report</a>
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row cols-1 row-cols-md-3 g-4" style="width: 60vw;">
+            <div class="col">
+                <div class="card" style="width:500px;">
+                    <div class="card-header text-justify">
+                        <div class="row w-100">
+                            <div class="col-md-9">Asset Counts</div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="text-decoration-none">
+                                    <i class="fa-solid fa-file-lines"></i> Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ render_chart(assetsTotalChart) }}
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="position-relative mb-4">
-                    <div class="chart-container" style="height:70vh;">
-                        <canvas id="assets-chart"></canvas>
+            <div class="col">
+                <div class="card" style="width:500px;">
+                    <div class="card-header text-justify">
+                        <div class="row w-100">
+                            <div class="col-md-9">Storage Sizes</div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="text-decoration-none">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {# TODO numbers aren't adding up #}
+                        {{ render_chart(storageSizeChart) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card" style="width:500px;">
+                    <div class="card-header text-justify">
+                        <div class="row w-100">
+                            <div class="col-md-9">Repairs Per Month</div>
+                            <div class="col-md-3 text-end">
+                                <a href="#" class="text-decoration-none">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ render_chart(repairsPerMonthChart) }}
                     </div>
                 </div>
             </div>
         </div>
-        <!-- /.card -->
-
     </div>
-    <!-- /.col-md-6 -->
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header border-0">
-                <div class="d-flex justify-content-between">
-                    <h3 class="card-title">Storage Sizes</h3>
-                    <a href="{{ path('app_report_assetsperstorage') }}">View Report</a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="position-relative mb-4">
-                    <canvas id="storageSizes-chart"></canvas>
-                </div>
-            </div>
-        </div>
-        <!-- /.card -->
-    </div>
-    <!-- /.col-md-6 -->
-</div>
-<!-- /.row -->
 {% endblock %}
-{% block optional_javascript %}
-{#<script src="{{ asset('bundles/adminlte/plugins/chart.js/Chart.min.js') }}"></script>#}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type="text/javascript">
-    $(function () {
-        const $storageSizesChart = $('#storageSizes-chart');
-        const $assetsChart = $('#assets-chart');
 
-        var storageSizesChartData = [];
-        {% for storageName, storageSize in storageSizes %}
-            storageSizesChartData['{{ storageName }}'] = {{ storageSize }};
-        {% endfor %}
-
-        const storageSizesChart = new Chart($storageSizesChart, {
-            type: 'bar',
-            data: {
-                labels: ['Storage Sizes'],
-                datasets: [
-                    {% for storageName, storageSize in storageSizes %}
-                        {
-                            label: '{{ storageName }}',
-                            data: [{{ storageSize }}],
-                        },
-                    {% endfor %}
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                }
-            }
-        });
-
-        const assetsChart = new Chart($assetsChart, {
-            type: 'doughnut',
-            data: {
-                labels: ['Total Assets', 'Assets Collected', 'Assets Decommissioned'],
-                datasets: [
-                    {
-                        data: [{{ totalAssetsCount }}, {{ totalCollectedAssetsCount }}, {{ totalDecommissionedAssetsCount }}],
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                }
-            }
-        });
-    });
-</script>
+{% block stylesheets %}
+    {{ parent() }}
 {% endblock %}

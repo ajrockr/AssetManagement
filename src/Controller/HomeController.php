@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Plugin\IIQ\Plugin;
 use App\Repository\AssetRepository;
 use Symfony\UX\Chartjs\Model\Chart;
 use App\Repository\AssetStorageRepository;
@@ -15,26 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
-    public function __construct(
-        private readonly AssetRepository $assetRepository,
-        private readonly AssetStorageRepository $assetStorageRepository,
-        private readonly AssetCollectionRepository $assetCollectionRepository,
-        private readonly RepairRepository $repairRepository,
-        // private readonly Plugin $iiq
-    )
-    {
-        // dd($this->iiq->getAssetById("ae9b69a2-2e23-442b-90dc-cb5fd0ddb43d"));
-        // dd($this->iiq->getAssetByTag("MOBILE-1978LT2"));
-        // dd($this->iiq->searchForAsset("1978LT2"));
-        // dd($this->iiq->getParts());
-        // dd($this->iiq->getSuppliers());
-        // dd($this->iiq->getUsers());
-        // dd($this->iiq->test());
-    }
-    #[Route('/', name: 'app_home')]
-    public function index(ChartBuilderInterface $chartBuilder): Response
-    {
-        $colorScheme = [
+    private array $colorScheme = [
             "#25CCF7","#FD7272","#54a0ff","#00d2d3",
             "#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e",
             "#16a085","#27ae60","#2980b9","#8e44ad","#2c3e50",
@@ -44,25 +24,44 @@ class HomeController extends AbstractController
             "#00b894","#00cec9","#0984e3","#6c5ce7","#ffeaa7",
             "#fab1a0","#ff7675","#fd79a8","#fdcb6e","#e17055",
             "#d63031","#feca57","#5f27cd","#54a0ff","#01a3a4"
-        ];
+    ];
 
-        shuffle($colorScheme);
+    public function __construct(
+        private readonly AssetRepository $assetRepository,
+        private readonly AssetStorageRepository $assetStorageRepository,
+        private readonly AssetCollectionRepository $assetCollectionRepository,
+        private readonly RepairRepository $repairRepository,
+        private readonly ChartBuilderInterface $chartBuilder,
+    )
+    {
+        // Shuffle the colors for charts
+        shuffle($this->colorScheme);
+    }
+    #[Route('/', name: 'app_home')]
+    public function index(ChartBuilderInterface $chartBuilder): Response
+    {
+        return $this->render('home/index.html.twig', [
+            'assetsTotalChart' => $this->generateAssetTotalChart(),
+            'storageSizeChart' => $this->generateStorageSizesChart(),
+            'repairsPerMonthChart' => $this->generateReparirsPerMonthChart(),
+        ]);
+    }
 
+    private function generateAssetTotalChart(): Chart
+    {
         $totalAssetsCount = $this->getTotalAssetsCount();
         $totalCollectedAssetsCount = $this->getCollectedAssetsCount();
         $totalDecommissionedAssetsCount = $this->getDecommissionedAssetsCount();
-        $repairsPerMonth = $this->getRepairsPerMonth();
-        $storageSizes = $this->getStorageSizes();
 
-        $assetsTotalChart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
+        $assetsTotalChart = $this->chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
         $assetsTotalChart->setData([
             'labels' => ['Total Assets', 'Assets Collected', 'Assets Decommissioned'],
             'datasets' => [
                 [
                     'label' => 'Asset Counts',
                     'data' => [$totalAssetsCount, $totalCollectedAssetsCount, $totalDecommissionedAssetsCount],
-                    'backgroundColor' => $colorScheme,
-                    'borderColor' => $colorScheme
+                    'backgroundColor' => $this->colorScheme,
+                    'borderColor' => $this->colorScheme
                 ]
             ]
         ]);
@@ -79,15 +78,21 @@ class HomeController extends AbstractController
             ]
         ]);
 
-        $storageSizeChart = $chartBuilder->createChart(Chart::TYPE_BAR);
+        return $assetsTotalChart;
+    }
+
+    private function generateStorageSizesChart(): Chart
+    {
+        $storageSizes = $this->getStorageSizes();
+        $storageSizeChart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
         $storageSizeChart->setData([
             'labels' => array_keys($storageSizes),
             'datasets' => [
                 [
                     'label' => 'Storage Sizes',
                     'data' => array_values($storageSizes),
-                    'backgroundColor' => $colorScheme,
-                    'borderColor' => $colorScheme,
+                    'backgroundColor' => $this->colorScheme,
+                    'borderColor' => $this->colorScheme,
                 ]
             ]
         ]);
@@ -109,13 +114,19 @@ class HomeController extends AbstractController
             ]
         ]);
 
-        $repairsPerMonthChart = $chartBuilder->createChart(Chart::TYPE_LINE);
+        return $storageSizeChart;
+    }
+
+    private function generateReparirsPerMonthChart(): Chart
+    {
+        $repairsPerMonth = $this->getRepairsPerMonth();
+        $repairsPerMonthChart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
         $repairsPerMonthChart->setData([
             'labels' => ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
             'datasets' => [
                 [
-                    'backgroundColor' => $colorScheme,
-                    'borderColor' => $colorScheme,
+                    'backgroundColor' => $this->colorScheme,
+                    'borderColor' => $this->colorScheme,
                     'label' => 'Repairs Per Month',
                     'data' => array_values($repairsPerMonth),
                 ]
@@ -131,11 +142,7 @@ class HomeController extends AbstractController
             ],
         ]);
 
-        return $this->render('home/index2.html.twig', [
-            'assetsTotalChart' => $assetsTotalChart,
-            'storageSizeChart' => $storageSizeChart,
-            'repairsPerMonthChart' => $repairsPerMonthChart,
-        ]);
+        return $repairsPerMonthChart;
     }
 
     private function getStorageCount(): int
