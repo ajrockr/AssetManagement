@@ -49,8 +49,10 @@ class KernelRequestSubscriber implements EventSubscriberInterface
             ));
         }
 
-        $userId = $this->security->getUser()->getId();
-        $this->userRepository->setLastActiveTime($userId, new \DateTimeImmutable('now'));
+        if ($this->security->getUser()) {
+            $userId = $this->security->getUser()->getId();
+            $this->userRepository->setLastActiveTime($userId, new \DateTimeImmutable('now'));
+        }
     }
 
     public static function getSubscribedEvents(): array
