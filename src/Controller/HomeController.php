@@ -109,6 +109,12 @@ class HomeController extends AbstractController
             ]
         ]);
 
+        if ($totalAssetsCount <= 0) {
+            $assetsTotalChart->setOptions([
+                'empty' => true
+            ]);
+        }
+
         return $assetsTotalChart;
     }
 

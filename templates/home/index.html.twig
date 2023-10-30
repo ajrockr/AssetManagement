@@ -37,7 +37,11 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        {{ render_chart(assetsTotalChart) }}
+                        {% if assetsTotalChart.options.empty is defined %}
+                            <div class="w-100 h-100 align-middle text-center">No data available</div>
+                        {% else %}
+                            {{ render_chart(assetsTotalChart) }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -82,7 +86,7 @@
                             </div>
                         </div>
                     </div>
-                </row>
+                </div>
             </div>
         </div>
     </div>
