@@ -135,19 +135,19 @@ class AppFixtures extends Fixture
                 'default_value' => '#80c0ed'
             ],
             [
-                'name' => '	collection_color_cell_checkedout',
+                'name' => 'collection_color_cell_checkedout',
                 'value' => '#ff0000',
                 'description' => 'The cell color to represent when occupied asset is checked out.',
                 'default_value' => '#ff0000'
             ],
             [
-                'name' => '	collection_color_cell_processed',
+                'name' => 'collection_color_cell_processed',
                 'value' => '#4287f5',
                 'description' => 'The cell color to represent when occupied asset has been processed by technician.',
                 'default_value' => '#4287f5'
             ],
             [
-                'name' => '	collection_color_cell_hasrepair',
+                'name' => 'collection_color_cell_hasrepair',
                 'value' => '#ff9c9c',
                 'description' => 'The cell color to represent when occupied asset has a repair associated with it.',
                 'default_value' => '#ff9c9c'
@@ -229,7 +229,7 @@ class AppFixtures extends Fixture
             $r->setRoleDescription($role['description']);
             $manager->persist($r);
         }
-        
+
         // Flush the database
         $manager->flush();
     }

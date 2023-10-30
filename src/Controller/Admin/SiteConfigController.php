@@ -23,7 +23,7 @@ class SiteConfigController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            
+
             // Company Information
             $this->updateConfigItem($entityManager, 'company_name', $data['companyName']);
             $this->updateConfigItem($entityManager, 'company_motto', $data['companyMotto']);
@@ -44,7 +44,7 @@ class SiteConfigController extends AbstractController
             // Profile Information
             $this->updateConfigItem($entityManager, 'profile_allowUserEditing', $data['allowUserEditProfile']);
             $this->updateConfigItem($entityManager, 'profile_allowManagerEditing', $data['allowManagerEditProfile']);
-            
+
             // Site Settings
             $this->updateConfigItem($entityManager, 'site_maintenanceModeEnabled', $data['setMaintenanceModeEnabled']);
             $this->updateConfigItem($entityManager, 'site_alertMessageEnabled', $data['setAlertMessageEnabled']);
