@@ -27,7 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_SUPER_ADMIN')")]
+//#[Security("is_granted('ROLE_ASSET_READ') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_SUPER_ADMIN')")]
 #[Route('/asset')]
 class AssetController extends AbstractController
 {

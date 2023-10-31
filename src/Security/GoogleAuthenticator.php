@@ -60,7 +60,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
     {
         $client = $this->clientRegistry->getClient('google');
         $accessToken = $this->fetchAccessToken($client);
-        
+
         return new SelfValidatingPassport(
             new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
                 $googleUser = $client->fetchUserFromToken($accessToken);
@@ -135,7 +135,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                 return new RedirectResponse('/');
             }
         }
-        
+
         $targetUrl = $this->router->generate('app_home');
 
         return new RedirectResponse($targetUrl);

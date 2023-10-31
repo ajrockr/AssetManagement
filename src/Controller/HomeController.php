@@ -59,7 +59,6 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(ChartBuilderInterface $chartBuilder): Response
     {
-        $this->getActiveUsers();
         return $this->render('home/index.html.twig', [
             'assetsTotalChart' => $this->generateAssetTotalChart(),
             'storageSizeChart' => $this->generateStorageSizesChart(),
@@ -128,7 +127,6 @@ class HomeController extends AbstractController
 
         foreach ($activityTimes as $activityTime) {
             if ($activityTime['lastActivity'] > $intervalTime) {
-                dump('trigger');
                 $activeUsers[] = [
                     'userId' => $activityTime['id'],
                     'username' => $activityTime['username']
