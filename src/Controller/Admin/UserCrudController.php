@@ -24,12 +24,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[Security("is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_USER_ADMIN')")]
+//#[Security("is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_USER_ADMIN')")]
 class UserCrudController extends AbstractCrudController
 {
     private UserPasswordHasherInterface $userPasswordHasher;
@@ -57,7 +57,7 @@ class UserCrudController extends AbstractCrudController
     {
         // Get roles
         $roles = $this->getRoles();
-        
+
         return [
             // Account Data Tab
             FormField::addTab('Account Data')->setIcon('fa fa-user'),
@@ -180,7 +180,7 @@ class UserCrudController extends AbstractCrudController
         $disableUserAction = Action::new('Disable')
             ->linkToCrudAction('disableUserAction')
         ;
-        
+
         $enableUserAction = Action::new('Enable')
             ->linkToCrudAction('enableUserAction')
         ;
@@ -238,7 +238,7 @@ class UserCrudController extends AbstractCrudController
                 ->generateUrl();
         return $this->redirect($url);
     }
-    
+
     public function enableUserAction(AdminContext $context)
     {
         $id = $context->getRequest()->query->get('entityId');

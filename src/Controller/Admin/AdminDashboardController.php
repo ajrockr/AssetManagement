@@ -16,10 +16,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Security("is_granted('ROLE_ADMIN')")]
+//#[Security("is_granted('ROLE_ADMIN')")]
+#[IsGranted('ROLE_ADMIN', statusCode: 423)]
 class AdminDashboardController extends AbstractDashboardController
 {
     private EntityManagerInterface $entityManager;

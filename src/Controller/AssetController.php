@@ -23,7 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -75,7 +75,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
+//    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/assign', name: 'app_assign_user_to_device', methods: ['POST'])]
     public function assignUserToDevice(Request $request, AssetRepository $assetRepository, EntityManagerInterface $entityManager): Response
     {
@@ -92,7 +92,7 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index');
     }
 
-    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
+//    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
     public function new(Request $request, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository): Response
     {
@@ -115,7 +115,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[Security("is_granted('ROLE_ASSET_EDIT') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
+//    #[Security("is_granted('ROLE_ASSET_EDIT') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
@@ -136,7 +136,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
+//    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/{id}/delete', name: 'app_asset_delete')]
     public function delete(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
@@ -153,7 +153,7 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_CHECKIN') or is_granted('ROLE_SUPER_ADMIN')")]
+//    #[Security("is_granted('ROLE_ASSET_MODIFY') or is_granted('ROLE_ASSET_FULL_CONTROL') or is_granted('ROLE_ASSET_CHECKIN') or is_granted('ROLE_SUPER_ADMIN')")]
     #[Route('/checkin', name: 'app_asset_checkin')]
     public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
