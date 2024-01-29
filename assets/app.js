@@ -34,6 +34,7 @@ document.addEventListener('chartjs:init', function (event) {
 import './bootstrap.js';
 // /assets/app.js
 
+<<<<<<< ours
 // import the main style sheet
 import './styles/main.scss';
 
@@ -63,4 +64,8 @@ document.addEventListener('chartjs:init', function (event) {
     Chart.register(zoomPlugin);
     Chart.register(Colors);
 });
+>>>>>>> theirs
+=======
+// any CSS you import will output into a single css file (app.css in this case)
+import './styles/app.css';
 >>>>>>> theirs
