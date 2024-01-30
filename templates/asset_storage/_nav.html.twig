@@ -6,4 +6,8 @@
             {{ item.name }} ({{ item.description }}) {#<p></p>#}
         </a>
     </li>
+{% else %}
+    <li class="nav-item">
+        <span class="dropdown-item">No Storages</span>
+    </li>
 {% endfor %}
