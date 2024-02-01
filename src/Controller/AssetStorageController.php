@@ -65,7 +65,9 @@ class AssetStorageController extends AbstractController
         $storageLocked = $storageModerationController->isLocked($id);
         $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
         $collectedAssets = $assetCollectionRepository->getAll();
-        $storage = $this->renderStorageView($this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData(), $storageLocked);
+        $storageData = $this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData();
+//        $storage = $this->renderStorageView($storageData, $storageLocked);
+        $storage = '';
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
         $users = $userRepository->getUsers();
@@ -140,6 +142,7 @@ class AssetStorageController extends AbstractController
             'repairParts' => $parts,
             'storageCounts' => $storageCounts,
             'storageRender' => $storage,
+            'storageData' => $storageData,
             'form' => $form,
             'collectedAssets' => $assets,
             'storageLocked' => $storageLocked ? 'true' : 'false'
@@ -191,7 +194,13 @@ class AssetStorageController extends AbstractController
 
         $html = '<div id="storageStart">';
 
+        if (! preg_grep('/^side*/', array_keys($storageData))) {
+            // 'side*' does not exist, this is a 1 sided cart
+        }
         foreach ($storageData as $side) {
+            if (preg_grep('/^row*/', array_keys($side))) {
+                // Do I care that 'row' wasn't part of the keys?
+            }
             $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
 
             foreach ($side as $row) {

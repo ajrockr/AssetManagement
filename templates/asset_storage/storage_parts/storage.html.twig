@@ -1,0 +1,25 @@
+{# Asset Storage part Storage #}
+
+{#Still needs a lot of work. A lot of duplicated code. Idea is to dynamically expand the html depending on sides/rows/slots#}
+
+{# Storage Data variable #}
+<div id="storageCart">
+    <div id="storageContainerSide" class="col storageSides my-3 px-3">
+        {% for key, sides in storageData %}
+            {% if 'side' in key %}
+                {% include 'asset_storage/storage_parts/side.html.twig' with sides %}
+            {% else %}
+                <div id="storageContainerRow" class="row no-gutters storageRows">
+                    {% for slot in sides %}
+                        <div id="slot-{{ slot }}" class="col-sm p-0 storageCell">
+                            <a href="javascript:void(0);" class="text-decoration-none my-asset-collection-btn" role="button" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="{{ slot }}" id="href-slot-{{ slot }}">
+                                <span data-bs-toggle="modal" data-bs-target="#modal-checkin" data-slot="{{ slot }}" id="slotNumber-{{ slot }}">{{ slot }}</span>
+                            </a>
+                        </div>
+                        <div class="col-sm"></div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

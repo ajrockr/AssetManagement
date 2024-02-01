@@ -10,7 +10,8 @@
         </div>
     </div>
     <div class="row">
-        {{ storageRender|raw }}
+        {% include 'asset_storage/storage_parts/storage.html.twig' with storageData %}
+{#        {{ storageRender|raw }}#}
     </div>
     <div class="container-fluid">
         <p class="text-right">
