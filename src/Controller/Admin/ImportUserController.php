@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\ImportUserType;
+use App\Repository\LogRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ImportUserController extends AbstractController
 {
+    public function __construct(private readonly LogRepository $logRepository) {}
     #[Route('/admin/import/user', name: 'app_admin_import_user')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -66,32 +68,37 @@ class ImportUserController extends AbstractController
     private function commitToDatabase(EntityManagerInterface $entityManager, array $userData): void
     {
         $userRepository = $entityManager->getRepository(User::class);
+        $logData = [];
+
         try {
             foreach ($userData as $user) {
                 // Skip if username already exists
                 if ($userRepository->findOneBy(['username' => $user['username']])) {
-                    $this->addFlash('warning', sprintf('User %s was skipped due to username conflicts.', $user['username']));
-                    continue;
+//                    $this->addFlash('warning', sprintf('User %s was skipped due to username conflicts.', $user['username']));
+                    $user['status'] = 'skipped, user already exists';
+                } else {
+                    $userEntity = new User();
+                    $userEntity->setSurname($user['surname']);
+                    $userEntity->setFirstname($user['firstname']);
+                    $userEntity->setUsername($user['username']);
+                    $userEntity->setEmail($user['email']);
+                    $userEntity->setTitle($user['title']);
+                    $userEntity->setRoles(['ROLE_DENY_LOGIN']);
+                    $userEntity->setEnabled(false);
+                    $userEntity->setUserUniqueId($user['uniqueId']);
+                    $userEntity->setType($user['type']);
+                    $entityManager->persist($userEntity);
                 }
 
-                $userEntity = new User();
-                $userEntity->setSurname($user['surname']);
-                $userEntity->setFirstname($user['firstname']);
-                $userEntity->setUsername($user['username']);
-                $userEntity->setEmail($user['email']);
-                $userEntity->setTitle($user['title']);
-                $userEntity->setRoles(['ROLE_DENY_LOGIN']);
-                $userEntity->setEnabled(false);
-                $userEntity->setUserUniqueId($user['uniqueId']);
-                $userEntity->setType($user['type']);
-                $entityManager->persist($userEntity);
+                $logData[] = $user;
             }
 
             $entityManager->flush();
+            $this->addFlash('success', 'Imported users.');
         } catch (ORMException $e) {
             $this->addFlash('error', 'Failed to import users.');
         }
 
-        $this->addFlash('success', 'Imported users.');
+        $this->logRepository->userImport($this->getUser()->getId(), $logData, 'admin/import_user', 'info', 'user_import');
     }
 }
