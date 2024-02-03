@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Asset;
 use App\Entity\AssetCollection;
+use App\Entity\Log;
 use App\Entity\RepairParts;
 use App\Entity\User;
 use App\Entity\UserRoles;
@@ -12,7 +13,7 @@ use App\Entity\AlertMessage;
 use App\Entity\Vendor;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -92,6 +93,7 @@ class AdminDashboardController extends AbstractDashboardController
             MenuItem::section('DEV'),
             MenuItem::linkToCrud('User Roles (dev)', 'fa fa-home', UserRoles::class),
             MenuItem::linkToCrud('Site Config (dev)', 'fa fa-home', SiteConfig::class),
+            MenuItem::linkToCrud('Logs (DEV)', 'fa fa-home', Log::class),
         ];
     }
 }
