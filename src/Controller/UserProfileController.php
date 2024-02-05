@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-//#[Security("is_granted('ROLE_USER')")]
+#[IsGranted('ROLE_USER')]
 class UserProfileController extends AbstractController
 {
     #[Route('/user/profile', name: 'app_user_profile')]

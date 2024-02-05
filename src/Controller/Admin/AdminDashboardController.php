@@ -2,30 +2,29 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AlertMessage;
 use App\Entity\Asset;
 use App\Entity\AssetCollection;
-use App\Entity\Log;
 use App\Entity\RepairParts;
+use App\Entity\SiteConfig;
 use App\Entity\User;
 use App\Entity\UserRoles;
-use App\Entity\SiteConfig;
-use App\Entity\AlertMessage;
 use App\Entity\Vendor;
+use App\Entity\Log;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
-//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-//#[Security("is_granted('ROLE_ADMIN')")]
 #[IsGranted('ROLE_ADMIN', statusCode: 423)]
 class AdminDashboardController extends AbstractDashboardController
 {
     private EntityManagerInterface $entityManager;
+
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -93,7 +92,7 @@ class AdminDashboardController extends AbstractDashboardController
             MenuItem::section('DEV'),
             MenuItem::linkToCrud('User Roles (dev)', 'fa fa-home', UserRoles::class),
             MenuItem::linkToCrud('Site Config (dev)', 'fa fa-home', SiteConfig::class),
-            MenuItem::linkToCrud('Logs (DEV)', 'fa fa-home', Log::class),
+            MenuItem::linkToCrud('Logs (dev)', 'fa fa-home', Log::class),
         ];
     }
 }

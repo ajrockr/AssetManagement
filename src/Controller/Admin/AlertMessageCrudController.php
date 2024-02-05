@@ -3,15 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\AlertMessage;
-use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-//#[Security("is_granted('ROLE_SUPER_ADMIN')")]
 #[IsGranted('ROLE_SUPER_ADMIN', statusCode: 423)]
 class AlertMessageCrudController extends AbstractCrudController
 {
