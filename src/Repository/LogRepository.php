@@ -20,25 +20,4 @@ class LogRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Log::class);
     }
-
-    public function userImport(
-        $userId,
-        array $usersImported,
-        string $source = 'admin/import_user',
-        string $type = 'info',
-        string $action = 'user_import')
-    {
-        $datetime = new \DateTimeImmutable('now');
-
-        $entityManager = $this->getEntityManager();
-        $log = new Log();
-        $log->setUserId($userId)
-            ->setAction($action)
-            ->setDatetime($datetime)
-            ->setType($type)
-            ->setSourcepage($source)
-            ->setMessage($usersImported);
-        $entityManager->persist($log);
-        $entityManager->flush();
-    }
 }

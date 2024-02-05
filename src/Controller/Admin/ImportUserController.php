@@ -2,19 +2,20 @@
 
 namespace App\Controller\Admin;
 
-use App\Controller\LoggerController;
 use App\Entity\User;
 use App\Form\ImportUserType;
+use App\Service\Logger;
+use App\Service\LoggerController;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ImportUserController extends AbstractController
 {
-    public function __construct(private readonly LoggerController $logger) {}
+    public function __construct(private readonly Logger $logger) {}
     #[Route('/admin/import/user', name: 'app_admin_import_user')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -99,6 +100,6 @@ class ImportUserController extends AbstractController
             $this->addFlash('error', 'Failed to import users.');
         }
 
-        $this->logger->importUsers($this->getUser()->getId(), $logData, 'admin/import_user');
+        $this->logger->importUsers($this->getUser()->getId(), $logData, Logger::SOURCE_IMPORT_USER);
     }
 }

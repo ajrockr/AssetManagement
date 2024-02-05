@@ -112,9 +112,9 @@ class Log
         return $this;
     }
 
-    public function getMessage(): array
+    public function getMessage(): string
     {
-        return json_decode($this->message);
+        return $this->message;
     }
 
     public function setMessage(array $message): static
