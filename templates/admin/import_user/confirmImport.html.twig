@@ -1,0 +1,9 @@
+{# templates/admin/import_user/confirmImport.html.twig #}
+{% extends '@!EasyAdmin/page/content.html.twig' %}
+
+{% block main %}
+    {% for user in userData %}
+        {{ dump(user) }}
+    {% endfor %}
+    {{ form(form) }}
+{% endblock %}

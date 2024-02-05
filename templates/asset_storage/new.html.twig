@@ -6,7 +6,7 @@
             <div class="card-header align-middle text-end">
                 <div class="row align-middle">
                     <div class="col text-start align-middle">
-                        <h4>Create new storage</h6>
+                        <h4>Create new storage</h4>
                     </div>
                     <div class="col text-end">
                         <a href="{{ path('app_asset_storage_index') }}" role="button" class="btn btn-sm">
@@ -20,4 +20,55 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+
+{#    https://stackoverflow.com/questions/35909091/how-to-convert-csv-file-to-json-using-jquery-and-download-that-json-file#}
+    <script type="text/javascript">
+        $(function () {
+            var csv = $("#fileUpload").val();
+
+            $("#upload").bind("click", function () {
+                var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+                if (regex.test($("#fileUpload").val().toLowerCase())) {
+                    if (typeof (FileReader) != "undefined") {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            var rows = e.target.result.split("\r\n");
+
+                            if(rows.length>0){
+                                var firstRowCells = GetCSVCells(rows[0], ",");
+
+                                var dataArray = new Array();
+                                for(var i=1;i<rows.length;i++)
+                                {
+                                    var cells = GetCSVCells(rows[i], ",");
+                                    var obj = {};
+                                    for(var j=0;j<cells.length;j++)
+                                    {
+                                        obj[firstRowCells[j]] = cells[j];
+                                    }
+                                    dataArray.push(obj);
+                                }
+
+                                $("#asset_storage_storageData").html('');
+                                $("#asset_storage_storageData").append(JSON.stringify(dataArray));
+                            }
+                        }
+                        reader.readAsText($("#fileUpload")[0].files[0]);
+                    } else {
+                        alert("This browser does not support HTML5.");
+                    }
+                } else {
+                    alert("Please upload a valid CSV file.");
+                }
+            });
+        });
+
+        function GetCSVCells(row, separator){
+            return row.split(separator);
+        }
+
+    </script>
 {% endblock %}
