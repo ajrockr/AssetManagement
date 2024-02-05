@@ -65,7 +65,7 @@ class Logger
             ->setType(self::TYPE_SECURITY)
             ->setAction(self::ACTION_USER_LOGIN)
             ->setMessage([
-                'message' => 'LOGIN',
+                'message' => 'User logged in',
                 'ip_address' => $ipAddress,
                 'username' => $username,
                 'success' => $successful
