@@ -19,25 +19,25 @@ class Asset
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $serialnumber = null;
+    private ?string $serial_number = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $assettag = null;
+    private ?string $asset_tag = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $purchasedate = null;
+    private ?\DateTimeImmutable $purchase_date = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $purchasedfrom = null;
+    private ?string $purchased_from = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $warrantystartdate = null;
+    private ?\DateTimeImmutable $warranty_start_date = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $warrantyenddate = null;
+    private ?\DateTimeImmutable $warranty_end_date = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $condition = null;
+    private ?string $asset_condition = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $make = null;
@@ -46,10 +46,10 @@ class Asset
     private ?string $model = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $decomisioned = null;
+    private ?bool $decommissioned = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $assignedTo = null;
+    private ?int $assigned_to = null;
 
     public function getId(): ?int
     {
@@ -62,96 +62,96 @@ class Asset
      * @return void
      */
     #[Assert\Callback]
-    public function validate(ExecutionContextInterface $context, $payload)
+    public function validate(ExecutionContextInterface $context, $payload): void
     {
         if (null !== $this->getWarrantystartdate()) {
             if ($this->getWarrantyenddate() <= $this->getWarrantystartdate()) {
                 $context->buildViolation('Warranty End Date must not be older than the start date.')
-                    ->atPath('warrantyenddate')
+                    ->atPath('warranty_end_date')
                     ->addViolation();
             }
         }
     }
-    public function getSerialnumber(): ?string
+    public function getSerialNumber(): ?string
     {
-        return $this->serialnumber;
+        return $this->serial_number;
     }
 
-    public function setSerialnumber(?string $serialnumber): self
+    public function setSerialNumber(?string $serial_number): self
     {
-        $this->serialnumber = $serialnumber;
+        $this->serial_number = $serial_number;
 
         return $this;
     }
 
-    public function getAssettag(): ?string
+    public function getAssetTag(): ?string
     {
-        return $this->assettag;
+        return $this->asset_tag;
     }
 
-    public function setAssettag(?string $assettag): self
+    public function setAssetTag(?string $asset_tag): self
     {
-        $this->assettag = $assettag;
+        $this->asset_tag = $asset_tag;
 
         return $this;
     }
 
-    public function getPurchasedate(): ?\DateTimeImmutable
+    public function getPurchaseDate(): ?\DateTimeImmutable
     {
-        return $this->purchasedate;
+        return $this->purchase_date;
     }
 
-    public function setPurchasedate(?\DateTimeImmutable $purchasedate): self
+    public function setPurchaseDate(?\DateTimeImmutable $purchase_date): self
     {
-        $this->purchasedate = $purchasedate;
+        $this->purchase_date = $purchase_date;
 
         return $this;
     }
 
-    public function getPurchasedfrom(): ?string
+    public function getPurchasedFrom(): ?string
     {
-        return $this->purchasedfrom;
+        return $this->purchased_from;
     }
 
-    public function setPurchasedfrom(?string $purchasedfrom): self
+    public function setPurchasedFrom(?string $purchased_from): self
     {
-        $this->purchasedfrom = $purchasedfrom;
+        $this->purchased_from = $purchased_from;
 
         return $this;
     }
 
-    public function getWarrantystartdate(): ?\DateTimeImmutable
+    public function getWarrantyStartDate(): ?\DateTimeImmutable
     {
-        return $this->warrantystartdate;
+        return $this->warranty_start_date;
     }
 
-    public function setWarrantystartdate(?\DateTimeImmutable $warrantystartdate): self
+    public function setWarrantyStartDate(?\DateTimeImmutable $warranty_start_date): self
     {
-        $this->warrantystartdate = $warrantystartdate;
+        $this->warranty_start_date = $warranty_start_date;
 
         return $this;
     }
 
-    public function getWarrantyenddate(): ?\DateTimeImmutable
+    public function getWarrantyEndDate(): ?\DateTimeImmutable
     {
-        return $this->warrantyenddate;
+        return $this->warranty_end_date;
     }
 
-    public function setWarrantyenddate(?\DateTimeImmutable $warrantyenddate): self
+    public function setWarrantyEndDate(?\DateTimeImmutable $warranty_end_date): self
     {
-        $this->warrantyenddate = $warrantyenddate;
+        $this->warranty_end_date = $warranty_end_date;
 
         return $this;
     }
 
-    public function getCondition(): ?string
+    public function getAssetCondition(): ?string
     {
-        return $this->condition;
+        return $this->asset_condition;
     }
 
-    public function setCondition(?string $condition): self
+    public function setAssetCondition(?string $condition): self
     {
-        $this->condition = $condition;
+        $this->asset_condition = $condition;
 
         return $this;
     }
@@ -180,26 +180,26 @@ class Asset
         return $this;
     }
 
-    public function isDecomisioned(): ?bool
+    public function isDecommissioned(): ?bool
     {
-        return $this->decomisioned;
+        return $this->decommissioned;
     }
 
-    public function setDecomisioned(?bool $decomisioned): self
+    public function setDecommissioned(?bool $decommissioned): self
     {
-        $this->decomisioned = $decomisioned;
+        $this->decommissioned = $decommissioned;
 
         return $this;
     }
 
     public function getAssignedTo(): ?int
     {
-        return $this->assignedTo;
+        return $this->assigned_to;
     }
 
-    public function setAssignedTo(?int $assignedTo): self
+    public function setAssignedTo(?int $assigned_to): self
     {
-        $this->assignedTo = $assignedTo;
+        $this->assigned_to = $assigned_to;
 
         return $this;
     }

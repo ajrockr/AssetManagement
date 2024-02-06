@@ -34,7 +34,8 @@ class AssetController extends AbstractController
     private int $lastSlotCollected;
 
     public function __construct(
-        protected readonly EventDispatcherInterface $eventDispatcher
+        protected readonly EventDispatcherInterface $eventDispatcher,
+        protected readonly EntityManagerInterface $entityManager,
     ) {}
 
     #[Route('/', name: 'app_asset_index', methods: ['GET'])]
@@ -60,11 +61,11 @@ class AssetController extends AbstractController
                 'purchasedfrom' => $asset->getPurchasedfrom(),
                 'warrantystartdate' => $asset->getWarrantystartdate(),
                 'warrantyenddate' => $asset->getWarrantyenddate(),
-                'condition' => $asset->getCondition(),
+                'condition' => $asset->getAssetCondition(),
                 'make' => $asset->getMake(),
                 'model' => $asset->getModel(),
                 'assignedTo' => $usersName,
-                'decomisioned' => $asset->isDecomisioned()
+                'decomisioned' => $asset->isDecommissioned()
             ];
         }
 
@@ -243,7 +244,7 @@ class AssetController extends AbstractController
         ]);
     }
 
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): bool
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): bool|Response
     {
         // Set up what is needed to render the page
         $users = $userRepository->findAll();
@@ -275,10 +276,10 @@ class AssetController extends AbstractController
         $device = null;
         switch ($assetUniqueIdentifier) {
             case 'assettag':
-                $device = $assetRepository->findOneBy(['assettag' => $data['device']]);
+                $device = $assetRepository->findOneBy(['asset_tag' => $data['device']]);
                 break;
             case 'serialnumber':
-                $device = $assetRepository->findOneBy(['serialnumber' => $data['device']]);
+                $device = $assetRepository->findOneBy(['serial_number' => $data['device']]);
                 break;
         }
 
@@ -286,12 +287,25 @@ class AssetController extends AbstractController
         if (null === $device) {
             $asset = new Asset;
             if ($assetUniqueIdentifier == 'assettag') {
-                $asset->setAssettag($data['device']);
+                $asset->setAssetTag($data['device'])
+                    ->setSerialNumber(null);
             } elseif ($assetUniqueIdentifier == 'serialnumber') {
-                $asset->setSerialnumber($data['device']);
+                $asset->setSerialNumber($data['serial'])
+                    ->setAssetTag(null);
             }
-
-            $assetRepository->save($asset, true);
+            $asset->setAssetCondition(null)
+                ->setMake(null)
+                ->setModel(null)
+                ->setAssignedTo(null)
+                ->SetDecommissioned(null)
+                ->setPurchaseDate(null)
+                ->setPurchasedFrom(null)
+                ->setWarrantyEndDate(null)
+                ->setWarrantyStartDate(null)
+            ;
+            $this->entityManager->persist($asset);
+            $this->entityManager->flush();
+//            $assetRepository->save($asset, true);
             $deviceId = $asset->getId();
         } else {
             $deviceId = $device->getId();
@@ -374,9 +388,8 @@ class AssetController extends AbstractController
         // }
 
         // TODO I'm returning bool here for testing, this might break other parts of the site for now
-
-        return true;
-        // return $this->redirect($request->headers->get('referer'));
+//        return true;
+         return $this->redirect($request->headers->get('referer'));
     }
 
     #[Route('/collection/collect', name: 'app_asset_collection_collect')]

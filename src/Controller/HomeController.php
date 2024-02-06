@@ -11,7 +11,7 @@ use App\Repository\RepairRepository;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -276,7 +276,7 @@ class HomeController extends AbstractController
      */
     private function getDecommissionedAssetsCount(): int
     {
-        return count($this->assetRepository->findBy(['decomisioned' => true]));
+        return count($this->assetRepository->findBy(['decommissioned' => true]));
     }
 
     /**

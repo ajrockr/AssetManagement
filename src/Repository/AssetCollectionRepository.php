@@ -56,7 +56,7 @@ class AssetCollectionRepository extends ServiceEntityRepository
             $return[] = $result['collectionLocation'];
         }
 
-        return $return;
+        return $return ?? [];
     }
 
     /**
@@ -68,13 +68,12 @@ class AssetCollectionRepository extends ServiceEntityRepository
     {
         $assets = $this->createQueryBuilder('assetcollection')
             ->select('assetcollection')
-            ->addSelect('asset.assettag', 'asset.serialnumber')
+            ->addSelect('asset.asset_tag', 'asset.serial_number')
             ->innerJoin('App\Entity\Asset', 'asset', 'WHERE', 'asset.id = assetcollection.DeviceID')
             ->getQuery()
             ->getArrayResult()
         ;
 
-        $return = [];
         foreach ($assets as $asset) {
             $return[] = [
                 'id' => $asset[0]['id'],
@@ -86,12 +85,12 @@ class AssetCollectionRepository extends ServiceEntityRepository
                 'location' => $asset[0]['collectionLocation'],
                 'checked_out' => $asset[0]['checkedout'],
                 'processed' => $asset[0]['processed'],
-                'asset_tag' => $asset['assettag'],
-                'serial_number' => $asset['serialnumber']
+                'asset_tag' => $asset['asset_tag'],
+                'serial_number' => $asset['serial_number']
             ];
         }
 
-        return $return;
+        return $return ?? [];
     }
 
     /**
