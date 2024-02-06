@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use function Doctrine\ORM\QueryBuilder;
+use function Doctrine\ORM\{QueryBuilder};
 
 class SearchController extends AbstractController
 {
@@ -26,6 +26,10 @@ class SearchController extends AbstractController
         private readonly AssetRepository $assetRepository,
         private readonly AssetStorageRepository $assetStorageRepository
     ) {}
+
+    /**
+     * @throws Exception
+     */
     #[Route('/search', name: 'app_search', methods: ['GET'])]
     public function index(Request $request): Response
     {
@@ -136,6 +140,9 @@ class SearchController extends AbstractController
         return $returnArray;
     }
 
+    /**
+     * @throws Exception
+     */
     private function searchForCollectedAsset(string $query): array
     {
         $assetSearch = $this->searchForAsset($query);

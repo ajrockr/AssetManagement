@@ -183,51 +183,51 @@ class AssetStorageController extends AbstractController
      * @param array|null $storageData
      * @return Response
      */
-    public function renderStorageView(?array $storageData, bool $storageLocked = false): string
-    {
-        // TODO: Create this HTML in the twig file
-//        if (null === $storageData) {
-//            $this->render('asset_storage/storageRender.html.twig', [
-//                'storage' => ''
-//            ]);
+//    public function renderStorageView(?array $storageData, bool $storageLocked = false): string
+//    {
+//        // TODO: Create this HTML in the twig file
+////        if (null === $storageData) {
+////            $this->render('asset_storage/storageRender.html.twig', [
+////                'storage' => ''
+////            ]);
+////        }
+//
+//        $html = '<div id="storageStart">';
+//
+//        if (! preg_grep('/^side*/', array_keys($storageData))) {
+//            // 'side*' does not exist, this is a 1 sided cart
 //        }
-
-        $html = '<div id="storageStart">';
-
-        if (! preg_grep('/^side*/', array_keys($storageData))) {
-            // 'side*' does not exist, this is a 1 sided cart
-        }
-        foreach ($storageData as $side) {
-            if (preg_grep('/^row*/', array_keys($side))) {
-                // Do I care that 'row' wasn't part of the keys?
-            }
-            $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
-
-            foreach ($side as $row) {
-                $html .= '<div id="storageContainerRow" class="row no-gutters storageRows">';
-
-                foreach ($row as $id=>$slot) {
-                    $html .= '
-                    <div id="slot-'.$slot.'" class="col-sm p-0 storageCell">
-                        <a href="javascript:void(0);" class="text-decoration-none my-asset-collection-btn" role="button" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="' . $slot . '" id="href-slot-' . $slot . '">
-                            <span data-bs-toggle="modal" data-bs-target="#modal-checkin" data-slot="'.$slot.'" id="slotNumber-'. $slot . '">' . $slot . '</span>
-                        </a>
-                    </div>
-                    <div class="col-sm"></div>';
-                }
-
-                $html .= '</div>';
-            }
-
-            $html .= '</div>';
-        }
-
-        $html .= '</div>';
-        return $html;
-//        return $this->render('asset_storage/storageRender.html.twig', [
-//            'storage' => $html
-//        ]);
-    }
+//        foreach ($storageData as $side) {
+//            if (preg_grep('/^row*/', array_keys($side))) {
+//                // Do I care that 'row' wasn't part of the keys?
+//            }
+//            $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
+//
+//            foreach ($side as $row) {
+//                $html .= '<div id="storageContainerRow" class="row no-gutters storageRows">';
+//
+//                foreach ($row as $id=>$slot) {
+//                    $html .= '
+//                    <div id="slot-'.$slot.'" class="col-sm p-0 storageCell">
+//                        <a href="javascript:void(0);" class="text-decoration-none my-asset-collection-btn" role="button" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="' . $slot . '" id="href-slot-' . $slot . '">
+//                            <span data-bs-toggle="modal" data-bs-target="#modal-checkin" data-slot="'.$slot.'" id="slotNumber-'. $slot . '">' . $slot . '</span>
+//                        </a>
+//                    </div>
+//                    <div class="col-sm"></div>';
+//                }
+//
+//                $html .= '</div>';
+//            }
+//
+//            $html .= '</div>';
+//        }
+//
+//        $html .= '</div>';
+//        return $html;
+////        return $this->render('asset_storage/storageRender.html.twig', [
+////            'storage' => $html
+////        ]);
+//    }
 
     /**
      * Renders storage items for use in the navigation

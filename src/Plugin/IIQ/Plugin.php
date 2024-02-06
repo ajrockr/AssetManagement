@@ -8,6 +8,8 @@ use App\Plugin\IIQ\Entity\User;
 use App\Plugin\IIQ\Entity\Asset;
 use App\Plugin\IIQ\Entity\Model;
 use JetBrains\PhpStorm\NoReturn;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Yaml\Yaml;
 use App\Plugin\IIQ\Entity\Supplier;
 use App\Plugin\IIQ\Entity\Manufacturer;
@@ -19,6 +21,10 @@ class Plugin extends ApiRequest
 {
     private array $config = [];
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function __construct(
         private readonly ContainerBagInterface $params,
         private readonly HttpClientInterface $client
@@ -27,6 +33,11 @@ class Plugin extends ApiRequest
         $this->config = $this->getConfig();
         parent::__construct($this->client, $this->config);
     }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     private function getConfig(): array
     {
         // TODO: Either put this in _ENV or sql db
