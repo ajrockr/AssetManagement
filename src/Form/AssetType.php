@@ -19,23 +19,23 @@ class AssetType extends AbstractType
         // TODO move all the field configs to the twig
         $assetUniqueIdentifier = $this->siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $builder
-            ->add('serialnumber', TextType::class, [
-                'required' => 'serialnumber' == $assetUniqueIdentifier,
+            ->add('serial_number', TextType::class, [
+                'required' => 'serial_number' == $assetUniqueIdentifier,
                 'label' => 'Serial Number',
                 // 'attr' => [
                 //     'class' => 'form-control'
                 // ],
                 // 'row_attr' => [ 'class' => 'form-floating mb-3' ]
             ])
-            ->add('assettag', TextType::class, [
-                'required' => 'assettag' == $assetUniqueIdentifier,
+            ->add('asset_tag', TextType::class, [
+                'required' => 'asset_tag' == $assetUniqueIdentifier,
                 'label' => 'Asset Tag',
                 // 'attr' => [
                 //     'class' => 'form-control'
                 // ],
                 // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
-            ->add('purchasedate', DateType::class, [
+            ->add('purchase_date', DateType::class, [
                 'required' => false,
                 'input' => 'datetime_immutable',
                 'label' => 'Purchased Date',
@@ -45,7 +45,7 @@ class AssetType extends AbstractType
                 // ],
                 // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
-            ->add('purchasedfrom', TextType::class, [
+            ->add('purchased_from', TextType::class, [
                 'required' => false,
                 'label' => 'Purchased From',
                 // 'attr' => [
@@ -53,7 +53,7 @@ class AssetType extends AbstractType
                 // ],
                 // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
-            ->add('warrantystartdate', DateType::class, [ // TODO: Allow warrantystart/end to also be null
+            ->add('warranty_start_date', DateType::class, [ // TODO: Allow warrantystart/end to also be null
                 'required' => false,
                 'input' => 'datetime_immutable',
                 'label' => 'Warranty Start',
@@ -63,7 +63,7 @@ class AssetType extends AbstractType
                 // ],
                 // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
-            ->add('warrantyenddate', DateType::class, [
+            ->add('warranty_end_date', DateType::class, [
                 'required' => false,
                 'input' => 'datetime_immutable',
                 'label' => 'Warranty End',
@@ -74,7 +74,7 @@ class AssetType extends AbstractType
                 // ],
                 // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
-            ->add('condition', TextType::class, [
+            ->add('asset_condition', TextType::class, [
                 'required' => false,
                 'label' => 'Condition',
                 // 'attr' => [
@@ -98,7 +98,7 @@ class AssetType extends AbstractType
                 // ],
                 // 'row_attr' => ['class' => 'form-floating mb-3']
             ])
-            ->add('decomisioned', CheckboxType::class, [
+            ->add('decommissioned', CheckboxType::class, [
                 'label' => 'Decommissioned',
                 'required' => false,
                 // 'row_attr' => [

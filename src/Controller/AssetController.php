@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
-use App\Entity\UserRoles;
 use App\Form\AssetType;
 use App\Entity\AssetCollection;
 use App\Form\AssetCollectionType;
@@ -11,10 +10,10 @@ use App\Repository\UserRepository;
 use App\Repository\AssetRepository;
 use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
+use App\Service\Logger;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
-use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -36,6 +35,7 @@ class AssetController extends AbstractController
     public function __construct(
         protected readonly EventDispatcherInterface $eventDispatcher,
         protected readonly EntityManagerInterface $entityManager,
+        protected readonly Logger $logger,
     ) {}
 
     #[Route('/', name: 'app_asset_index', methods: ['GET'])]
@@ -55,17 +55,17 @@ class AssetController extends AbstractController
 
             $assetsArray[] = [
                 'id' => $asset->getId(),
-                'serialnumber' => $asset->getSerialnumber(),
-                'assettag' => $asset->getAssettag(),
-                'purchasedate' => $asset->getPurchasedate(),
-                'purchasedfrom' => $asset->getPurchasedfrom(),
-                'warrantystartdate' => $asset->getWarrantystartdate(),
-                'warrantyenddate' => $asset->getWarrantyenddate(),
+                'serialnumber' => $asset->getSerialNumber(),
+                'assettag' => $asset->getAssetTag(),
+                'purchasedate' => $asset->getPurchaseDate(),
+                'purchasedfrom' => $asset->getPurchasedFrom(),
+                'warrantystartdate' => $asset->getWarrantyStartDate(),
+                'warrantyenddate' => $asset->getWarrantyEndDate(),
                 'condition' => $asset->getAssetCondition(),
                 'make' => $asset->getMake(),
                 'model' => $asset->getModel(),
                 'assignedTo' => $usersName,
-                'decomisioned' => $asset->isDecommissioned()
+                'decommissioned' => $asset->isDecommissioned()
             ];
         }
 
@@ -97,7 +97,6 @@ class AssetController extends AbstractController
     #[IsGranted('ROLE_ASSET_MODIFY')]
     public function new(Request $request, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository): Response
     {
-        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $asset = new Asset();
         $form = $this->createForm(AssetType::class, $asset);
         $form->handleRequest($request);

@@ -1,31 +1,31 @@
 {{ form_start(form) }}
     <div class="mb-3 form-floating">
-        {{ form_widget(form.serialnumber, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.serialnumber) }}
+        {{ form_widget(form.serial_number, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.serial_number) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.assettag, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.assettag) }}
+        {{ form_widget(form.asset_tag, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.asset_tag) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.purchasedate, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.purchasedate) }}
+        {{ form_widget(form.purchase_date, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.purchase_date) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.purchasedfrom, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.purchasedfrom) }}
+        {{ form_widget(form.purchased_from, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.purchased_from) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.warrantystartdate, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.warrantystartdate) }}
+        {{ form_widget(form.warranty_start_date, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.warranty_start_date) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.warrantyenddate, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.warrantyenddate) }}
+        {{ form_widget(form.warranty_end_date, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.warranty_end_date) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.condition, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.condition) }}
+        {{ form_widget(form.asset_condition, { 'attr': {'class': 'form-control' } }) }}
+        {{ form_label(form.asset_condition) }}
     </div>
     <div class="mb-3 form-floating">
         {{ form_widget(form.make, { 'attr': {'class': 'form-control' } }) }}
@@ -36,8 +36,8 @@
         {{ form_label(form.model) }}
     </div>
     <div class="mb-3 form-check">
-        {{ form_widget(form.decomisioned, { 'choice_attr': { 'class': 'form-check-input' } }) }}
-        {{ form_label(form.decomisioned, null, { 'label_attr': { 'class': 'form-check-label' } }) }}
+        {{ form_widget(form.decommissioned, { 'choice_attr': { 'class': 'form-check-input' } }) }}
+        {{ form_label(form.decommissioned, null, { 'label_attr': { 'class': 'form-check-label' } }) }}
     </div>
     <div class="row">
         <div class="col-sm-12 col-lg-2 text-start">
