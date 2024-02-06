@@ -29,7 +29,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_SUPER_ADMIN')]
 #[IsGranted('ROLE_USER_ADMIN')]
 class UserCrudController extends AbstractCrudController
 {

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
+use App\Entity\UserRoles;
 use App\Form\AssetType;
 use App\Entity\AssetCollection;
 use App\Form\AssetCollectionType;
@@ -13,6 +14,7 @@ use App\Repository\SiteConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,11 +27,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_SUPER_ADMIN')]
-#[IsGranted('ROLE_ASSET_READ')]
-#[IsGranted('ROLE_ASSET_FULL_CONTROL')]
-#[IsGranted('ROLE_ASSET_MODIFY')]
 #[Route('/asset')]
+#[IsGranted('ROLE_ASSET_READ')]
 class AssetController extends AbstractController
 {
     private int $lastSlotCollected;
@@ -76,10 +75,8 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ASSET_MODIFY')]
-    #[IsGranted('ROLE_ASSET_FULL_CONTROL')]
-    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/assign', name: 'app_assign_user_to_device', methods: ['POST'])]
+    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function assignUserToDevice(Request $request, AssetRepository $assetRepository, EntityManagerInterface $entityManager): Response
     {
         $data = $request->request->all();
@@ -95,10 +92,8 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index');
     }
 
-    #[IsGranted('ROLE_ASSET_MODIFY')]
-    #[IsGranted('ROLE_ASSET_FULL_CONTROL')]
-    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function new(Request $request, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository): Response
     {
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
@@ -120,10 +115,8 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ASSET_MODIFY')]
-    #[IsGranted('ROLE_ASSET_FULL_CONTROL')]
-    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function edit(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
         $form = $this->createForm(AssetType::class, $asset);
@@ -143,13 +136,10 @@ class AssetController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ASSET_MODIFY')]
-    #[IsGranted('ROLE_ASSET_FULL_CONTROL')]
-    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/{id}/delete', name: 'app_asset_delete')]
+    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function delete(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
-//        if ($this->isCsrfTokenValid('delete'.$asset->getId(), $request->request->get('_token'))) {
         try {
             $assetRepository->remove($asset, true);
         } catch (\Exception $e) {
@@ -162,10 +152,8 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[IsGranted('ROLE_ASSET_MODIFY')]
-    #[IsGranted('ROLE_ASSET_FULL_CONTROL')]
-    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/checkin', name: 'app_asset_checkin')]
+    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
         // TODO: Fix form submit, forward to checkin, check unique identifier
@@ -392,6 +380,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/collection/collect', name: 'app_asset_collection_collect')]
+    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
     {
         // TODO also, select2 styling is weird on different pages. make sure that is uniform

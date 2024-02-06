@@ -44,6 +44,26 @@ security:
         - { path: ^/logout, roles: ROLE_USER }
         - { path: ^/*, roles: ROLE_USER }
 
+    role_hierarchy:
+        # Allow access to Admin dashboard and statistics
+        ROLE_ADMIN: ROLE_USER
+
+        # Allow full control over entire application
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH, ROLE_ASSET_FULL_CONTROL, ROLE_USER_ADMIN]
+
+        # Control user accounts
+        ROLE_USER_ADMIN: [ROLE_ADMIN]
+
+        # Read, modify, full control over assets
+        ROLE_ASSET_READ: [ROLE_USER]
+        ROLE_ASSET_MODIFY: [ROLE_ASSET_READ]
+        ROLE_ASSET_FULL_CONTROL: [ROLE_ASSET_MODIFY]
+
+        # Read, modify, full control over repairs. Asset modify will be needed
+        ROLE_ASSET_REPAIR_READ: [ROLE_ASSET_MODIFY]
+        ROLE_ASSET_REPAIR_MODIFY: [ROLE_ASSET_REPAIR_READ]
+        ROLE_ASSET_REPAIR_FULL_CONTROL: [ROLE_ASSET_REPAIR_MODIFY]
+
 when@test:
     security:
         password_hashers:

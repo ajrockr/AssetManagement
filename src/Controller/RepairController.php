@@ -11,13 +11,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/repair')]
+#[IsGranted('ROLE_ASSET_REPAIR_READ')]
 class RepairController extends AbstractController
 {
-    const STATUS_RESOLVED = 'status_resolved';
-    const STATUS_OPEN = 'status_open';
-    const STATUS_NOTSTARTED = 'status_not_started';
+    public const STATUS_RESOLVED = 'status_resolved';
+    public const STATUS_OPEN = 'status_open';
+    public const STATUS_NOT_STARTED = 'status_not_started';
     private array $parts;
     public function __construct(
         private readonly RepairPartsRepository $repairPartsRepository,
@@ -53,6 +55,7 @@ class RepairController extends AbstractController
     }
 
     #[Route('/new', name: 'app_repair_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
     public function new(Request $request, RepairRepository $repairRepository, AssetRepository $assetRepository, ?array $data = null): Response
     {
         $repair = new Repair();
@@ -73,6 +76,7 @@ class RepairController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
     public function createRepair(AssetRepository $assetRepository, RepairRepository $repairRepository, Repair|array $repairData, bool $isInternalReferred = false): bool
     {
         $repair = $repairData;
@@ -114,6 +118,7 @@ class RepairController extends AbstractController
     }
 
     #[Route('/{id}/show', name: 'app_repair_show', methods: ['GET'])]
+    #[IsGranted('ROLE_ASSET_REPAIR_READ')]
     public function show(Repair $repairEntity): Response
     {
 //        $getRepair = $repairRepository->getRepair($id);
@@ -129,6 +134,7 @@ class RepairController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_repair_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
     public function edit(Request $request, Repair $repair, RepairRepository $repairRepository): Response
     {
         $form = $this->createForm(RepairType::class, $repair);
@@ -147,6 +153,7 @@ class RepairController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_repair_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
     public function delete(Request $request, Repair $repair, RepairRepository $repairRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$repair->getId(), $request->request->get('_token'))) {
