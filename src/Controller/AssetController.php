@@ -258,6 +258,7 @@ class AssetController extends AbstractController
                 'serial' => $form['asset_serial'],
                 'user' => $form['user'],
                 'location' => $form['location'],
+                'storage' => $form['storage'],
                 'checkout' => false,
                 'processed' => false,
                 'notes' => '',
@@ -332,7 +333,9 @@ class AssetController extends AbstractController
                 ->setCollectedFrom($data['user'])
                 ->setCheckedout($data['checkout'])
                 ->setProcessed($data['processed'])
-                ->setCollectionNotes($data['notes']);
+                ->setCollectionNotes($data['notes'])
+                ->setCollectionStorage($data['storage'])
+            ;
             $action = 'create';
         }
 
@@ -419,6 +422,7 @@ class AssetController extends AbstractController
         }
 
         // TODO what happens when there is more than one?
+        // TODO also...wtf is this? I forgot
         $pathParamKey = null;
         $pathParamVal = null;
         if (is_countable($requestingPathParams) && count($requestingPathParams) > 0) {
@@ -478,7 +482,15 @@ class AssetController extends AbstractController
 
             $openStorageSlots = array_map('intval', array_diff($storageData, $assignedAssets));
 
-            if (count($openStorageSlots) == 0) {
+            // Check to see if asset is already collected
+            $assetId = $assetRepository->findAssetId($data['asset_tag'], $data['asset_serial']);
+            if ($assetCollected = $assetCollectionRepository->findOneBy(['DeviceID' => $assetId])) {
+                $storageName = $assetStorageRepository->findOneBy(['id' => $assetCollected->getCollectionStorage()])->getName();
+                $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName]);
+            }
+
+            // Check to see if Storage is full
+            elseif (count($openStorageSlots) == 0) {
                 // return no open slots, ask user to place asset aside?
                 // TODO fix this
                 dd('Storage is full, place asset aside?');
@@ -488,24 +500,24 @@ class AssetController extends AbstractController
                     ->add('Collect', SubmitType::class)
                     ->getForm()
                 ;
-            }
-
-            // pseudo for now, allow this to be changed in config
-            $config['storage_collection_sort_slots_order'] = 'asc';
-            if ($config['storage_collection_sort_slots_order'] === 'desc') {
-                rsort($openStorageSlots);
             } else {
-                // If 'desc' is not the config value or 'asc' is defined, default to ascending
-                sort($openStorageSlots);
+                // pseudo for now, allow this to be changed in config
+                $config['storage_collection_sort_slots_order'] = 'asc';
+                if ($config['storage_collection_sort_slots_order'] === 'desc') {
+                    rsort($openStorageSlots);
+                } else {
+                    // If 'desc' is not the config value or 'asc' is defined, default to ascending
+                    sort($openStorageSlots);
+                }
+
+                $nextOpenSlot = reset($openStorageSlots);
+
+                $data['location'] = $nextOpenSlot;
+
+                $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
+                // TODO set a flash message
+                $this->addFlash('assetCollected', $nextOpenSlot);
             }
-
-            $nextOpenSlot = reset($openStorageSlots);
-
-            $data['location'] = $nextOpenSlot;
-
-            $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
-            // TODO set a flash message
-            $this->addFlash('assetCollected', $nextOpenSlot);
 
             return $this->redirectToRoute($requestingPath, [
                 $data['requestingPathParamKey'] => $data['requestingPathParamVal'],

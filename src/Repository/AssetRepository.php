@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Asset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -50,17 +52,19 @@ class AssetRepository extends ServiceEntityRepository
         if ($decommissioned) {
             return $this->createQueryBuilder('asset')
                 ->select('count(asset.id)')
-                ->where('decomisioned = true')
+                ->where('decommissioned = true')
                 ->getQuery()
                 ->getSingleScalarResult()
             ;
         }
 
-        return $this->createQueryBuilder('asset')
-            ->select('count(asset.id)')
-            ->getQuery()
-            ->getSingleScalarResult()
-        ;
+        try {
+            return $this->createQueryBuilder('asset')
+                ->select('count(asset.id)')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (NoResultException|NonUniqueResultException $e) {
+        }
     }
 
     /**
@@ -71,5 +75,24 @@ class AssetRepository extends ServiceEntityRepository
     public function getDecommissionedCount(): int
     {
         return $this->getCount(true);
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function findAssetId(?string $assetTag = null, ?string $serialNumber = null): ?int
+    {
+        $result =  $this->createQueryBuilder('asset')
+            ->select('asset.id')
+            ->orWhere('asset.asset_tag = :assetTag')
+            ->orWhere('asset.serial_number = :serialNumber')
+            ->setParameter(':assetTag', $assetTag)
+            ->setParameter(':serialNumber', $serialNumber)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        return $result['id'] ?? null;
     }
 }

@@ -37,6 +37,9 @@ class AssetCollection
     #[ORM\Column]
     private ?bool $processed = null;
 
+    #[ORM\Column]
+    private ?int $collectionStorage = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,6 +137,18 @@ class AssetCollection
     public function setProcessed(bool $processed): self
     {
         $this->processed = $processed;
+
+        return $this;
+    }
+
+    public function getCollectionStorage(): ?int
+    {
+        return $this->collectionStorage;
+    }
+
+    public function setCollectionStorage(int $collectionStorage): static
+    {
+        $this->collectionStorage = $collectionStorage;
 
         return $this;
     }

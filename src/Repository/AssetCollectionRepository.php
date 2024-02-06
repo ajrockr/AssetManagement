@@ -64,12 +64,14 @@ class AssetCollectionRepository extends ServiceEntityRepository
      *
      * @return array
      */
-    public function getAllCollectedAssets(): array
+    public function getAllCollectedAssets(int $storageId): array
     {
         $assets = $this->createQueryBuilder('assetcollection')
             ->select('assetcollection')
             ->addSelect('asset.asset_tag', 'asset.serial_number')
-            ->innerJoin('App\Entity\Asset', 'asset', 'WHERE', 'asset.id = assetcollection.DeviceID')
+            ->where('assetcollection.collectionStorage = :storageId')
+            ->innerJoin('App\Entity\Asset', 'asset', 'WITH', 'asset.id = assetcollection.DeviceID')
+            ->setParameter(':storageId', $storageId)
             ->getQuery()
             ->getArrayResult()
         ;

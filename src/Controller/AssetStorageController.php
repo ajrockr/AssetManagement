@@ -64,7 +64,7 @@ class AssetStorageController extends AbstractController
     {
         $storageLocked = $storageModerationController->isLocked($id);
         $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
-        $collectedAssets = $assetCollectionRepository->getAll();
+        $collectedAssets = $assetCollectionRepository->getAllCollectedAssets($id);
         $storageData = $this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData();
 //        $storage = $this->renderStorageView($storageData, $storageLocked);
         $storage = '';

@@ -148,8 +148,10 @@
         {# end:javascript #}
 
         {% block assetCollectedModal %}
-            {# Asset Collected Modal #}
             {% include('alerts/assetCollected.html.twig') %}
+        {% endblock %}
+        {% block assetAlreadyCollectedModal %}
+            {% include('alerts/assetCollected_AlreadyCollected.html.twig') %}
         {% endblock %}
     </body>
 </html>
