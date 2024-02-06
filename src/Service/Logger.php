@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Log;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 
 class Logger
 {
@@ -22,7 +21,6 @@ class Logger
 
 
     public function __construct(
-        private readonly LoggerInterface $logger,
         private readonly EntityManagerInterface $entityManager,
     ) {}
 

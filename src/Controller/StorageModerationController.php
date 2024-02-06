@@ -15,8 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class StorageModerationController extends AbstractController
 {
     public function __construct(
-        private readonly AssetStorageRepository $assetStorageRepository,
-        private readonly AssetCollectionRepository $assetCollectionRepository,
         private readonly StorageLockRepository $storageLockRepository
     ) {}
 

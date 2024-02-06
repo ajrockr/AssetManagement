@@ -11,16 +11,7 @@ use Twig\Environment;
 
 class AlertMessageSubscriber implements EventSubscriberInterface
 {
-    private Environment $twig;
-    private AlertMessageRepository $alertMessage;
-    private SiteConfigRepository $siteConfig;
-
-    public function __construct(Environment $twig, AlertMessageRepository $alertMessage, SiteConfigRepository $siteConfig)
-    {
-        $this->twig = $twig;
-        $this->alertMessage = $alertMessage;
-        $this->siteConfig = $siteConfig;
-    }
+    public function __construct(private readonly Environment $twig, private readonly AlertMessageRepository $alertMessage) {}
 
     public function onKernelController(ControllerEvent $event): void
     {

@@ -7,6 +7,7 @@ use App\Plugin\IIQ\Entity\Part;
 use App\Plugin\IIQ\Entity\User;
 use App\Plugin\IIQ\Entity\Asset;
 use App\Plugin\IIQ\Entity\Model;
+use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Yaml\Yaml;
 use App\Plugin\IIQ\Entity\Supplier;
 use App\Plugin\IIQ\Entity\Manufacturer;
@@ -138,7 +139,7 @@ class Plugin extends ApiRequest
                 } elseif (isset($response['PreviousOwnerId'])) {
                     $asset->setPreviousOwnerId($response['PreviousOwnerId']);
                 }
-                
+
                 $assets[] = $asset;
             }
 
@@ -314,13 +315,13 @@ class Plugin extends ApiRequest
         return null;
     }
 
-    public function test()
+    public function test(): ?array
     {
         $currentMaxExecutionTime = ini_get('max_execution_time');
         $currentMemoryLimit = ini_get('memory_limit');
         ini_set('max_execution_time', $currentMaxExecutionTime * 2);
         ini_set('memory_limit', '2048M');
-        
+
         $request = $this->setRequestUrl('assets/of/2a1561e5-34ff-4fcf-87de-2a146f0e1c01?$s=10000&$o=SerialNumber&$d=Ascending')
             ->setRequestMethod(parent::HTTP_METHOD_POST)
             ->sendRequest();
@@ -334,4 +335,3 @@ class Plugin extends ApiRequest
 }
 
 
-    

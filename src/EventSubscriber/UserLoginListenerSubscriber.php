@@ -13,8 +13,7 @@ use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 class UserLoginListenerSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly Logger $logger,
-        private readonly RequestStack $requestStack,
-        private readonly TokenStorageInterface $tokenStorage) {}
+        private readonly RequestStack $requestStack) {}
 
 
     /**

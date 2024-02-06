@@ -48,7 +48,6 @@ class RepairRepository extends ServiceEntityRepository
             ->getScalarResult()
         ;
 
-        $return = [];
         foreach ($repairs as $repair) {
             $return[$repair['r_id']] = [
                 'id' => $repair['r_id'],
@@ -67,7 +66,7 @@ class RepairRepository extends ServiceEntityRepository
             ];
         }
 
-        return $return;
+        return isset($return) ?: [];
     }
 
     /**
@@ -118,7 +117,7 @@ class RepairRepository extends ServiceEntityRepository
             ->getScalarResult()
         ;
 
-        $return = [];
+        // TODO fix this, can just return the querybuilder
         foreach ($repairs as $repair) {
             $return[$repair['r_id']] = [
                 'id' => $repair['r_id'],
@@ -137,7 +136,7 @@ class RepairRepository extends ServiceEntityRepository
             ];
         }
 
-        return $return;
+        return isset($return) ?: [];
     }
 
     /**

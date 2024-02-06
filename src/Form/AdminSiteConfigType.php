@@ -53,19 +53,19 @@ class AdminSiteConfigType extends AbstractType
                 'required' => false
             ])
             ->add('useGoogleAuth', CheckboxType::class, [
-                'data' => $options['data']['auth_useGoogle'] ? true : false,
+                'data' => (bool)$options['data']['auth_useGoogle'],
                 'help' => 'Client ID and Secret Key must be provided to Support. This information is hard coded into the application for security.',
                 'required' => false
             ])
 
             // Authentication Information
             ->add('useMicrosoftAuth', CheckboxType::class, [
-                'data' => $options['data']['auth_useMicrosoft'] ? true : false,
+                'data' => (bool)$options['data']['auth_useMicrosoft'],
                 'help' => 'Client ID and Secret Key must be provided to Support. This information is hard coded into the application for security.',
                 'required' => false
             ])
             ->add('useNoExternalAuth', CheckboxType::class, [
-                'data' => $options['data']['auth_useMicrosoft'] <=> $options['data']['auth_useGoogle'] ? false : true,
+                'data' => !($options['data']['auth_useMicrosoft'] <=> $options['data']['auth_useGoogle']),
                 'required' => false
             ])
             // Prefer this, but having trouble with styling
@@ -85,26 +85,26 @@ class AdminSiteConfigType extends AbstractType
 
             // User Profiles
             ->add('allowUserEditProfile', CheckboxType::class, [
-                'data' => $options['data']['profile_allowUserEditing'] ? true : false,
+                'data' => (bool)$options['data']['profile_allowUserEditing'],
                 'required' => false
             ])
             ->add('allowManagerEditProfile', CheckboxType::class, [
-                'data' => $options['data']['profile_allowManagerEditing'] ? true : false,
+                'data' => (bool)$options['data']['profile_allowManagerEditing'],
                 'required' => false
             ])
             // @todo, finish rest of profile stuff
 
             // Site Information
             ->add('setMaintenanceModeEnabled', CheckboxType::class, [
-                'data' => $options['data']['site_maintenanceModeEnabled'] ? true : false,
+                'data' => (bool)$options['data']['site_maintenanceModeEnabled'],
                 'required' => false
             ])
             ->add('setAlertMessageEnabled', CheckboxType::class, [
-                'data' => $options['data']['site_alertMessageEnabled'] ? true : false,
+                'data' => (bool)$options['data']['site_alertMessageEnabled'],
                 'required' => false
             ])
             ->add('setAllowUserRegistration', CheckboxType::class, [
-                'data' => $options['data']['user_allowRegistration'] ? true : false,
+                'data' => (bool)$options['data']['user_allowRegistration'],
                 'required' => false
             ])
             ->add('setDeviceUniqueId', TextType::class, [

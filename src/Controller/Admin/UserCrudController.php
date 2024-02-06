@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\UserRoles;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Form\FormEvents;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
@@ -224,12 +226,16 @@ class UserCrudController extends AbstractCrudController
         return parent::delete($context);
     }
 
-    public function disableUserAction(AdminContext $context)
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function toggleEnableUserAction(AdminContext $context, bool $enabled): RedirectResponse
     {
         $id = $context->getRequest()->query->get('entityId');
         $em = $this->container->get('doctrine')->getManager();
         $ur = $em->getRepository(User::class)->find($id)
-            ->setEnabled(false);
+            ->setEnabled($enabled);
         $this->persistEntity($em, $ur);
 
         $url = $this->container->get(AdminUrlGenerator::class)
@@ -238,21 +244,21 @@ class UserCrudController extends AbstractCrudController
                 ->generateUrl();
         return $this->redirect($url);
     }
-
-    public function enableUserAction(AdminContext $context)
-    {
-        $id = $context->getRequest()->query->get('entityId');
-        $em = $this->container->get('doctrine')->getManager();
-        $ur = $em->getRepository(User::class)->find($id)
-            ->setEnabled(true);
-        $this->persistEntity($em, $ur);
-
-        $url = $this->container->get(AdminUrlGenerator::class)
-                ->setController(UserCrudController::class)
-                ->setAction(Action::INDEX)
-                ->generateUrl();
-        return $this->redirect($url);
-    }
+//
+//    public function enableUserAction(AdminContext $context)
+//    {
+//        $id = $context->getRequest()->query->get('entityId');
+//        $em = $this->container->get('doctrine')->getManager();
+//        $ur = $em->getRepository(User::class)->find($id)
+//            ->setEnabled($en);
+//        $this->persistEntity($em, $ur);
+//
+//        $url = $this->container->get(AdminUrlGenerator::class)
+//                ->setController(UserCrudController::class)
+//                ->setAction(Action::INDEX)
+//                ->generateUrl();
+//        return $this->redirect($url);
+//    }
 
     public function getRoles(): array
     {

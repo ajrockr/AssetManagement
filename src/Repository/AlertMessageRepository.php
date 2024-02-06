@@ -56,14 +56,12 @@ class AlertMessageRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('am')
             ->select('am.subject', 'am.message', 'am.dateCreated', 'am.source', 'am.active')
             ->orderBy('am.dateCreated', ':sort')->setParameter('sort', $sort);
-        
+
         if ($source === 'all') {
             $qb->andWhere('am.source = :source')->setParameter('source', $source);
         }
-        
-        $result = $qb->getQuery()->getResult();
 
-        return $result;
+        return $qb->getQuery()->getResult();
     }
 
     public function isActiveMessage(): ?AlertMessage
@@ -79,6 +77,6 @@ class AlertMessageRepository extends ServiceEntityRepository
 
     public function alertsEnabled(): bool
     {
-        return $this->getEntityManager()->getRepository(SiteConfig::class)->findOneByName('site_alertMessageEnabled')->getConfigValue() == "1" ? true : false;
+        return $this->getEntityManager()->getRepository(SiteConfig::class)->findOneByName('site_alertMessageEnabled')->getConfigValue() == "1";
     }
 }
