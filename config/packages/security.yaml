@@ -54,6 +54,9 @@ security:
         # Control user accounts
         ROLE_USER_ADMIN: [ROLE_ADMIN]
 
+        # View reports
+        ROLE_REPORT_VIEWER: [ROLE_USER]
+
         # Read, modify, full control over assets
         ROLE_ASSET_READ: [ROLE_USER]
         ROLE_ASSET_MODIFY: [ROLE_ASSET_READ]
