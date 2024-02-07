@@ -66,7 +66,6 @@ class AssetStorageController extends AbstractController
         $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
         $collectedAssets = $assetCollectionRepository->getAllCollectedAssets($id);
         $storageData = $this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData();
-//        $storage = $this->renderStorageView($storageData, $storageLocked);
         $storage = '';
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
@@ -110,6 +109,11 @@ class AssetStorageController extends AbstractController
                 return $this->forward('App\Controller\StorageModerationController::clearLocation', ['location' => $clearLocation]);
             }
 
+            if (is_null($form->getData()['user'])) {
+                $this->addFlash('error', 'No user specified.');
+                return $this->redirect($request->headers->get('referer'));
+            }
+
             return $this->forward('App\Controller\AssetController::checkIn', [
                 'form' => $form
             ]);
@@ -137,6 +141,7 @@ class AssetStorageController extends AbstractController
         }
 
         return $this->render('asset_storage/show.html.twig', [
+            'storageId' => $id,
             'assetStorage' => $assetStorage,
             'colors' => $colors,
             'repairParts' => $parts,

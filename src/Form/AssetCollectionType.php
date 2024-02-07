@@ -39,6 +39,7 @@ class AssetCollectionType extends AbstractType
             ])
             ->add('user', ChoiceType::class, [
                 'choices' => array_combine(array_values($this->users), array_keys($this->users)),
+                'required' => true,
                 'multiple' => false,
                 'attr' => [
                     'class' => 'form-control js-example-basic-single',
@@ -46,6 +47,7 @@ class AssetCollectionType extends AbstractType
             ])
             ->add('userId', HiddenType::class)
             ->add('assetId', HiddenType::class)
+            ->add('storageId', HiddenType::class)
             ->add('needsrepair', CheckboxType::class, [
                 'required' => false,
                 'attr' => [

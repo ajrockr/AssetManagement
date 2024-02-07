@@ -258,7 +258,7 @@ class AssetController extends AbstractController
                 'serial' => $form['asset_serial'],
                 'user' => $form['user'],
                 'location' => $form['location'],
-                'storage' => $form['storage'],
+                'storageId' => $form['storage'],
                 'checkout' => false,
                 'processed' => false,
                 'notes' => '',
@@ -321,7 +321,9 @@ class AssetController extends AbstractController
                 ->setCollectedFrom($data['user'])
                 ->setCheckedout($data['checkout'])
                 ->setProcessed($data['processed'])
-                ->setCollectionNotes($data['notes']);
+                ->setCollectionNotes($data['notes'])
+                ->setCollectionStorage($data['storageId'])
+            ;
             $action = 'update';
         // Device not collected, create the collection record
         } else {
@@ -334,7 +336,7 @@ class AssetController extends AbstractController
                 ->setCheckedout($data['checkout'])
                 ->setProcessed($data['processed'])
                 ->setCollectionNotes($data['notes'])
-                ->setCollectionStorage($data['storage'])
+                ->setCollectionStorage($data['storageId'])
             ;
             $action = 'create';
         }
@@ -342,13 +344,17 @@ class AssetController extends AbstractController
         // Persist the collection record
         try {
             $assetCollectionRepository->save($assetCollection, true);
+            $this->logger->assetCheckInOut($loggedInUserId,
+                $deviceId,
+                $this->logger::ACTION_ASSET_CHECKIN,
+                $request->headers->get('referer'),
+                $data['user'],
+                $data['storage'] . $data['location']
+            );
         } catch(\Exception $e) {
             // Failed, get out of here with Flash Message
-            // TODO commenting out for testing
-            // $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
-            // return $this->redirect($request->headers->get('referer'));
-            // TODO I'm returning bool here for testing, this might break other parts of the site for now
-            return false;
+            $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
+            return $this->redirect($request->headers->get('referer'));
         }
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,

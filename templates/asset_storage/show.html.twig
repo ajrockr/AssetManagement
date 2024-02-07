@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-
+{#TODO add flashbag#}
 {% block body %}
     <div class="row">
         <div class="col">
@@ -96,6 +96,7 @@
                         </div>
                         {{ form_widget(form.userId) }}
                         {{ form_widget(form.assetId) }}
+                        {{ form_widget(form.storageId, { 'attr': { 'value': storageId } }) }}
                     </div>
                     <div class="modal-footer justify-content-between">
                         {{ form_widget(form.clearLocation, {'label': 'Clear', 'attr': { 'class': 'btn btn-outline-secondary'}}) }}

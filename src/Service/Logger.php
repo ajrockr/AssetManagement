@@ -7,11 +7,13 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class Logger
 {
-    public const SOURCE_IMPORT_USER = 'admin/import_user';
-    public const SOURCE_USER_LOGIN = 'user/login';
-    public const ACTION_ADMIN = 'ADMIN';
-    public const ACTION_IMPORT_USER = 'IMPORT_USER';
-    public const ACTION_USER_LOGIN = 'USER_LOGIN';
+    public const SOURCE_IMPORT_USER = 'admin_import_user';
+    public const SOURCE_USER_LOGIN = 'user_login';
+    public const ACTION_ADMIN = 'admin_action';
+    public const ACTION_IMPORT_USER = 'import_user';
+    public const ACTION_USER_LOGIN = 'user_login';
+
+    public const ACTION_ASSET_CHECKIN = 'asset_checkin';
 
     private const TYPE_ADMIN = 'ADMIN';
 
