@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\AssetCollection;
 use App\Entity\AssetStorage;
 use App\Form\AssetCollectionType;
 use App\Form\AssetStorageType;
@@ -12,12 +11,11 @@ use App\Repository\AssetStorageRepository;
 use App\Repository\RepairPartsRepository;
 use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
-use App\Repository\StorageLockRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/asset/storage')]
 class AssetStorageController extends AbstractController
@@ -245,11 +243,6 @@ class AssetStorageController extends AbstractController
         $storage = $assetStorageRepository->findAll();
         $array = [];
         foreach ($storage as $item) {
-            // Pseudo for do not show
-            if ($item->getLocation() == 0) {
-                continue;
-            }
-
             $array[] = [
                 'name' => $item->getName(),
                 'id' => $item->getId(),
