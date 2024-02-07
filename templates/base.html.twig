@@ -14,13 +14,6 @@
         {% endblock %}
     </head>
     <body>
-
-        {# include:flash messages #}
-        {# TODO fix later #}
-        {# {% include('flash_messages.html.twig') %} #}
-        {% include('alerts/alert.twig') %}
-        {# end:flash messages #}
-
         {# include:collectionForm #}
         {% block asset_collection_form %}
             {# Because we are calling this method from anywhere on the site, we need to know what route it was called from #}
@@ -73,6 +66,9 @@
         {% endblock %}
         {% block assetAlreadyCollectedModal %}
             {% include('alerts/assetCollected_AlreadyCollected.html.twig') %}
+        {% endblock %}
+        {% block assetStorageIsFullModal %}
+            {% include('alerts/assetCollected_StorageFull.html.twig') %}
         {% endblock %}
 
         {# begin:javascript #}

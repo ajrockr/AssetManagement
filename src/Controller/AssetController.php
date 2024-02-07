@@ -266,6 +266,7 @@ class AssetController extends AbstractController
                 'processed' => false,
                 'notes' => '',
                 'needsrepair' => false,
+                'storageIsFull' => $form['storageIsFull']
             ];
         } else {
             $data = $form->getData();
@@ -332,7 +333,7 @@ class AssetController extends AbstractController
         if ($assetCollection = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
                 ->setCollectedBy($loggedInUserId)
-                ->setCollectionLocation($data['location'])
+                ->setCollectionLocation($data['storageIsFull'] ? null : $data['location'])
                 ->setDeviceID($deviceId)
                 ->setCollectedFrom($data['user'])
                 ->setCheckedout($data['checkout'])
@@ -452,8 +453,6 @@ class AssetController extends AbstractController
             }
         }
 
-        // Set up forms
-        $storageFullForm = null;
         $collectionForm = $this->createFormBuilder()
             ->setAction($this->generateUrl('app_asset_collection_collect'))
             ->add('storage', ChoiceType::class, [
@@ -486,7 +485,7 @@ class AssetController extends AbstractController
 
         $collectionForm->handleRequest($request);
 
-        $nextOpenSlot = null;
+//        $nextOpenSlot = null;
 
         if ($collectionForm->isSubmitted() && $collectionForm->isValid()) {
             $data = $collectionForm->getData();
@@ -512,15 +511,8 @@ class AssetController extends AbstractController
 
             // Check to see if Storage is full
             elseif (count($openStorageSlots) == 0) {
-                // return no open slots, ask user to place asset aside?
-                // TODO fix this
-                dd('Storage is full, place asset aside?');
-
-                $storageFullForm = $this->createFormBuilder()
-                    ->add('storage_full_place_aside', CheckboxType::class)
-                    ->add('Collect', SubmitType::class)
-                    ->getForm()
-                ;
+                $data['storageIsFull'] = true;
+                $this->addFlash('assetStorageIsFull', 'Storage is full');
             } else {
                 // pseudo for now, allow this to be changed in config
                 $config['storage_collection_sort_slots_order'] = 'asc';
@@ -547,7 +539,6 @@ class AssetController extends AbstractController
 
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
-            'storageFullForm' => (null === $storageFullForm) ? '' : $storageFullForm->createView(),
         ]);
     }
 
