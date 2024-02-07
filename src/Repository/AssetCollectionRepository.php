@@ -138,11 +138,26 @@ class AssetCollectionRepository extends ServiceEntityRepository
         ;
     }
 
-    private function collectAsset(array $asset): bool
+    public function findCollectedAssetsByStorageId(int $storageId): array
     {
-        /**
-         * 1) Check if asset already collected, return bool
-         */
-        return true;
+        return $this->createQueryBuilder('assetcollection')
+            ->select('assetcollection')
+            ->where('assetcollection.collectionStorage = :storageId')
+            ->setParameter(':storageId', $storageId)
+            ->getQuery()
+            ->getArrayResult()
+        ;
+    }
+
+    public function findOobCollectedAssetsByStorageId(int $storageId): array
+    {
+        return $this->createQueryBuilder('assetcollection')
+            ->select('assetcollection')
+            ->where('assetcollection.collectionStorage = :storageId')
+            ->andWhere('assetcollection.collectionLocation IS NULL')
+            ->setParameter(':storageId', $storageId)
+            ->getQuery()
+            ->getArrayResult()
+            ;
     }
 }

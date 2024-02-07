@@ -347,7 +347,7 @@ class AssetController extends AbstractController
             $assetCollection = new AssetCollection();
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
                 ->setCollectedBy($loggedInUserId)
-                ->setCollectionLocation($data['location'])
+                ->setCollectionLocation($data['storageIsFull'] ? null : $data['location'])
                 ->setDeviceID($deviceId)
                 ->setCollectedFrom($data['user'])
                 ->setCheckedout($data['checkout'])
@@ -504,16 +504,18 @@ class AssetController extends AbstractController
             // TODO moving this to checkIn()
             // Check to see if asset is already collected
             $assetId = $assetRepository->findByAssetId($data['asset_tag'], $data['asset_serial']);
+
+
             if ($assetCollected = $assetCollectionRepository->findOneBy(['DeviceID' => $assetId])) {
                 $storageName = $assetStorageRepository->findOneBy(['id' => $assetCollected->getCollectionStorage()])->getName();
                 $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName, true]);
-            }
-
-            // Check to see if Storage is full
-            elseif (count($openStorageSlots) == 0) {
-                $data['storageIsFull'] = true;
-                $this->addFlash('assetStorageIsFull', 'Storage is full');
             } else {
+                // Check to see if Storage is full
+                if (count($openStorageSlots) == 0) {
+                    $data['storageIsFull'] = true;
+                    $this->addFlash('assetStorageIsFull', 'Storage is full');
+                }
+
                 // pseudo for now, allow this to be changed in config
                 $config['storage_collection_sort_slots_order'] = 'asc';
                 if ($config['storage_collection_sort_slots_order'] === 'desc') {
