@@ -62,7 +62,7 @@ class AssetStorageController extends AbstractController
     {
         $storageLocked = $storageModerationController->isLocked($id);
         $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
-        $collectedAssets = $assetCollectionRepository->getAllCollectedAssets($id);
+        $collectedAssets = $assetCollectionRepository->getAllCollectedAssetsByStorageId($id);
         $storageData = $this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData();
         $storage = '';
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
@@ -72,11 +72,11 @@ class AssetStorageController extends AbstractController
 
         $assets = [];
         foreach ($collectedAssets as $asset) {
-            $user = $users[$asset['collected_from']];
+            $user = $users[$asset['assetcollection_CollectedFrom']];
 
             // Check if asset has a repair associated with it
             $repairAssets = array_column($repairs, 'asset_id');
-            $hasRepair = in_array($asset['asset_id'], $repairAssets);
+            $hasRepair = in_array($asset['assetcollection_id'], $repairAssets);
 
             $repairId = null;
             if ($hasRepair) {
@@ -84,15 +84,15 @@ class AssetStorageController extends AbstractController
             }
 
             $assets[] = [
-                'slot' => $asset['location'],
+                'slot' => $asset['assetcollection_collectionLocation'],
                 'asset' => ($assetUniqueIdentifier == 'assettag')
                     ? $asset['asset_tag']
                     : $asset['serial_number'],
                 'user' => $user['id'],
                 'usersName' => $user['surname'] . ', ' . $user['firstname'],
-                'note' => $asset['notes'],
-                'checkedOut' => $asset['checked_out'],
-                'processed' => $asset['processed'],
+                'note' => $asset['assetcollection_collectionNotes'],
+                'checkedOut' => $asset['assetcollection_checkedout'],
+                'processed' => $asset['assetcollection_processed'],
                 'hasRepair' => $hasRepair,
                 'repairId' => $repairId
             ];

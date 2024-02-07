@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\AssetCollection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * @extends ServiceEntityRepository<AssetCollection>
@@ -62,48 +64,19 @@ class AssetCollectionRepository extends ServiceEntityRepository
     /**
      * getAllCollectedAssets
      *
+     * @param int $storageId
      * @return array
      */
-    public function getAllCollectedAssets(int $storageId): array
+    public function getAllCollectedAssetsByStorageId(int $storageId): array
     {
-        $assets = $this->createQueryBuilder('assetcollection')
-            ->select('assetcollection')
-            ->addSelect('asset.asset_tag', 'asset.serial_number')
+        return $this->createQueryBuilder('assetcollection')
+            ->select('assetcollection, asset.asset_tag, asset.serial_number')
             ->where('assetcollection.collectionStorage = :storageId')
-            ->innerJoin('App\Entity\Asset', 'asset', 'WITH', 'asset.id = assetcollection.DeviceID')
+            ->leftJoin('App\Entity\Asset', 'asset', 'WITH', 'asset.id = assetcollection.DeviceID')
             ->setParameter(':storageId', $storageId)
             ->getQuery()
-            ->getArrayResult()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
         ;
-
-        foreach ($assets as $asset) {
-            $return[] = [
-                'id' => $asset[0]['id'],
-                'asset_id' => $asset[0]['DeviceID'],
-                'collected_from' => $asset[0]['CollectedFrom'],
-                'collected_by' => $asset[0]['CollectedBy'],
-                'collected_date' => $asset[0]['collectedDate'],
-                'notes' => $asset[0]['collectionNotes'],
-                'location' => $asset[0]['collectionLocation'],
-                'checked_out' => $asset[0]['checkedout'],
-                'processed' => $asset[0]['processed'],
-                'asset_tag' => $asset['asset_tag'],
-                'serial_number' => $asset['serial_number']
-            ];
-        }
-
-        return $return ?? [];
-    }
-
-    /**
-     * getAll
-     * Alias for getAllCollectedAssets
-     *
-     * @return array
-     */
-    public function getAll(): array
-    {
-        return $this->getAllCollectedAssets();
     }
 
     /**
