@@ -137,4 +137,12 @@ class AssetCollectionRepository extends ServiceEntityRepository
             ->getSingleScalarResult()
         ;
     }
+
+    private function collectAsset(array $asset): bool
+    {
+        /**
+         * 1) Check if asset already collected, return bool
+         */
+        return true;
+    }
 }

@@ -58,13 +58,11 @@ class AssetRepository extends ServiceEntityRepository
             ;
         }
 
-        try {
-            return $this->createQueryBuilder('asset')
-                ->select('count(asset.id)')
-                ->getQuery()
-                ->getSingleScalarResult();
-        } catch (NoResultException|NonUniqueResultException $e) {
-        }
+
+        return $this->createQueryBuilder('asset')
+            ->select('count(asset.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /**
@@ -81,7 +79,7 @@ class AssetRepository extends ServiceEntityRepository
      * @throws NonUniqueResultException
      * @throws NoResultException
      */
-    public function findAssetId(?string $assetTag = null, ?string $serialNumber = null): ?int
+    public function findByAssetId(?string $assetTag = null, ?string $serialNumber = null): ?int
     {
         $result =  $this->createQueryBuilder('asset')
             ->select('asset.id')

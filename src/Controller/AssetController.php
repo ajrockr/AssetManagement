@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
+use App\Entity\AssetStorage;
 use App\Form\AssetType;
 use App\Entity\AssetCollection;
 use App\Form\AssetCollectionType;
@@ -36,6 +37,8 @@ class AssetController extends AbstractController
         protected readonly EventDispatcherInterface $eventDispatcher,
         protected readonly EntityManagerInterface $entityManager,
         protected readonly Logger $logger,
+        protected readonly AssetCollectionRepository $assetCollectionRepository,
+        protected readonly AssetStorageRepository $assetStorageRepository,
     ) {}
 
     #[Route('/', name: 'app_asset_index', methods: ['GET'])]
@@ -274,6 +277,7 @@ class AssetController extends AbstractController
         $date = null;
 
         $device = null;
+        // TODO Replace this with repository method that finds device by either asset_tag or serial_number. This will also need the AssetFormType to pull from config to see if asset/serial is required
         switch ($assetUniqueIdentifier) {
             case 'assettag':
                 $device = $assetRepository->findOneBy(['asset_tag' => $data['device']]);
@@ -283,6 +287,7 @@ class AssetController extends AbstractController
                 break;
         }
 
+        // TODO make this a repository method that returns bool for checking
         // If device doesn't exist, create it
         if (null === $device) {
             $asset = new Asset;
@@ -305,12 +310,23 @@ class AssetController extends AbstractController
             ;
             $this->entityManager->persist($asset);
             $this->entityManager->flush();
-//            $assetRepository->save($asset, true);
+
             $deviceId = $asset->getId();
         } else {
             $deviceId = $device->getId();
         }
 
+        // Check to see if asset is already collected
+        // TODO Serial is not part of form in Storage view. This will have to be added and config will handle which fields are required
+        $data['serial'] = null;
+        $assetId = $assetRepository->findByAssetId($data['device'], $data['serial']);
+        if ($assetCollected = $this->assetCollectionRepository->findOneBy(['DeviceID' => $assetId])) {
+            $storageName = $this->assetStorageRepository->findOneBy(['id' => $assetCollected->getCollectionStorage()])->getName();
+            $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName, false]);
+            return $this->redirect($request->headers->get('referer'));
+        }
+
+        // TODO make this a repository method that returns bool for checking
         $action = false;
         // Device already collected, update the record
         if ($assetCollection = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
@@ -352,8 +368,6 @@ class AssetController extends AbstractController
                 $data['storage'] . $data['location']
             );
         } catch(\Exception $e) {
-            // Failed, get out of here with Flash Message
-            $this->addFlash('error', 'Failed collecting asset ['.$data['device'].'].');
             return $this->redirect($request->headers->get('referer'));
         }
 
@@ -367,7 +381,7 @@ class AssetController extends AbstractController
                 $assetRepository->save($asset, true);
             } catch(\Exception $e) {
                 // TODO commenting out for testing
-                // $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
+                 $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
             }
         }
 
@@ -488,11 +502,12 @@ class AssetController extends AbstractController
 
             $openStorageSlots = array_map('intval', array_diff($storageData, $assignedAssets));
 
+            // TODO moving this to checkIn()
             // Check to see if asset is already collected
-            $assetId = $assetRepository->findAssetId($data['asset_tag'], $data['asset_serial']);
+            $assetId = $assetRepository->findByAssetId($data['asset_tag'], $data['asset_serial']);
             if ($assetCollected = $assetCollectionRepository->findOneBy(['DeviceID' => $assetId])) {
                 $storageName = $assetStorageRepository->findOneBy(['id' => $assetCollected->getCollectionStorage()])->getName();
-                $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName]);
+                $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName, true]);
             }
 
             // Check to see if Storage is full
