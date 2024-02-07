@@ -1,0 +1,64 @@
+{% for message in app.flashes('error') %}
+    <script type="text/javascript">
+        Toastify({
+            text: "{{ message }}",
+            duration: 3000,
+            newWindow: true,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "#dc3545",
+            },
+        }).showToast();
+    </script>
+{% endfor %}
+{% for message in app.flashes('success') %}
+    <script type="text/javascript">
+        Toastify({
+            text: "{{ message }}",
+            duration: 3000,
+            newWindow: true,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "#198754",
+            },
+        }).showToast();
+    </script>
+{% endfor %}
+{% for message in app.flashes('info') %}
+    <script type="text/javascript">
+        Toastify({
+            text: "{{ message }}",
+            duration: 3000,
+            newWindow: true,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "#0dcaf0",
+            },
+        }).showToast();
+    </script>
+{% endfor %}
+{% for message in app.flashes('warning') %}
+    <script type="text/javascript">
+        Toastify({
+            text: "{{ message }}",
+            duration: 3000,
+            newWindow: true,
+            close: true,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            style: {
+                background: "#ffc107",
+            },
+        }).showToast();
+    </script>
+{% endfor %}
