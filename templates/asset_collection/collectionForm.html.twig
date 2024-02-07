@@ -24,12 +24,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" data-bs-target="#assetCheckinSelectUsereModal" data-bs-toggle="modal">Next</button>
+                    <button class="btn btn-primary" data-bs-target="#assetCheckinSelectUsersModal" data-bs-toggle="modal">Next</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="assetCheckinSelectUsereModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
+    <div class="modal fade" id="assetCheckinSelectUsersModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -99,10 +99,10 @@
         */
         // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
         $('#form_user').select2({
-            dropdownParent: $('#assetCheckinSelectUsereModal'),
+            dropdownParent: $('#assetCheckinSelectUsersModal'),
+            placeholder: 'Select a user',
             theme: 'bootstrap-5'
-        });
-        $('#form_user').prop("required", true);
+        }.prop('required', true));
     });
 </script>
 {% block collection_form %}

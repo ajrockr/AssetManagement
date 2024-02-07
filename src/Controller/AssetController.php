@@ -419,13 +419,17 @@ class AssetController extends AbstractController
         $users = $userRepository->findAll();
 
         $usersFormArray = [];
+//        dd($users);
         foreach ($users as $user) {
+            if ('Admin' == $user->getUserIdentifier()) continue;
             if ($uid = $user->getUserUniqueId()) {
                 $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $uid . ')'] = $user->getId();
             } else {
                 $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname()] = $user->getId();
             }
+
         }
+        array_unshift($usersFormArray, '');
 
         // TODO what happens when there is more than one?
         // TODO also...wtf is this? I forgot
@@ -444,7 +448,12 @@ class AssetController extends AbstractController
                 'choices' => $storagesFormArray
             ])
             ->add('user', ChoiceType::class, [
-                'choices' => $usersFormArray
+                'choices' => $usersFormArray,
+                'multiple' => false,
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-control js-example-basic-single',
+                ]
             ])
             ->add('asset_tag', TextType::class)
             ->add('asset_serial', TextType::class, [

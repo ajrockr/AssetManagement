@@ -24,6 +24,7 @@ class AssetCollectionType extends AbstractType
         // Populate user choices
         $users = $this->userRepository->findAll();
         foreach ($users as $user) {
+            if ('Admin' == $user->getUserIdentifier()) continue;
             $this->users[$user->getId()] = $user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getTitle() . ')';
         }
     }
