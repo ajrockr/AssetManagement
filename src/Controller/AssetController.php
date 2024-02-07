@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Asset;
 use App\Form\AssetType;
 use App\Entity\AssetCollection;
-use App\Form\AssetCollectionType;
 use App\Repository\UserRepository;
 use App\Repository\AssetRepository;
 use App\Repository\RepairRepository;
@@ -14,7 +13,10 @@ use App\Service\Logger;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Exception;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -110,7 +112,7 @@ class AssetController extends AbstractController
 
         return $this->render('asset/new.html.twig', [
             'asset' => $asset,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -131,7 +133,7 @@ class AssetController extends AbstractController
 
         return $this->render('asset/edit.html.twig', [
             'asset' => $asset,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -151,103 +153,106 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/checkin', name: 'app_asset_checkin')]
-    #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
-    {
-        $users = $userRepository->findAll();
-        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
-        $form = $this->createForm(AssetCollectionType::class);
-        $assets = $assetRepository->findAll();
-        $returnAssetsArr = [];
-
-        // No assets in the database, so skip this part
-        if (null === $assets) {
-            return $this->render('asset/checkin.html.twig', [
-                'allAssets' => $returnAssetsArr,
-                'form' => $form,
-                'users' => $users
-            ]);
-        }
-
-        $collectedAssets = [];
-        foreach ($assetCollectionRepository->findAll() as $collectedAsset) {
-            $collectedAssets[] = $collectedAsset->getDeviceID();
-        }
-
-        foreach ($assets as $asset) {
-            if (!in_array($asset->getId(), $collectedAssets)) {
-                $user = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
-                // Not collected
-                $returnAssetsArr[] = [
-                    'id' => $asset->getId(),
-                    'assettag' => $asset->getAssettag(),
-                    'serialnumber' => $asset->getSerialnumber(),
-                    'assignedTo' => (null === $user) ? null : $user->getSurname() . ', ' . $user->getFirstname(),
-                    'assignedToId' => $asset->getAssignedTo()
-                ];
-            }
-        }
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Set up for the database insertion
-            $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
-            $data = $form->getData();
-
-            // TODO: Check to make sure the storage exists
-            $loggedInUserId = $this->getUser()->getId();
-
-            // TODO: Add the date field to the form
-            $date = null;
-
-            switch ($assetUniqueIdentifier) {
-                case 'assettag':
-                    $deviceId = $assetRepository->findOneBy(['assettag' => $data['device']])->getId();
-                    break;
-                case 'serialnumber':
-                    $deviceId = $assetRepository->findOneBy(['serialnumber' => $data['device']])->getId();
-                    break;
-            }
-
-            // Set the asset collection
-            $assetCollection = new AssetCollection();
-            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
-            $assetCollection->setCollectedBy($loggedInUserId);
-            $assetCollection->setCollectionLocation($data['location']);
-            $assetCollection->setDeviceID($deviceId);
-            $assetCollection->setCollectedFrom($data['user']);
-            $assetCollection->setCheckedout(false);
-            $assetCollection->setCollectionNotes($data['notes']);
-
-            $assetCollectionRepository->save($assetCollection, true);
-
-            // If the asset is not assigned or the config value to overwrite the assigned user is true,
-            // overwrite the assigned user.
-            $asset = $assetRepository->findOneBy(['id' => $deviceId]);
-            if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
-                $asset->setAssignedTo($data['user']);
-                $assetRepository->save($asset, true);
-            }
-
-            return $this->redirectToRoute('app_asset_checkin', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('asset/checkin.html.twig', [
-            'allAssets' => $returnAssetsArr,
-            'form' => $form,
-            'users' => $users
-        ]);
-    }
-
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): bool|Response
-    {
+//    #[Route('/checkin', name: 'app_asset_checkin')]
+//    #[IsGranted('ROLE_ASSET_MODIFY')]
+//    // TODO Deprecated, checked storage and quick checkin form and doesn't seem to affect anything
+//    public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
+//    {
 //        $users = $userRepository->findAll();
-        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
+//        $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
+//        $form = $this->createForm(AssetCollectionType::class);
+//        $assets = $assetRepository->findAll();
+//        $returnAssetsArr = [];
+//
+//        // No assets in the database, so skip this part
+//        if (null === $assets) {
+//            return $this->render('asset/checkin.html.twig', [
+//                'allAssets' => $returnAssetsArr,
+//                'form' => $form->createView(),
+//                'users' => $users
+//            ]);
+//        }
+//
+//        $collectedAssets = [];
+//        foreach ($assetCollectionRepository->findAll() as $collectedAsset) {
+//            $collectedAssets[] = $collectedAsset->getDeviceID();
+//        }
+//
+//        foreach ($assets as $asset) {
+//            if (!in_array($asset->getId(), $collectedAssets)) {
+//                $user = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
+//                // Not collected
+//                $returnAssetsArr[] = [
+//                    'id' => $asset->getId(),
+//                    'assettag' => $asset->getAssettag(),
+//                    'serialnumber' => $asset->getSerialnumber(),
+//                    'assignedTo' => (null === $user) ? null : $user->getSurname() . ', ' . $user->getFirstname(),
+//                    'assignedToId' => $asset->getAssignedTo()
+//                ];
+//            }
+//        }
+//
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            // Set up for the database insertion
+//            $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
+//            $data = $form->getData();
+//
+//            $loggedInUserId = $this->getUser()->getId();
+//
+//            // TODO: Add the date field to the form
+//            $date = null;
+//
+//            switch ($assetUniqueIdentifier) {
+//                case 'assettag':
+//                    $deviceId = $assetRepository->findOneBy(['assettag' => $data['device']])->getId();
+//                    break;
+//                case 'serialnumber':
+//                    $deviceId = $assetRepository->findOneBy(['serialnumber' => $data['device']])->getId();
+//                    break;
+//            }
+//
+//            // Set the asset collection
+//            $assetCollection = new AssetCollection();
+//            $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'));
+//            $assetCollection->setCollectedBy($loggedInUserId);
+//            $assetCollection->setCollectionLocation($data['location']);
+//            $assetCollection->setDeviceID($deviceId);
+//            $assetCollection->setCollectedFrom($data['user']);
+//            $assetCollection->setCheckedout(false);
+//            $assetCollection->setCollectionNotes($data['notes']);
+//
+//            $assetCollectionRepository->save($assetCollection, true);
+//
+//            // If the asset is not assigned or the config value to overwrite the assigned user is true,
+//            // overwrite the assigned user.
+//            $asset = $assetRepository->findOneBy(['id' => $deviceId]);
+//            if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
+//                $asset->setAssignedTo($data['user']);
+//                $assetRepository->save($asset, true);
+//            }
+//
+//            return $this->redirectToRoute('app_asset_checkin', [], Response::HTTP_SEE_OTHER);
+//        }
+//
+//        return $this->render('asset/checkin.html.twig', [
+//            'allAssets' => $returnAssetsArr,
+//            'form' => $form->createView(),
+//            'users' => $users
+//        ]);
+//    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, array|Form $form, array $neededParts = []): bool|Response
+    {
+        $assetUniqueIdentifier = $siteConfigRepository->findOneByName('asset_unique_identifier')->getConfigValue();
 
         // Set up for the database insertion
-        $configForceAssignUser = $siteConfigRepository->findOneBy(['configName' => 'asset_assignUser_on_checkin']);
+        $configForceAssignUser = $siteConfigRepository->findOneByName('asset_assignUser_on_checkin')->getConfigValue();
 
         if (is_array($form)) {
             $data = [
@@ -322,9 +327,8 @@ class AssetController extends AbstractController
             return $this->redirect($request->headers->get('referer'));
         }
 
-        // TODO make this a repository method that returns bool for checking
-        $action = false;
         // Device already collected, update the record
+        // TODO Make a conditional to check if asset already collected
         if ($assetCollection = $assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']])) {
             $assetCollection->setCollectedDate($date ?? new \DateTimeImmutable('now'))
                 ->setCollectedBy($loggedInUserId)
@@ -336,7 +340,7 @@ class AssetController extends AbstractController
                 ->setCollectionNotes($data['notes'])
                 ->setCollectionStorage($data['storageId'])
             ;
-            $action = 'update';
+
         // Device not collected, create the collection record
         } else {
             $assetCollection = new AssetCollection();
@@ -350,7 +354,6 @@ class AssetController extends AbstractController
                 ->setCollectionNotes($data['notes'])
                 ->setCollectionStorage($data['storageId'])
             ;
-            $action = 'create';
         }
 
         // Persist the collection record
@@ -363,21 +366,22 @@ class AssetController extends AbstractController
                 $data['user'],
                 $data['storage'] . $data['location']
             );
-        } catch(Exception $e) {
+        } catch(Exception) {
             return $this->redirect($request->headers->get('referer'));
         }
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,
         // overwrite the assigned user.
         $asset = $assetRepository->findOneBy(['id' => $deviceId]);
-        if (null === $asset->getAssignedTo() || $configForceAssignUser->getConfigValue()) {
+        if (null === $asset->getAssignedTo() || $configForceAssignUser) {
+            // TODO Make this a repository function
             $asset->setAssignedTo($data['user']);
 
             try {
                 $assetRepository->save($asset, true);
-            } catch(Exception $e) {
+            } catch(Exception) {
                 // TODO this check doesn't belong here
-                 $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
+//                 $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
             }
         }
 
@@ -395,6 +399,10 @@ class AssetController extends AbstractController
          return $this->redirect($request->headers->get('referer'));
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     #[Route('/collection/collect', name: 'app_asset_collection_collect', methods: 'POST')]
     #[IsGranted('ROLE_ASSET_MODIFY')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
@@ -413,7 +421,7 @@ class AssetController extends AbstractController
         $usersFormArray = [];
         foreach ($users as $user) {
             if ($uid = $user->getUserUniqueId()) {
-                $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getUserUniqueId() . ')'] = $user->getId();
+                $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $uid . ')'] = $user->getId();
             } else {
                 $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname()] = $user->getId();
             }
@@ -501,7 +509,7 @@ class AssetController extends AbstractController
 
                 $data['location'] = $nextOpenSlot;
 
-                $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
+                $this->checkIn($request, $siteConfigRepository, $assetRepository, $assetCollectionRepository, $repairRepository, $repairController, $data);
                 $this->addFlash('assetCollected', $nextOpenSlot);
             }
 
