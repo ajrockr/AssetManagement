@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{#TODO add flashbag#}
 {% block body %}
     <div class="row">
         <div class="col">
@@ -294,6 +293,7 @@
                 theme: 'bootstrap-5',
                 dropdownParent: $("#modal-checkin")
             });
+            $("#asset_collection_user").prop("required", true);
 
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus();
