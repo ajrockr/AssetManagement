@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Asset;
-use App\Entity\AssetStorage;
 use App\Form\AssetType;
 use App\Entity\AssetCollection;
 use App\Form\AssetCollectionType;
@@ -15,14 +14,13 @@ use App\Service\Logger;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -31,8 +29,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ASSET_READ')]
 class AssetController extends AbstractController
 {
-    private int $lastSlotCollected;
-
     public function __construct(
         protected readonly EventDispatcherInterface $eventDispatcher,
         protected readonly EntityManagerInterface $entityManager,
@@ -98,7 +94,7 @@ class AssetController extends AbstractController
 
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function new(Request $request, AssetRepository $assetRepository, SiteConfigRepository $siteConfigRepository): Response
+    public function new(Request $request, AssetRepository $assetRepository): Response
     {
         $asset = new Asset();
         $form = $this->createForm(AssetType::class, $asset);
@@ -141,11 +137,11 @@ class AssetController extends AbstractController
 
     #[Route('/{id}/delete', name: 'app_asset_delete')]
     #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function delete(Request $request, Asset $asset, AssetRepository $assetRepository): Response
+    public function delete(Asset $asset, AssetRepository $assetRepository): Response
     {
         try {
             $assetRepository->remove($asset, true);
-        } catch (\Exception $e) {
+        } catch (Exception) {
             $this->addFlash('warning', 'Failed to delete asset.');
             return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -157,10 +153,8 @@ class AssetController extends AbstractController
 
     #[Route('/checkin', name: 'app_asset_checkin')]
     #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
+    public function assetCheckIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetCollectionRepository $assetCollectionRepository, UserRepository $userRepository): Response
     {
-        // TODO: Fix form submit, forward to checkin, check unique identifier
-        // Set up what is needed to render the page
         $users = $userRepository->findAll();
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
         $form = $this->createForm(AssetCollectionType::class);
@@ -176,6 +170,7 @@ class AssetController extends AbstractController
             ]);
         }
 
+        $collectedAssets = [];
         foreach ($assetCollectionRepository->findAll() as $collectedAsset) {
             $collectedAssets[] = $collectedAsset->getDeviceID();
         }
@@ -248,8 +243,7 @@ class AssetController extends AbstractController
 
     public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, $form, array $neededParts = [], bool $return = false): bool|Response
     {
-        // Set up what is needed to render the page
-        $users = $userRepository->findAll();
+//        $users = $userRepository->findAll();
         $assetUniqueIdentifier = $siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
 
         // Set up for the database insertion
@@ -270,6 +264,7 @@ class AssetController extends AbstractController
             ];
         } else {
             $data = $form->getData();
+            $data['storageIsFull'] = false;
         }
 
         $loggedInUserId = $this->getUser()->getId();
@@ -368,7 +363,7 @@ class AssetController extends AbstractController
                 $data['user'],
                 $data['storage'] . $data['location']
             );
-        } catch(\Exception $e) {
+        } catch(Exception $e) {
             return $this->redirect($request->headers->get('referer'));
         }
 
@@ -380,8 +375,8 @@ class AssetController extends AbstractController
 
             try {
                 $assetRepository->save($asset, true);
-            } catch(\Exception $e) {
-                // TODO commenting out for testing
+            } catch(Exception $e) {
+                // TODO this check doesn't belong here
                  $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
             }
         }
@@ -397,31 +392,13 @@ class AssetController extends AbstractController
             $repairController->createRepair($assetRepository, $repairRepository, $repairData);
         }
 
-        // TODO again, do I just make this return bool. No flash messages, no nothing...?
-        // if ($action == 'update') {
-        //     $this->addFlash('success', 'Asset (' . $data['device'] . ') assigned to slot (' . $data['location'] . ')');
-        // } elseif ($action == 'create') {
-        //     $this->addFlash('success', 'Asset (' . $data['device'] . ') has been updated on slot (' . $data['location'] . ')');
-        // } else {
-        //     $this->addFlash('warning', 'Something went wrong, could not update asset (' . $data['device'] . ') in slot ' . $data['location'] . '.');
-        // }
-
-        // if ($return) {
-        //     return true;
-        // }
-
-        // TODO I'm returning bool here for testing, this might break other parts of the site for now
-//        return true;
          return $this->redirect($request->headers->get('referer'));
     }
 
-    #[Route('/collection/collect', name: 'app_asset_collection_collect')]
+    #[Route('/collection/collect', name: 'app_asset_collection_collect', methods: 'POST')]
     #[IsGranted('ROLE_ASSET_MODIFY')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
     {
-        // TODO also, select2 styling is weird on different pages. make sure that is uniform
-        // TODO can I deny someone from accessing this through the browser?
-
         // Form 1) Select which cart
         $storages = $assetStorageRepository->findAll();
 
@@ -485,27 +462,23 @@ class AssetController extends AbstractController
 
         $collectionForm->handleRequest($request);
 
-//        $nextOpenSlot = null;
-
         if ($collectionForm->isSubmitted() && $collectionForm->isValid()) {
             $data = $collectionForm->getData();
 
             $requestingPath = $data['requestingPath'];
             $requestingPathParams[$data['requestingPathParamKey']] = $data['requestingPathParamVal'];
 
-            // Get storage data
             $storageData = $assetStorageRepository->getStorageData($data['storage']);
 
-            // Get collected assets
             $assignedAssets = $assetCollectionRepository->getCollectedAssetSlots();
 
             $openStorageSlots = array_map('intval', array_diff($storageData, $assignedAssets));
 
-            // TODO moving this to checkIn()
-            // Check to see if asset is already collected
             $assetId = $assetRepository->findByAssetId($data['asset_tag'], $data['asset_serial']);
 
+            $data['storageIsFull'] = false;
 
+            // Check to see if asset is already collected
             if ($assetCollected = $assetCollectionRepository->findOneBy(['DeviceID' => $assetId])) {
                 $storageName = $assetStorageRepository->findOneBy(['id' => $assetCollected->getCollectionStorage()])->getName();
                 $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName, true]);
@@ -516,9 +489,8 @@ class AssetController extends AbstractController
                     $this->addFlash('assetStorageIsFull', 'Storage is full');
                 }
 
-                // pseudo for now, allow this to be changed in config
-                $config['storage_collection_sort_slots_order'] = 'asc';
-                if ($config['storage_collection_sort_slots_order'] === 'desc') {
+                $order = $siteConfigRepository->findOneByName('storage_collection_sort_slots_order')->getConfigValue();
+                if ($order === 'desc') {
                     rsort($openStorageSlots);
                 } else {
                     // If 'desc' is not the config value or 'asc' is defined, default to ascending
@@ -530,7 +502,6 @@ class AssetController extends AbstractController
                 $data['location'] = $nextOpenSlot;
 
                 $this->checkIn($request, $siteConfigRepository, $assetRepository, $userRepository, $assetCollectionRepository, $repairRepository, $repairController, $data, [], true);
-                // TODO set a flash message
                 $this->addFlash('assetCollected', $nextOpenSlot);
             }
 
@@ -542,15 +513,5 @@ class AssetController extends AbstractController
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
         ]);
-    }
-
-    public function setLastSlotCollected(int $slotNumber): void
-    {
-        $this->lastSlotCollected = $slotNumber;
-    }
-
-    public function getLastSlotCollected(): int
-    {
-        return $this->lastSlotCollected;
     }
 }

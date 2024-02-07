@@ -34,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255, nullable: true, unique: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -96,7 +96,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getId
      *
-     * @return int
+     * @return int|null
      */
     public function getId(): ?int
     {
@@ -106,7 +106,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getUsername
      *
-     * @return string
+     * @return string|null
      */
     public function getUsername(): ?string
     {
@@ -194,7 +194,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getEmail
      *
-     * @return string
+     * @return string|null
      */
     public function getEmail(): ?string
     {
@@ -217,7 +217,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getLocation
      *
-     * @return string
+     * @return string|null
      */
     public function getLocation(): ?string
     {
@@ -240,7 +240,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getDepartment
      *
-     * @return string
+     * @return string|null
      */
     public function getDepartment(): ?string
     {
@@ -263,7 +263,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getPhone
      *
-     * @return string
+     * @return string|null
      */
     public function getPhone(): ?string
     {
@@ -286,7 +286,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getExtension
      *
-     * @return string
+     * @return string|null
      */
     public function getExtension(): ?string
     {
@@ -309,7 +309,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getTitle
      *
-     * @return string
+     * @return string|null
      */
     public function getTitle(): ?string
     {
@@ -332,7 +332,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getHomepage
      *
-     * @return string
+     * @return string|null
      */
     public function getHomepage(): ?string
     {
@@ -355,7 +355,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getManager
      *
-     * @return string
+     * @return string|null
      */
     public function getManager(): ?string
     {
@@ -378,7 +378,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getGoogleId
      *
-     * @return string
+     * @return string|null
      */
     public function getGoogleId(): ?string
     {
@@ -401,7 +401,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getMicrosoftId
      *
-     * @return string
+     * @return string|null
      */
     public function getMicrosoftId(): ?string
     {
@@ -424,7 +424,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getDateCreated
      *
-     * @return DateTimeImmutable
+     * @return DateTimeImmutable|null
      */
     public function getDateCreated(): ?DateTimeImmutable
     {
@@ -447,7 +447,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getSurname
      *
-     * @return string
+     * @return string|null
      */
     public function getSurname(): ?string
     {
@@ -470,7 +470,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getFirstname
      *
-     * @return string
+     * @return string|null
      */
     public function getFirstname(): ?string
     {
@@ -493,7 +493,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * isEnabled
      *
-     * @return bool
+     * @return bool|null
      */
     public function isEnabled(): ?bool
     {
@@ -516,7 +516,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * isPending
      *
-     * @return bool
+     * @return bool|null
      */
     public function isPending(): ?bool
     {
@@ -539,7 +539,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getAvatar
      *
-     * @return string
+     * @return string|null
      */
     public function getAvatar(): ?string
     {
@@ -562,7 +562,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getUserUniqueId
      *
-     * @return string
+     * @return string|null
      */
     public function getUserUniqueId(): ?string
     {
@@ -585,7 +585,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getType
      *
-     * @return string
+     * @return string|null
      */
     public function getType(): ?string
     {
@@ -608,7 +608,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * getLastActivity
      *
-     * @return DateTimeImmutable
+     * @return DateTimeImmutable|null
      */
     public function getLastActivity(): ?DateTimeImmutable
     {

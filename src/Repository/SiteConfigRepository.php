@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\SiteConfig;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,6 +40,9 @@ class SiteConfigRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function findOneByName($value): mixed
     {
         return $this->createQueryBuilder('s')
