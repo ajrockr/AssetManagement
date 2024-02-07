@@ -85,7 +85,7 @@ class AssetCollectionRepository extends ServiceEntityRepository
      * @param  mixed $locations
      * @return void
      */
-    public function removeCollection(int|array $locations)
+    public function removeCollection(int|array $locations): void
     {
         $conditions = preg_filter('/^/', 'ac.collectionLocation = ', $locations);
         $qb = $this->createQueryBuilder('assetcollection');
@@ -107,22 +107,17 @@ class AssetCollectionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('assetcollection')
             ->select('count(assetcollection.id)')
             ->getQuery()
-            ->getSingleScalarResult()
+            ->getResult()
         ;
     }
 
-    public function findCollectedAssetsByStorageId(int $storageId): array
-    {
-        return $this->createQueryBuilder('assetcollection')
-            ->select('assetcollection')
-            ->where('assetcollection.collectionStorage = :storageId')
-            ->setParameter(':storageId', $storageId)
-            ->getQuery()
-            ->getArrayResult()
-        ;
-    }
-
-    public function findOobCollectedAssetsByStorageId(int $storageId): array
+    /**
+     * Retrieves all records that of a location of NULL. This means they are not assigned to a specific location.
+     *
+     * @param int $storageId
+     * @return array
+     */
+    public function getAllOOBCollectedAssetsByStorageId(int $storageId): array
     {
         return $this->createQueryBuilder('assetcollection')
             ->select('assetcollection')
