@@ -49,7 +49,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectStorageModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
-                    <button class="btn btn-primary" data-bs-target="#assetCheckinSelectAssetModal" data-bs-toggle="modal" data-bs-dismiss="modal">Next</button>
+                    <button id="btnSelectAssetModal" class="btn btn-primary" data-bs-target="#assetCheckinSelectAssetModal" data-bs-toggle="modal" data-bs-dismiss="modal" disabled>Next</button>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectUsereModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
+                    <button class="btn btn-secondary" data-bs-target="#assetCheckinSelectUsersModal" data-bs-toggle="modal" data-bs-dismiss="modal">Previous</button>
                     <button type="submit" class="btn btn-primary">Confirm</button>
                 </div>
             </div>
@@ -101,8 +101,15 @@
         $('#form_user').select2({
             dropdownParent: $('#assetCheckinSelectUsersModal'),
             placeholder: 'Select a user',
-            theme: 'bootstrap-5'
-        }.prop('required', true));
+            theme: 'bootstrap-5',
+        });
+
+        $('#assetCheckinSelectUsersModal').on('shown.bs.modal', () => {
+            $('#form_user').focus();
+            $('#form_user').on('change', function() {
+                $('#btnSelectAssetModal').removeAttr("disabled");
+            });
+        });
     });
 </script>
 {% block collection_form %}
