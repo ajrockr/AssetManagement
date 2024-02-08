@@ -28,6 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/asset')]
+// TODO This was just causing a bug when logging in
 //#[IsGranted('ROLE_ASSET_READ')]
 class AssetController extends AbstractController
 {
@@ -37,12 +38,13 @@ class AssetController extends AbstractController
         protected readonly Logger $logger,
         protected readonly AssetCollectionRepository $assetCollectionRepository,
         protected readonly AssetStorageRepository $assetStorageRepository,
+        protected readonly AssetRepository $assetRepository,
     ) {}
 
     #[Route('/', name: 'app_asset_index', methods: ['GET'])]
-    public function index(AssetRepository $assetRepository, UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository): Response
     {
-        $assets = $assetRepository->findAll();
+        $assets = $this->assetRepository->findAll();
         $users = $userRepository->findAll();
         $assetsArray = [];
         foreach ($assets as $asset) {
@@ -79,10 +81,10 @@ class AssetController extends AbstractController
 
     #[Route('/assign', name: 'app_assign_user_to_device', methods: ['POST'])]
 //    #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function assignUserToDevice(Request $request, AssetRepository $assetRepository, EntityManagerInterface $entityManager): Response
+    public function assignUserToDevice(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data = $request->request->all();
-        if ($asset = $assetRepository->findOneBy(['id' => $data['assetId']])) {
+        if ($asset = $this->assetRepository->findOneBy(['id' => $data['assetId']])) {
             $asset->setAssignedTo($data['userId']);
             $entityManager->persist($asset);
             $entityManager->flush();
@@ -96,14 +98,14 @@ class AssetController extends AbstractController
 
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
 //    #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function new(Request $request, AssetRepository $assetRepository): Response
+    public function new(Request $request): Response
     {
         $asset = new Asset();
         $form = $this->createForm(AssetType::class, $asset);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $assetRepository->save($asset, true);
+            $this->assetRepository->save($asset, true);
 
             $this->addFlash('success', 'Added new asset.');
 
@@ -118,13 +120,13 @@ class AssetController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
 //    #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function edit(Request $request, Asset $asset, AssetRepository $assetRepository): Response
+    public function edit(Request $request, Asset $asset): Response
     {
         $form = $this->createForm(AssetType::class, $asset);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $assetRepository->save($asset, true);
+            $this->assetRepository->save($asset, true);
 
             $this->addFlash('success', 'Edited asset.');
 
@@ -139,10 +141,10 @@ class AssetController extends AbstractController
 
     #[Route('/{id}/delete', name: 'app_asset_delete')]
 //    #[IsGranted('ROLE_ASSET_MODIFY')]
-    public function delete(Asset $asset, AssetRepository $assetRepository): Response
+    public function delete(Asset $asset): Response
     {
         try {
-            $assetRepository->remove($asset, true);
+            $this->assetRepository->remove($asset, true);
         } catch (Exception) {
             $this->addFlash('warning', 'Failed to delete asset.');
             return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
@@ -157,7 +159,7 @@ class AssetController extends AbstractController
      * @throws NonUniqueResultException
      * @throws NoResultException
      */
-    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetRepository $assetRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, array|Form $form, array $neededParts = []): bool|Response
+    public function checkIn(Request $request, SiteConfigRepository $siteConfigRepository, AssetCollectionRepository $assetCollectionRepository, RepairRepository $repairRepository, RepairController $repairController, array|Form $form, array $neededParts = []): bool|Response
     {
         $assetUniqueIdentifier = $siteConfigRepository->findOneByName('asset_unique_identifier')->getConfigValue();
 
@@ -182,6 +184,8 @@ class AssetController extends AbstractController
             $data['storageIsFull'] = false;
         }
 
+        $this->createAssetIfNotExist($data);
+
         $loggedInUserId = $this->getUser()->getId();
 
         // TODO Add the date field to the form
@@ -191,10 +195,10 @@ class AssetController extends AbstractController
         // TODO Replace this with repository method that finds device by either asset_tag or serial_number. This will also need the AssetFormType to pull from config to see if asset/serial is required
         switch ($assetUniqueIdentifier) {
             case 'assettag':
-                $device = $assetRepository->findOneBy(['asset_tag' => $data['device']]);
+                $device = $this->assetRepository->findOneBy(['asset_tag' => $data['device']]);
                 break;
             case 'serialnumber':
-                $device = $assetRepository->findOneBy(['serial_number' => $data['device']]);
+                $device = $this->assetRepository->findOneBy(['serial_number' => $data['device']]);
                 break;
         }
 
@@ -230,8 +234,9 @@ class AssetController extends AbstractController
         // Check to see if asset is already collected
         // TODO Serial is not part of form in Storage view. This will have to be added and config will handle which fields are required
         $data['serial'] = null;
-        $assetId = $assetRepository->findByAssetId($data['device'], $data['serial']);
-        if ($assetCollected = $this->assetCollectionRepository->findOneBy(['DeviceID' => $assetId])) {
+        $assetId = $this->assetRepository->findByAssetId($data['device'], $data['serial']);
+        if ($assetCollected = $this->assetCollectionRepository->findOneBy(['DeviceID' => $assetId]) && is_array($form)) {
+            // TODO need to compare current location data with new and see if the user is updating the location
             $storageName = $this->assetStorageRepository->findOneBy(['id' => $assetCollected->getCollectionStorage()])->getName();
             $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageName, false]);
             return $this->redirect($request->headers->get('referer'));
@@ -282,13 +287,13 @@ class AssetController extends AbstractController
 
         // If the asset is not assigned or the config value to overwrite the assigned user is true,
         // overwrite the assigned user.
-        $asset = $assetRepository->findOneBy(['id' => $deviceId]);
+        $asset = $this->assetRepository->findOneBy(['id' => $deviceId]);
         if (null === $asset->getAssignedTo() || $configForceAssignUser) {
             // TODO Make this a repository function
             $asset->setAssignedTo($data['user']);
 
             try {
-                $assetRepository->save($asset, true);
+                $this->assetRepository->save($asset, true);
             } catch(Exception) {
                 // TODO this check doesn't belong here
 //                 $this->addFlash('warning', 'Failed assign user to device ['.$data['device'].'].');
@@ -303,7 +308,7 @@ class AssetController extends AbstractController
                 'assetId' => $deviceId,
                 'partsNeeded' => $neededParts
             ];
-            $repairController->createRepair($assetRepository, $repairRepository, $repairData);
+            $repairController->createRepair($repairData);
         }
 
          return $this->redirect($request->headers->get('referer'));
@@ -428,7 +433,7 @@ class AssetController extends AbstractController
 
                 $data['location'] = $nextOpenSlot;
 
-                $this->checkIn($request, $siteConfigRepository, $assetRepository, $assetCollectionRepository, $repairRepository, $repairController, $data);
+                $this->checkIn($request, $siteConfigRepository, $assetCollectionRepository, $repairRepository, $repairController, $data);
                 $this->addFlash('assetCollected', $nextOpenSlot);
             }
 
@@ -440,5 +445,10 @@ class AssetController extends AbstractController
         return $this->render('asset_collection/collectionForm.html.twig', [
             'collectionForm' => $collectionForm->createView(),
         ]);
+    }
+
+    private function createAssetIfNotExist(array $data)
+    {
+//        $assetId = $this->assetRepository->findByAssetId($data['device'], $data['serial']);
     }
 }

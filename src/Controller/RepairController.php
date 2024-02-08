@@ -23,7 +23,8 @@ class RepairController extends AbstractController
     private array $parts;
     public function __construct(
         private readonly RepairPartsRepository $repairPartsRepository,
-        private readonly RepairRepository $repairRepository
+        private readonly RepairRepository $repairRepository,
+        private readonly AssetRepository $assetRepository
     )
     {
         $this->parts = $this->repairPartsRepository->getAllParts();
@@ -63,7 +64,7 @@ class RepairController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->createRepair($assetRepository, $repairRepository, $repair, true)) {
+            if (!$this->createRepair($repair, true)) {
                 return $this->redirectToRoute('app_repair_new');
             }
 
@@ -77,7 +78,7 @@ class RepairController extends AbstractController
     }
 
     #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function createRepair(AssetRepository $assetRepository, RepairRepository $repairRepository, Repair|array $repairData, bool $isInternalReferred = false): bool
+    public function createRepair(Repair|array $repairData, bool $isInternalReferred = false): bool
     {
         $repair = $repairData;
 
@@ -91,8 +92,8 @@ class RepairController extends AbstractController
             $repair->setPartsNeeded($repairData['partsNeeded']);
         }
 
-        if (null === ($asset = $assetRepository->findOneBy(['asset_tag' => $repair->getAssetUniqueIdentifier()]))) {
-            if (null === ($asset = $assetRepository->findOneBy(['serial_number' => $repair->getAssetUniqueIdentifier()]))) {
+        if (null === ($asset = $this->assetRepository->findOneBy(['asset_tag' => $repair->getAssetUniqueIdentifier()]))) {
+            if (null === ($asset = $this->assetRepository->findOneBy(['serial_number' => $repair->getAssetUniqueIdentifier()]))) {
                 $this->addFlash('error', 'The asset could not be found.');
 
                 if ($isInternalReferred) {
@@ -107,7 +108,7 @@ class RepairController extends AbstractController
         $repair->setLastModifiedDate(new \DateTimeImmutable('now'));
 
         try {
-            $repairRepository->save($repair, true);
+            $this->repairRepository->save($repair, true);
         } catch(\Exception $e) {
             $this->addFlash('error', 'There was an error creating the repair.');
             return false;
@@ -135,18 +136,18 @@ class RepairController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_repair_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function edit(Request $request, Repair $repair, RepairRepository $repairRepository): Response
+    public function edit(Request $request, Repair $repair): Response
     {
         $form = $this->createForm(RepairType::class, $repair);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $repairRepository->save($repair, true);
+            $this->repairRepository->save($repair, true);
 
             return $this->redirectToRoute('app_repair_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('repair/edit.html.twig', [
+        return $this->render('repair/edit.html.twig', [
             'repair' => $repair,
             'form' => $form->createView(),
         ]);
@@ -154,10 +155,10 @@ class RepairController extends AbstractController
 
     #[Route('/{id}/delete', name: 'app_repair_delete', methods: ['POST'])]
     #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function delete(Request $request, Repair $repair, RepairRepository $repairRepository): Response
+    public function delete(Request $request, Repair $repair): Response
     {
         if ($this->isCsrfTokenValid('delete'.$repair->getId(), $request->request->get('_token'))) {
-            $repairRepository->remove($repair, true);
+            $this->repairRepository->remove($repair, true);
         }
 
         return $this->redirectToRoute('app_repair_index', [], Response::HTTP_SEE_OTHER);
