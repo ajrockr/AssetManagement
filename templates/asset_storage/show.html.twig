@@ -1,16 +1,26 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <div class="row">
-        <div class="col">
-            <h4>Located at: {{ assetStorage.location }}</h4>
-        </div>
+        {% if storageLocked == 'true' %}
+            <div class="col">
+                <div class="alert alert-warning">
+                    <i class="fa fa-lock mr-2"></i> Storage Locked
+                </div>
+            </div>
+        {% endif %}
         <div class="col text-end">
             {{ render(controller('App\\Controller\\StorageModerationController::renderModerationButton', {id: assetStorage.id})) }}
         </div>
     </div>
+    {% if assetStorage.location is not null %}
+        <div class="row">
+            <div class="col">
+                <span>Located at: {{ assetStorage.location }}</span>
+            </div>
+        </div>
+    {% endif %}
     <div class="row">
         {% include 'asset_storage/storage_parts/storage.html.twig' with storageData %}
-{#        {{ storageRender|raw }}#}
     </div>
     <div class="container-fluid">
         <p class="text-right">
@@ -201,7 +211,7 @@
                 let checkedOut = $(e.relatedTarget).attr("data-checkedout") ?? null;
                 let processed = $(e.relatedTarget).attr("data-processed") ?? null;
                 let hasRepair = $(e.relatedTarget).attr("data-hasrepair") ?? null;
-                let repairId = $(e.relatedTarget).attr("data-repairid") ?? null;
+                // let repairId = $(e.relatedTarget).attr("data-repairid") ?? null;
                 // let locationEntity = document.getElementById('asset_collection_location');
 
                 setTimeout(function () {
@@ -215,19 +225,11 @@
                 document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
                 $("#clearLocation").attr("value", storageSlot);
 
-                if (checkedOut != null) {
-                    document.getElementById("asset_collection_checkout").checked = true;
-                } else {
-                    document.getElementById("asset_collection_checkout").checked = false;
-                }
+                document.getElementById("asset_collection_checkout").checked = checkedOut != null;
 
-                if (processed != null) {
-                    document.getElementById("asset_collection_processed").checked = true;
-                } else {
-                    document.getElementById("asset_collection_processed").checked = false;
-                }
+                document.getElementById("asset_collection_processed").checked = processed != null;
 
-                if (hasRepair == "true") {
+                if (hasRepair === "true") {
                     $("#needsRepairLabel").text("Has Repair");
                     $("#asset_collection_needsrepair").prop("disabled", true).prop("checked", true);
 
@@ -275,7 +277,7 @@
                 });
             }
 
-            $("#modal-checkin").on("hide.bs.modal", function(e) {
+            $("#modal-checkin").on("hide.bs.modal", function() {
                 document.getElementById("asset_collection_userId").removeAttribute("value");
                 document.getElementById("asset_collection_user").removeAttribute("value");
                 document.getElementById("asset_collection_location").removeAttribute("value");
