@@ -38,11 +38,11 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/connect/, roles: PUBLIC_ACCESS }
         - { path: ^/admin/, roles: ROLE_ADMIN }
+        - { path: ^/*, roles: ROLE_USER }
 #        - { path: ^/profile, roles: ROLE_USER }
 #        - { path: ^/user/changepassword, roles: ROLE_USER }
 #        - { path: ^/user/profile, roles: ROLE_USER }
 #        - { path: ^/logout, roles: ROLE_USER }
-        - { path: ^/*, roles: ROLE_USER }
 
     role_hierarchy:
         # Allow access to Admin dashboard and statistics
