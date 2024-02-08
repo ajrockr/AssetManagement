@@ -53,7 +53,7 @@ class AssetStorageController extends AbstractController
 
         return $this->render('asset_storage/new.html.twig', [
             'asset_storage' => $assetStorage,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -134,10 +134,6 @@ class AssetStorageController extends AbstractController
         $colors['cellProcessed'] = $this->config['collection_color_cell_processed'];
         $colors['cellHasRepair'] = $this->config['collection_color_cell_hasrepair'];
 
-        if ($storageLocked) {
-            $this->addFlash('warning', 'This storage has been locked, editing has been disabled.');
-        }
-
         return $this->render('asset_storage/show.html.twig', [
             'storageId' => $id,
             'assetStorage' => $assetStorage,
@@ -146,7 +142,7 @@ class AssetStorageController extends AbstractController
             'storageCounts' => $storageCounts,
             'storageRender' => $storage,
             'storageData' => $storageData,
-            'form' => $form,
+            'form' => $form->createView(),
             'collectedAssets' => $assets,
             'storageLocked' => $storageLocked ? 'true' : 'false'
         ]);
@@ -166,7 +162,7 @@ class AssetStorageController extends AbstractController
 
         return $this->renderForm('asset_storage/edit.html.twig', [
             'asset_storage' => $assetStorage,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
