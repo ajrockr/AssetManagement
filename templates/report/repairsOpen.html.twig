@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="dataTables_wrapper dt-bootstrap4 w-100">
+        <div class="row w-100">
+                <table id="openRepairsTable" class="table table-bordered table-striped dataTable dtr-inline display w-100" aria-describedby="assetTable_info">
+                    <thead>
+                        <tr>
+                            <th class="all">Ticket No.</th>
+                            <th class="all">Asset Tag / Serial Number</th>
+                            <th class="all">Created Date</th>
+                            <th class="all">Started Date</th>
+                            <th class="all">Modified Date</th>
+                            <th class="all">Status</th>
+                            <th class="all">Actions Performed</th>
+                            <th class="all">Technician</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for repair in openRepairs %}
+                                <td class="text-center">{{ repair.r_id }}</td>
+                                <td class="text-center">{{ repair.r_assetUniqueIdentifier }}</td>
+                                <td class="text-center">{{ repair.r_createdDate|date('Y-m-d') }}</td>
+                                <td class="text-center">{{ repair.r_startedDate|date('Y-m-d') }}</td>
+                                <td class="text-center">{{ repair.r_lastModifiedDate|date('Y-m-d') }}</td>
+                                <td class="text-center">{{ repair.r_status }}</td>
+                                <td class="text-center">{% if repair.r_partsNeeded is empty %}None{% else %}{{ repair.r_partsNeeded|join }}{% endif %}</td>
+                                <td class="text-center">{% if repair.surname is null and repair.firstname is null %}Unknown{% else %}{{ repair.surname }}, {{ repair.firstname }}{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Popper Js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+    <!-- DataTables  & Plugins -->
+    {{ encore_entry_script_tags('datatables') }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Set the DataTable
+            var table = $('#openRepairsTable').DataTable({
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                scrollX: true,
+                paging: true,
+                lengthChange: true,
+                iDisplayLength: 25,
+                searching: true,
+                ordering: true,
+                columnDefs: [
+                    {orderable: false, targets: 7}
+                ],
+                info: true,
+                autoWidth: true,
+                responsive: true,
+                autoFill: true,
+                colReorder: true,
+            });
+        });
+    </script>
+{% endblock %}

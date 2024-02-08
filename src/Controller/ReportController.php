@@ -5,9 +5,9 @@ namespace App\Controller;
 use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
+use App\Repository\RepairRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,7 +23,7 @@ class ReportController extends AbstractController
             'collectedAssets' => [
                 'title' => 'Collected Assets',
                 'route' => 'app_report_collectedassets',
-                'description' => 'Ammount of assets collected.',
+                'description' => 'Amount of assets collected.',
             ],
             'usersAssetsNotCollected' => [
                 'title' => 'Assets not Collected by User Group',
@@ -33,8 +33,13 @@ class ReportController extends AbstractController
             'assetsCollectedPerStorage' => [
                 'title' => 'Collected Assets per Storage',
                 'route' => 'app_report_assetsperstorage',
-                'description' => 'Ammount of assets collected organized by storage container.',
-            ]
+                'description' => 'Amount of assets collected organized by storage container.',
+            ],
+            'repairsOpen' => [
+                'title' => 'Open Repairs',
+                'route' => 'app_report_repairsopen',
+                'description' => 'All current repairs that are not closed.',
+            ],
         ];
 
         return $this->render('report/index.html.twig', [
@@ -87,7 +92,7 @@ class ReportController extends AbstractController
     }
 
     #[Route('/usersnotcollected/{userType}', name: 'app_report_usersnotcollected')]
-    public function usersNotCollected(Request $request, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, string $userType = null): Response
+    public function usersNotCollected(UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, string $userType = null): Response
     {
         $assetsQuery = $assetCollectionRepository->findAll();
         $users = $userRepository->findBy(['type' => ucfirst($userType)]);
@@ -168,6 +173,14 @@ class ReportController extends AbstractController
         ]);
     }
 
+    #[Route('/repairs/open', 'app_report_repairsopen')]
+    public function repairsOpen(RepairRepository $repairRepository): Response
+    {
+        return $this->render('report/repairsOpen.html.twig', [
+            'openRepairs' => $repairRepository->getAllOpen(),
+        ]);
+    }
+
     /**
      * create an array of compound array keys aliasing the non-array values
      * of the original array.
@@ -178,7 +191,7 @@ class ReportController extends AbstractController
      * @param array $array
      * @return array
      */
-    private function array_compound_key_alias(array &$array, $separator = '.')
+    private function array_compound_key_alias(array &$array, string $separator = '.'): array
     {
         $index = array();
         foreach($array as $key => &$value)

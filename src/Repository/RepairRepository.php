@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Repair;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -42,31 +43,12 @@ class RepairRepository extends ServiceEntityRepository
 
     public function getAll(): array
     {
-        $repairs = $this->createQueryBuilder('r')
-            ->select('r')
+        return $this->createQueryBuilder('r')
+            ->select('r, user.firstname, user.surname')
+            ->leftJoin('App\Entity\User', 'user', 'WITH', 'user.id = r.technicianId')
             ->getQuery()
             ->getScalarResult()
         ;
-
-        foreach ($repairs as $repair) {
-            $return[$repair['r_id']] = [
-                'id' => $repair['r_id'],
-                'asset_id' => $repair['r_assetId'],
-                'created_date' => $repair['r_createdDate'],
-                'started_date' => $repair['r_startedDate'],
-                'modified_date' => $repair['r_lastModifiedDate'],
-                'resolved_date' => $repair['r_resolvedDate'],
-                'technician' => $repair['r_technicianId'],
-                'issue' => $repair['r_issue'],
-                'parts_needed' => $repair['r_partsNeeded'],
-                'actions_performed' => $repair['r_actionsPerformed'],
-                'status' => $repair['r_status'],
-                'users_following' => $repair['r_usersFollowing'],
-                'asset_identifier' => $repair['r_assetUniqueIdentifier']
-            ];
-        }
-
-        return isset($return) ?: [];
     }
 
     /**
@@ -81,62 +63,18 @@ class RepairRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
-//
-//        dd($repairs);
-//
-//        $return = [];
-//        foreach ($repairs as $repair) {
-//            $return[$repair['id']] = [
-//                'id' => $repair['id'],
-//                'asset_id' => $repair['assetId'],
-//                'created_date' => $repair['createdDate'],
-//                'started_date' => $repair['startedDate'],
-//                'modified_date' => $repair['lastModifiedDate'],
-//                'resolved_date' => $repair['resolvedDate'],
-//                'technician' => $repair['technicianId'],
-//                'issue' => $repair['issue'],
-//                'parts_needed' => $repair['partsNeeded'],
-//                'actions_performed' => $repair['actionsPerformed'],
-//                'status' => $repair['status'],
-//                'users_following' => $repair['usersFollowing'],
-//                'asset_identifier' => $repair['assetUniqueIdentifier']
-//            ];
-//        }
-//
-//        return $return;
     }
 
     public function getAllOpen(): array
     {
         $qb = $this->createQueryBuilder('r');
-        $repairs = $qb
-            ->select('r')
+        return $qb->select('r, user.firstname, user.surname')
             ->where($qb->expr()->neq('r.status', ':repairstatus'))
+            ->leftJoin('App\Entity\User', 'user', 'WITH', 'user.id = r.technicianId')
             ->setParameter('repairstatus', 'status_resolved')
             ->getQuery()
-            ->getScalarResult()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
         ;
-
-        // TODO fix this, can just return the querybuilder
-        foreach ($repairs as $repair) {
-            $return[$repair['r_id']] = [
-                'id' => $repair['r_id'],
-                'asset_id' => $repair['r_assetId'],
-                'created_date' => $repair['r_createdDate'],
-                'started_date' => $repair['r_startedDate'],
-                'modified_date' => $repair['r_lastModifiedDate'],
-                'resolved_date' => $repair['r_resolvedDate'],
-                'technician' => $repair['r_technicianId'],
-                'issue' => $repair['r_issue'],
-                'parts_needed' => $repair['r_partsNeeded'],
-                'actions_performed' => $repair['r_actionsPerformed'],
-                'status' => $repair['r_status'],
-                'users_following' => $repair['r_usersFollowing'],
-                'asset_identifier' => $repair['r_assetUniqueIdentifier']
-            ];
-        }
-
-        return isset($return) ?: [];
     }
 
     /**

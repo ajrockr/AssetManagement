@@ -10,7 +10,7 @@ use App\Repository\RepairRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/repair')]
@@ -36,15 +36,15 @@ class RepairController extends AbstractController
 
         foreach($repairs as $repair) {
             $returnArray[] = [
-                'id' => $repair['id'],
-                'assetUniqueIdentifier' => $repair['asset_identifier'],
-                'createdDate' => $repair['created_date'],
-                'startedDate' => $repair['started_date'],
-                'technicianId' => $repair['technician'],
-                'issue' => $repair['issue'],
-                'partsNeeded' => $this->convertPartIdsToName($repair['parts_needed']),
-                'status' => $repair['status'],
-                'lastModifiedDate' => $repair['modified_date']
+                'id' => $repair['r_id'],
+                'assetUniqueIdentifier' => $repair['r_assetUniqueIdentifier'],
+                'createdDate' => $repair['r_createdDate'],
+                'startedDate' => $repair['r_startedDate'],
+                'technicianId' => $repair['r_technicianId'],
+                'issue' => $repair['r_issue'],
+                'partsNeeded' => $this->convertPartIdsToName($repair['r_partsNeeded']),
+                'status' => $repair['r_status'],
+                'lastModifiedDate' => $repair['r_lastModifiedDate'],
             ];
 
         }
@@ -72,7 +72,7 @@ class RepairController extends AbstractController
 
         return $this->renderForm('repair/new.html.twig', [
             'repair' => $repair,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -91,8 +91,8 @@ class RepairController extends AbstractController
             $repair->setPartsNeeded($repairData['partsNeeded']);
         }
 
-        if (null === ($asset = $assetRepository->findOneBy(['assettag' => $repair->getAssetUniqueIdentifier()]))) {
-            if (null === ($asset = $assetRepository->findOneBy(['serialnumber' => $repair->getAssetUniqueIdentifier()]))) {
+        if (null === ($asset = $assetRepository->findOneBy(['asset_tag' => $repair->getAssetUniqueIdentifier()]))) {
+            if (null === ($asset = $assetRepository->findOneBy(['serial_number' => $repair->getAssetUniqueIdentifier()]))) {
                 $this->addFlash('error', 'The asset could not be found.');
 
                 if ($isInternalReferred) {
@@ -148,7 +148,7 @@ class RepairController extends AbstractController
 
         return $this->renderForm('repair/edit.html.twig', [
             'repair' => $repair,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
