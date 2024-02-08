@@ -4,7 +4,7 @@
 
 {# Storage Data variable #}
 <div id="storageCart">
-    <div id="storageContainerSide" class="col storageSides my-3 px-3">
+    <div id="storageContainerSide" class="col my-3 px-3 storage">
         {% for key, sides in storageData %}
             {% if 'side' in key %}
                 {% include 'asset_storage/storage_parts/side.html.twig' with sides %}
