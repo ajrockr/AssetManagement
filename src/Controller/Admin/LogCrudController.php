@@ -22,10 +22,11 @@ class LogCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
             NumberField::new('userid'),
             DateTimeField::new('datetime'),
-            TextField::new('message')
+            TextField::new('sourcepage'),
+            TextField::new('action'),
+            TextField::new('message'),
         ];
     }
 }

@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class Logger
 {
+    // TODO I don't know what I'm doing with these constants... Figure it out later
     public const SOURCE_IMPORT_USER = 'admin_import_user';
     public const SOURCE_USER_LOGIN = 'user_login';
     public const ACTION_ADMIN = 'admin_action';
@@ -79,10 +80,10 @@ class Logger
      * @param int $userId
      * @param string $source
      * @param string $action
-     * @param string $target
+     * @param string|null $target
      * @return void
      */
-    public function adminAction(int $userId, string $source, string $action, string $target = 'null'): void
+    public function adminAction(int $userId, string $source, string $action, ?string $target = null): void
     {
         $log = new Log();
         $log->setType(self::TYPE_ADMIN)

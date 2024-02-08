@@ -6,20 +6,18 @@ use App\Entity\StorageLock;
 use App\Repository\StorageLockRepository;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Service\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class StorageModerationController extends AbstractController
 {
     public function __construct(
-        private readonly StorageLockRepository $storageLockRepository
+        private readonly StorageLockRepository $storageLockRepository,
+        private readonly Logger $logger,
     ) {}
-
-    #[Route('/storage/moderation', name: 'app_storage_moderation')]
-    public function index() {}
 
     #[Route('/asset/storage/moderation/clear/{id}', name: 'app_storage_moderation_clear')]
     public function clearStorage(Request $request, AssetStorageRepository $assetStorageRepository, AssetCollectionRepository $assetCollectionRepository, int $id): Response
@@ -27,17 +25,41 @@ class StorageModerationController extends AbstractController
         $locations = $assetStorageRepository->getStorageData($id);
         $assetCollectionRepository->removeCollection($locations);
 
+        $this->addFlash('info', 'Cleared storage of collected assets.');
+        $this->logger->adminAction($this->getUser()->getId(), $request->headers->get('referer'), 'clear_storage', "$id");
+
         return $this->redirectToRoute('app_asset_storage_show', [
             'id' => $id
         ]);
     }
 
-    public function clearLocation(Request $request, AssetCollectionRepository $assetCollectionRepository, $location): Response
+    /**
+     * Clears a location entity in given storage(s)
+     *
+     * @param Request $request
+     * @param AssetCollectionRepository $assetCollectionRepository
+     * @param int|array $locations
+     * @return Response
+     */
+    public function clearLocation(Request $request, AssetCollectionRepository $assetCollectionRepository, int|array $locations): Response
     {
-        $assetCollectionRepository->removeCollection($location);
-        return $this->redirect($request->headers->get('referer'));
+        $assetCollectionRepository->removeCollection($locations);
+
+        $referer = $request->headers->get('referer');
+        $target = is_int($locations) ? (string)$locations : implode(',', $locations);
+
+        $this->addFlash('info', 'Cleared location(s) of collected assets.');
+        $this->logger->adminAction($this->getUser()->getId(), $referer, 'clear_location', $target);
+
+        return $this->redirect($referer);
     }
 
+    /**
+     * Renders the moderation menu in Twig
+     *
+     * @param int $id
+     * @return Response
+     */
     public function renderModerationButton(int $id): Response
     {
         $isLocked = $this->isLocked($id);
@@ -81,8 +103,9 @@ class StorageModerationController extends AbstractController
     /**
      * Set a lock on the storage
      *
+     * @param Request $request
      * @param int $id
-     * @return void
+     * @return Response
      */
     #[Route('/asset/storage/moderation/lock/{id}', name: 'app_storage_moderation_lock')]
      public function lockStorage(Request $request, int $id): Response
@@ -94,6 +117,9 @@ class StorageModerationController extends AbstractController
             $this->storageLockRepository->save($lock, true);
         }
 
+        $this->addFlash('info', 'Locked storage, editing is disabled.');
+        $this->logger->adminAction($this->getUser()->getId(), $request->headers->get('referer'), 'lock_storage', "$id");
+
         return $this->redirectToRoute('app_asset_storage_show', [
             'id' => $id
         ]);
@@ -102,8 +128,9 @@ class StorageModerationController extends AbstractController
     /**
      * Remove a lock on a storage
      *
+     * @param Request $request
      * @param int $id
-     * @return void
+     * @return Response
      */
     #[Route('/asset/storage/moderation/unlock/{id}', name: 'app_storage_moderation_unlock')]
     public function unlockStorage(Request $request, int $id): Response
@@ -111,6 +138,9 @@ class StorageModerationController extends AbstractController
         if ($lock = $this->storageLockRepository->findOneBy(['storageId' => $id])) {
             $this->storageLockRepository->remove($lock, true);
         }
+
+        $this->addFlash('info', 'Unlocked storage, editing is enabled again.');
+        $this->logger->adminAction($this->getUser()->getId(), $request->headers->get('referer'), 'unlock_storage', "$id");
 
         return $this->redirectToRoute('app_asset_storage_show', [
             'id' => $id
