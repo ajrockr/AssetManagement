@@ -55,15 +55,16 @@ class ReportController extends AbstractController
 
             // Check if collected from is different from assigned to
             if ($asset->getAssignedTo() !== $collectedAsset->getCollectedFrom()) {
-                $diffUser = $userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
-                $assignedTo = [
-                    'assignedToFirstName'     => $diffUser->getFirstname(),
-                    'assignedToSurName'       => $diffUser->getSurname(),
-                    'assignedToTitle'         => $diffUser->getTitle(),
-                    'assignedToType'          => $diffUser->getType(),
-                    'assignedToEmail'         => $diffUser->getEmail(),
-                    'assignedToUniqueId'      => $diffUser->getUserUniqueId()
-                ];
+                if ($diffUser = $userRepository->findOneBy(['id' => $asset->getAssignedTo()])) {
+                    $assignedTo = [
+                        'assignedToFirstName' => $diffUser->getFirstname(),
+                        'assignedToSurName' => $diffUser->getSurname(),
+                        'assignedToTitle' => $diffUser->getTitle(),
+                        'assignedToType' => $diffUser->getType(),
+                        'assignedToEmail' => $diffUser->getEmail(),
+                        'assignedToUniqueId' => $diffUser->getUserUniqueId()
+                    ];
+                }
             }
 
             $collectedFrom = [
