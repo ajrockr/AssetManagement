@@ -28,7 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/asset')]
-#[IsGranted('ROLE_ASSET_READ')]
+//#[IsGranted('ROLE_ASSET_READ')]
 class AssetController extends AbstractController
 {
     public function __construct(
@@ -78,7 +78,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/assign', name: 'app_assign_user_to_device', methods: ['POST'])]
-    #[IsGranted('ROLE_ASSET_MODIFY')]
+//    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function assignUserToDevice(Request $request, AssetRepository $assetRepository, EntityManagerInterface $entityManager): Response
     {
         $data = $request->request->all();
@@ -95,7 +95,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/new', name: 'app_asset_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ASSET_MODIFY')]
+//    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function new(Request $request, AssetRepository $assetRepository): Response
     {
         $asset = new Asset();
@@ -117,7 +117,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_asset_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ASSET_MODIFY')]
+//    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function edit(Request $request, Asset $asset, AssetRepository $assetRepository): Response
     {
         $form = $this->createForm(AssetType::class, $asset);
@@ -138,7 +138,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_asset_delete')]
-    #[IsGranted('ROLE_ASSET_MODIFY')]
+//    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function delete(Asset $asset, AssetRepository $assetRepository): Response
     {
         try {
@@ -404,7 +404,7 @@ class AssetController extends AbstractController
      * @throws NoResultException
      */
     #[Route('/collection/collect', name: 'app_asset_collection_collect', methods: 'POST')]
-    #[IsGranted('ROLE_ASSET_MODIFY')]
+//    #[IsGranted('ROLE_ASSET_MODIFY')]
     public function checkInForm(Request $request, SiteConfigRepository $siteConfigRepository, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
     {
         // Form 1) Select which cart
