@@ -26,7 +26,7 @@
                             </li>
                             <li>
                                 <a href="{{ path('app_asset_distribution_roulette') }}" class="dropdown-item">
-                                        <i class="fas fa-diagram-next"></i> Roulette
+                                    <i class="fas fa-diagram-next"></i> Roulette
                                 </a>
                             </li>
                             <li>
@@ -65,70 +65,70 @@
                             <i class="nav-icon fas fa-toolbox"></i>
                             Repairs</a>
                     </li>
-                </a>
-                <li class="nav-item">
-                    <a href="{{ path('app_report_index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-file-lines"></i>
-                        Reports
-                    </a>
-                </li>
-                {# Spacer #}
-                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
-                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
-                    <hr class="d-lg-none my-2 text-white-50">
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-circle-half-stroke"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a href="#" class="dropdown-item" data-bs-theme-value="dark">
-                                <i class="fa-regular fa-moon"></i>
-                                Dark
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-item" data-bs-theme-value="light">
-                                <i class="fa-solid fa-sun"></i>
-                                Light
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                {# Spacer #}
-                <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
-                    <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
-                    <hr class="d-lg-none my-2 text-white-50">
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
-                        </svg>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        {% if app.user %}
+                    <li class="nav-item">
+                        <a href="{{ path('app_report_index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-file-lines"></i>
+                            Reports
+                        </a>
+                    </li>
+                    {# Spacer #}
+                    <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                        <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                        <hr class="d-lg-none my-2 text-white-50">
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-circle-half-stroke"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
                             <li>
+                                <a href="#" class="dropdown-item" data-bs-theme-value="dark">
+                                    <i class="fa-regular fa-moon"></i>
+                                    Dark
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-item" data-bs-theme-value="light">
+                                    <i class="fa-solid fa-sun"></i>
+                                    Light
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {# Spacer #}
+                    <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
+                        <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                        <hr class="d-lg-none my-2 text-white-50">
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if app.user %}
+                                <li>
                                 <span class="dropdown-item">
-                                    <img src="{{ app.user.avatar }}" class="bg-info rounded-circle me-1" style="width:15%;" alt="User Image">
+                                    <img src="{{ (app.user.avatar is null) ? 'https://raw.githubusercontent.com/twbs/icons/main/icons/person-fill.svg' : app.user.avatar }}" class="avatar avatar-32 rounded-circle me-1" alt="User Image">
                                     {{ app.user.firstname }} {{ app.user.surname }}
                                 </span>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a href="{{ path('app_user_profile') }}" class="dropdown-item">Profile</a></li>
-                            <li><a href="#" class="dropdown-item">Settings</a></li>
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <li><a href="{{ path('admin') }}" class="dropdown-item">Admin</a></li>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a href="{{ path('app_user_profile') }}" class="dropdown-item">Profile</a></li>
+                                <li><a href="#" class="dropdown-item">Settings</a></li>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li><a href="{{ path('admin') }}" class="dropdown-item">Admin</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a href="{{ path('app_logout') }}" class="dropdown-item">Sign Out</a></li>
+                            {% else %}
+                                <li><a href="{{ path('app_login') }}">Login</a></li>
                             {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a href="{{ path('app_logout') }}" class="dropdown-item">Sign Out</a></li>
-                        {% else %}
-                            <li><a href="{{ path('app_login') }}">Login</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-            </ul>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 </header>
