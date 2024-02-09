@@ -178,10 +178,10 @@ class AssetController extends AbstractController
         $usersFormArray = [];
         foreach ($users as $user) {
             if ('Admin' == $user->getUserIdentifier()) continue;
-            if ($uid = $user->getUserUniqueId()) {
-                $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $uid . ')'] = $user->getId();
-            } else {
+            if ( !($uid = $user->getUserUniqueId())) {
                 $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname()] = $user->getId();
+            } else {
+                $usersFormArray[$user->getSurname() . ', ' . $user->getFirstname() . ' (' . $uid . ')'] = $user->getId();
             }
 
         }
