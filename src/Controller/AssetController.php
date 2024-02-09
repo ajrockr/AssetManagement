@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Asset;
 use App\Form\AssetType;
-use App\Entity\AssetCollection;
 use App\Repository\UserRepository;
 use App\Repository\AssetRepository;
 use App\Repository\RepairRepository;
@@ -15,10 +14,7 @@ use App\Service\RepairService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Exception;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -162,7 +158,7 @@ class AssetController extends AbstractController
     }
 
     #[Route('/collection/collect', name: 'app_asset_collection_collect', methods: 'POST')]
-    public function checkInForm(Request $request, RepairRepository $repairRepository, AssetRepository $assetRepository, RepairController $repairController, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
+    public function checkInForm(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
     {
         // Form 1) Select which cart
         $storages = $assetStorageRepository->findAll();
