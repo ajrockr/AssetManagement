@@ -6,9 +6,9 @@
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-body align-middle text-center">
-                            {% if collectedSlot is defined %}
-                                <div class="display-4 text-bg-warning">{{ storageName }} is Full</div><br />
-                                Asset must be placed to side, not in cart.
+                            {% if storageName is defined %}
+                                <div class="display-2 text-warning fw-bolder">{{ storageName }}<br /> is full</div>
+                                <div class="display-6 text-light fw-light">Asset must be placed to side, not in cart.</div>
                             {% endif %}
                         </div>
                         <div class="modal-footer">
@@ -21,8 +21,8 @@
             {{ encore_entry_script_tags('app') }}
             <script type="text/javascript">
                 $(document).ready(function() {
-                    const assetCheckinCompleteModal = $('#assetStorageIsFullModal');
-                    assetCheckinCompleteModal.modal('show');
+                    const assetStorageIsFullModal = $('#assetStorageIsFullModal');
+                    assetStorageIsFullModal.modal('show');
                 });
             </script>
         {% endfor %}
