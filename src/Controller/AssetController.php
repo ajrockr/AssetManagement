@@ -258,27 +258,29 @@ class AssetController extends AbstractController
 
             if ($assetCollected = $this->assetCollectionService->assetIsCollected($assetId)) {
                 $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageEntity->getName(), true]);
+                return $this->redirect($request->headers->get('referer'));
             }
-            elseif(count($openStorageSlots) == 0) {
+
+            $order = $this->siteConfigRepository->findOneByName('storage_collection_sort_slots_order');
+            if ($order === 'desc') {
+                rsort($openStorageSlots);
+            } else {
+                // If 'desc' is not the config value or 'asc' is defined, default to ascending
+                sort($openStorageSlots);
+            }
+
+            $nextOpenSlot = reset($openStorageSlots);
+
+            $data['location'] = $nextOpenSlot;
+
+            if(count($openStorageSlots) == 0) {
                 // Check if Storage is full
                 $data['location'] = null;
                 $this->addFlash('assetStorageIsFull', $storageEntity->getName());
-            } else {
-                $order = $this->siteConfigRepository->findOneByName('storage_collection_sort_slots_order');
-                if ($order === 'desc') {
-                    rsort($openStorageSlots);
-                } else {
-                    // If 'desc' is not the config value or 'asc' is defined, default to ascending
-                    sort($openStorageSlots);
-                }
-
-                $nextOpenSlot = reset($openStorageSlots);
-
-                $data['location'] = $nextOpenSlot;
-
-                $this->assetCollectionService->checkIn($data, $this->getUser()->getId());
-                $this->addFlash('assetCollected', [$storageEntity->getName(), $nextOpenSlot]);
             }
+
+            $this->assetCollectionService->checkIn($data, $this->getUser()->getId());
+            $this->addFlash('assetCollected', [$storageEntity->getName(), $nextOpenSlot]);
 
 //            return $this->redirectToRoute($requestingPath, [
 //                $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
