@@ -13,6 +13,7 @@ use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use App\Service\AssetCollectionService;
+use App\Service\StorageModerationService;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +30,8 @@ class AssetStorageController extends AbstractController
         private readonly SiteConfigRepository $siteConfigRepository,
         private readonly AssetStorageRepository $assetStorageRepository,
         private readonly AssetCollectionService $assetCollectionService,
+        private readonly StorageModerationService $storageModerationService,
+        private readonly AssetCollectionRepository $assetCollectionRepository,
     )
     {
         $this->config = $this->siteConfigRepository->getAllConfigItems();
@@ -107,10 +110,15 @@ class AssetStorageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !$storageLocked) {
+            $data = $form->getData();
+
             if ($form->get('clearLocation')->isClicked()) {
-                $clearLocation = $form->get('location')->getViewData();
-                // TODO Fix this, no forwarding. Make service
-                return $this->forward('App\Controller\StorageModerationController::clearLocation', ['location' => $clearLocation]);
+                $clearStorage = $this->assetCollectionRepository->findOneBy(['collectionLocation' => $data['location'], 'collectionStorage' => $data['storageId']]);
+
+                $this->storageModerationService->clearLocation($clearStorage->getId(), $this->getUser()->getId());
+
+                $this->addFlash('info', 'Cleared location(s) of collected assets.');
+                return $this->redirect($request->headers->get('referer'));
             }
 
             // Check the asset into collection

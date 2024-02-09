@@ -20,6 +20,7 @@
         {% endif %}
         <div class="col text-end">
             {{ render(controller('App\\Controller\\StorageModerationController::renderModerationButton', {id: assetStorage.id})) }}
+
         </div>
     </div>
     {% if assetStorage.location is not null %}
