@@ -69,7 +69,8 @@ class AssetStorageController extends AbstractController
     {
         $storageLocked = $storageModerationController->isLocked($id);
         $collectedAssets = $assetCollectionRepository->getAllCollectedAssetsByStorageId($id);
-        $storageData = $this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData();
+        $storage = $this->assetStorageRepository->findOneBy(['id' => $id]);
+        $storageData = $storage->getStorageData();
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
         $users = $userRepository->getUsers();
@@ -108,11 +109,18 @@ class AssetStorageController extends AbstractController
         if ($form->isSubmitted() && $form->isValid() && !$storageLocked) {
             if ($form->get('clearLocation')->isClicked()) {
                 $clearLocation = $form->get('location')->getViewData();
+                // TODO Fix this, no forwarding. Make service
                 return $this->forward('App\Controller\StorageModerationController::clearLocation', ['location' => $clearLocation]);
             }
 
             // Check the asset into collection
-            $this->assetCollectionService->createOrUpdateAsset($form->getData());
+            $asset = $this->assetCollectionService->createOrUpdateAsset($form->getData());
+
+            if ($collected = $this->assetCollectionService->assetIsCollected($asset->getId())) {
+                $this->addFlash('assetAlreadyCollected', [$collected->getCollectionLocation(), $storage->getName(), false]);
+                return $this->redirect($request->headers->get('referer'));
+            }
+
             $this->assetCollectionService->checkIn($form->getData(), $this->getUser()->getId());
 
             return $this->redirect($request->headers->get('referer'));

@@ -259,14 +259,11 @@ class AssetController extends AbstractController
             if ($assetCollected = $this->assetCollectionService->assetIsCollected($assetId)) {
                 $this->addFlash('assetAlreadyCollected', [$assetCollected->getCollectionLocation(), $storageEntity->getName(), true]);
             }
-            else {
-                // Check to see if Storage is full
-                if (count($openStorageSlots) == 0) {
-                    // TODO This might be dangerous. Not sure yet, was previously passing the storageIsFull in array, going to try just setting location to null here. We really only care when using the "quick" checkIn
-                    $data['location'] = null;
-                    $this->addFlash('assetStorageIsFull', $storageEntity->getName());
-                }
-
+            elseif(count($openStorageSlots) == 0) {
+                // Check if Storage is full
+                $data['location'] = null;
+                $this->addFlash('assetStorageIsFull', $storageEntity->getName());
+            } else {
                 $order = $this->siteConfigRepository->findOneByName('storage_collection_sort_slots_order');
                 if ($order === 'desc') {
                     rsort($openStorageSlots);
@@ -283,9 +280,10 @@ class AssetController extends AbstractController
                 $this->addFlash('assetCollected', [$storageEntity->getName(), $nextOpenSlot]);
             }
 
-            return $this->redirectToRoute($requestingPath, [
-                $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
-            ]);
+//            return $this->redirectToRoute($requestingPath, [
+//                $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
+//            ]);
+            return $this->redirect($request->headers->get('referer'));
         }
 
         return $this->render('asset_collection/collectionForm.html.twig', [
