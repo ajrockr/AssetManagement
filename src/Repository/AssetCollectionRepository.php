@@ -87,7 +87,7 @@ class AssetCollectionRepository extends ServiceEntityRepository
      */
     public function removeCollection(int|array $locations): void
     {
-        $conditions = preg_filter('/^/', 'ac.collectionLocation = ', $locations);
+        $conditions = preg_filter('/^/', 'assetcollection.collectionLocation = ', $locations);
         $qb = $this->createQueryBuilder('assetcollection');
         $delete = $qb->delete()
             ->where(
