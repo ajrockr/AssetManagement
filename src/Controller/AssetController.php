@@ -273,15 +273,18 @@ class AssetController extends AbstractController
 
             $data['location'] = $nextOpenSlot;
 
+            // If the storage is full, set location to null and notify user
             if(count($openStorageSlots) == 0) {
-                // Check if Storage is full
                 $data['location'] = null;
                 $this->addFlash('assetStorageIsFull', $storageEntity->getName());
+            } else {
+                // TODO Is there a more programmatic way of doing this?
+                $this->addFlash('assetCollected', [$storageEntity->getName(), $nextOpenSlot]);
             }
 
             $this->assetCollectionService->checkIn($data, $this->getUser()->getId());
-            $this->addFlash('assetCollected', [$storageEntity->getName(), $nextOpenSlot]);
 
+            // TODO Is redirecting to referer better than this way? Test more
 //            return $this->redirectToRoute($requestingPath, [
 //                $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
 //            ]);
