@@ -40,17 +40,9 @@ class SiteConfigRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @throws NonUniqueResultException
-     */
-    public function findOneByName($value): mixed
+    public function findOneByName(string $name): ?string
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.configName = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return ($config = $this->findOneBy(['configName' => $name])) ? $config->getConfigValue() : null;
     }
 
     public function getAllConfigItems(): array

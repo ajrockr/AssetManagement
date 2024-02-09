@@ -12,6 +12,9 @@ use App\Repository\RepairPartsRepository;
 use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
+use App\Service\AssetCollectionService;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,11 +24,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class AssetStorageController extends AbstractController
 {
     private array $config;
-    private array $storage;
 
     public function __construct(
         private readonly SiteConfigRepository $siteConfigRepository,
-        private readonly AssetStorageRepository $assetStorageRepository
+        private readonly AssetStorageRepository $assetStorageRepository,
+        private readonly AssetCollectionService $assetCollectionService,
     )
     {
         $this->config = $this->siteConfigRepository->getAllConfigItems();
@@ -57,14 +60,16 @@ class AssetStorageController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     #[Route('/{id}', name: 'app_asset_storage_show')]
-    public function showStorage(Request $request, StorageModerationController $storageModerationController, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, $id): Response
+    public function showStorage(Request $request, AssetController $assetController, StorageModerationController $storageModerationController, RepairRepository $repairRepository, RepairPartsRepository $repairPartsRepository, ReportController $reportController, AssetStorage $assetStorage, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, AssetRepository $assetRepository, $id): Response
     {
         $storageLocked = $storageModerationController->isLocked($id);
-        $assetUniqueIdentifier = $this->config['asset_unique_identifier'];
         $collectedAssets = $assetCollectionRepository->getAllCollectedAssetsByStorageId($id);
         $storageData = $this->assetStorageRepository->findOneBy(['id' => $id])->getStorageData();
-        $storage = '';
         $storageCounts = $reportController->assetsPerStorage($this->assetStorageRepository, $assetCollectionRepository, $id);
 
         $users = $userRepository->getUsers();
@@ -85,16 +90,15 @@ class AssetStorageController extends AbstractController
 
             $assets[] = [
                 'slot' => $asset['assetcollection_collectionLocation'],
-                'asset' => ($assetUniqueIdentifier == 'assettag')
-                    ? $asset['asset_tag']
-                    : $asset['serial_number'],
+                'asset_tag' => $asset['asset_tag'],
                 'user' => $user['id'],
                 'usersName' => $user['surname'] . ', ' . $user['firstname'],
                 'note' => $asset['assetcollection_collectionNotes'],
                 'checkedOut' => $asset['assetcollection_checkedout'],
                 'processed' => $asset['assetcollection_processed'],
                 'hasRepair' => $hasRepair,
-                'repairId' => $repairId
+                'repairId' => $repairId,
+                'serial_number' => $asset['serial_number'],
             ];
         }
 
@@ -107,14 +111,11 @@ class AssetStorageController extends AbstractController
                 return $this->forward('App\Controller\StorageModerationController::clearLocation', ['location' => $clearLocation]);
             }
 
-            if (is_null($form->getData()['user'])) {
-                $this->addFlash('error', 'No user specified.');
-                return $this->redirect($request->headers->get('referer'));
-            }
+            // Check the asset into collection
+            $this->assetCollectionService->createOrUpdateAsset($form->getData());
+            $this->assetCollectionService->checkIn($form->getData(), $this->getUser()->getId());
 
-            return $this->forward('App\Controller\AssetController::checkIn', [
-                'form' => $form
-            ]);
+            return $this->redirect($request->headers->get('referer'));
         }
 
         $repairParts = $repairPartsRepository->findAll();
@@ -140,7 +141,6 @@ class AssetStorageController extends AbstractController
             'colors' => $colors,
             'repairParts' => $parts,
             'storageCounts' => $storageCounts,
-            'storageRender' => $storage,
             'storageData' => $storageData,
             'form' => $form->createView(),
             'collectedAssets' => $assets,
@@ -175,58 +175,6 @@ class AssetStorageController extends AbstractController
 
         return $this->redirectToRoute('app_asset_storage_index', [], Response::HTTP_SEE_OTHER);
     }
-
-    /**
-     * Renders the HTML that represents the storages
-     *
-     * @param array|null $storageData
-     * @return Response
-     */
-//    public function renderStorageView(?array $storageData, bool $storageLocked = false): string
-//    {
-//        // TODO: Create this HTML in the twig file
-////        if (null === $storageData) {
-////            $this->render('asset_storage/storageRender.html.twig', [
-////                'storage' => ''
-////            ]);
-////        }
-//
-//        $html = '<div id="storageStart">';
-//
-//        if (! preg_grep('/^side*/', array_keys($storageData))) {
-//            // 'side*' does not exist, this is a 1 sided cart
-//        }
-//        foreach ($storageData as $side) {
-//            if (preg_grep('/^row*/', array_keys($side))) {
-//                // Do I care that 'row' wasn't part of the keys?
-//            }
-//            $html .= '<div id="storageContainerSide" class="col storageSides my-3 px-3">';
-//
-//            foreach ($side as $row) {
-//                $html .= '<div id="storageContainerRow" class="row no-gutters storageRows">';
-//
-//                foreach ($row as $id=>$slot) {
-//                    $html .= '
-//                    <div id="slot-'.$slot.'" class="col-sm p-0 storageCell">
-//                        <a href="javascript:void(0);" class="text-decoration-none my-asset-collection-btn" role="button" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="' . $slot . '" id="href-slot-' . $slot . '">
-//                            <span data-bs-toggle="modal" data-bs-target="#modal-checkin" data-slot="'.$slot.'" id="slotNumber-'. $slot . '">' . $slot . '</span>
-//                        </a>
-//                    </div>
-//                    <div class="col-sm"></div>';
-//                }
-//
-//                $html .= '</div>';
-//            }
-//
-//            $html .= '</div>';
-//        }
-//
-//        $html .= '</div>';
-//        return $html;
-////        return $this->render('asset_storage/storageRender.html.twig', [
-////            'storage' => $html
-////        ]);
-//    }
 
     /**
      * Renders storage items for use in the navigation

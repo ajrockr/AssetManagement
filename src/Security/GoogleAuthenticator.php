@@ -45,7 +45,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
         $this->session = new Session();
 
         // Check if Google authentication was disabled
-        if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('auth_useGoogle')->getConfigValue() !== "1") {
+        if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('auth_useGoogle') !== "1") {
             $this->session->getFlashBag()->add('notice', 'Use of Google authentication is disabled.');
             return new RedirectResponse('/');
         }

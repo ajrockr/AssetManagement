@@ -1,13 +1,13 @@
 {% block collection_form %}
     {% set assetAlreadyStorageIsFullFlashBag = app.flashes('assetStorageIsFull') %}
     {% if assetAlreadyStorageIsFullFlashBag|length > 0 %}
-        {% for label, collectedSlot in assetAlreadyStorageIsFullFlashBag %}
+        {% for label, storageName in assetAlreadyStorageIsFullFlashBag %}
             <div class="modal fade" id="assetStorageIsFullModal" data-bs-backdrop="static" data-bs-keyword="false" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-body align-middle text-center">
                             {% if collectedSlot is defined %}
-                                <div class="display-4 text-bg-warning">Storage Is Full</div><br />
+                                <div class="display-4 text-bg-warning">{{ storageName }} is Full</div><br />
                                 Asset must be placed to side, not in cart.
                             {% endif %}
                         </div>

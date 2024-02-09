@@ -77,6 +77,6 @@ class AlertMessageRepository extends ServiceEntityRepository
 
     public function alertsEnabled(): bool
     {
-        return $this->getEntityManager()->getRepository(SiteConfig::class)->findOneByName('site_alertMessageEnabled')->getConfigValue() == "1";
+        return $this->getEntityManager()->getRepository(SiteConfig::class)->findOneByName('site_alertMessageEnabled') == "1";
     }
 }

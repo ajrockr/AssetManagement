@@ -34,7 +34,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         // Check if maintenance mode was enabled
-        $isMaintenance = $this->entityManager->getRepository(SiteConfig::class)->findOneByName('site_maintenanceModeEnabled')->getConfigValue();
+        $isMaintenance = $this->entityManager->getRepository(SiteConfig::class)->findOneByName('site_maintenanceModeEnabled');
 
         // Check if we are cli
         $isCli = \PHP_SAPI === 'cli';

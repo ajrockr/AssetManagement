@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Asset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -77,12 +78,11 @@ class AssetRepository extends ServiceEntityRepository
 
     /**
      * @throws NonUniqueResultException
-     * @throws NoResultException
      */
-    public function findByAssetId(?string $assetTag = null, ?string $serialNumber = null): ?int
+    public function findByAssetId(?string $assetTag = null, ?string $serialNumber = null): ?Asset
     {
-        $result =  $this->createQueryBuilder('asset')
-            ->select('asset.id')
+        return $this->createQueryBuilder('asset')
+            ->select('asset')
             ->orWhere('asset.asset_tag = :assetTag')
             ->orWhere('asset.serial_number = :serialNumber')
             ->setParameter(':assetTag', $assetTag)
@@ -90,7 +90,5 @@ class AssetRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
-
-        return $result['id'] ?? null;
     }
 }

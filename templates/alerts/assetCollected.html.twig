@@ -8,7 +8,8 @@
                         <div class="modal-body align-middle text-center">
                             {% if nextOpenSlot is defined %}
                                 <div class="display-4">Asset assigned to:</div><br />
-                                <div class="display-1 text-success fw-bolder">{{ nextOpenSlot }}</div>
+                                {{ nextOpenSlot[0] }}
+                                <div class="display-1 text-success fw-bolder">{{ nextOpenSlot[1] }}</div>
                             {% endif %}
                         </div>
                         <div class="modal-footer">

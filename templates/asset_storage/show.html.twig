@@ -1,6 +1,16 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <div class="row">
+        <div class="col">
+            <blockquote class="blockquote">
+                <h1 class="fw-bolder text-light">{{ assetStorage.name }}</h1>
+            </blockquote>
+            {% if assetStorage.description is not null %}
+                <figcaption class="blockquote-footer">
+                    {{ assetStorage.description }}
+                </figcaption>
+            {% endif %}
+        </div>
         {% if storageLocked == 'true' %}
             <div class="col">
                 <div class="alert alert-warning">
@@ -36,13 +46,14 @@
         {% set assignedSlotsInfo = assignedSlotsInfo|merge([{
             user: collectedAsset.user,
             slot: collectedAsset.slot,
-            asset: collectedAsset.asset,
+            asset: collectedAsset.asset_tag,
             note: collectedAsset.note,
             checkedOut: collectedAsset.checkedOut,
             processed: collectedAsset.processed,
             usersName: collectedAsset.usersName,
             hasRepair: collectedAsset.hasRepair,
-            repairId: collectedAsset.repairId
+            repairId: collectedAsset.repairId,
+            serialnumber: collectedAsset.serial_number,
         }]) %}
     {% endfor %}
     <div class="js-assignedSlots" data-assignedSlots="{{ assignedSlots|json_encode }}"></div>
@@ -54,63 +65,62 @@
             <div class="modal-content">
                 <div class="modal-body">
                     {{ form_start(form, { 'attr': { 'class': 'form-floating' } }) }}
-                    <input id="assignAssetId" type="hidden" name="assetId" value=""/>
-                    <div class="modal-header">
-                        <h4 class="modal-title">Assign User</h4>
-                        <button name="closeModal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body pl-2">
-                        <div class="mb-3">
-                            {{ form_label(form.user, 'Collected From') }}
-                            {{ form_widget(form.user, { 'attr': { 'tabindex': 1, 'style': 'width:100%'}}) }}
+                        <input id="assignAssetId" type="hidden" name="assetId" value=""/>
+                        <div class="modal-header">
+                            <h4 class="modal-title">Location: <span id="modalLocationNumber"></span></h4>
+                            <button name="closeModal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col">
-                                <div class="form-floating">
-                                    {{ form_widget(form.device, { 'attr': { 'tabindex': 2, 'placeholder': 'Asset' }}) }}
-                                    {{ form_label(form.device, 'Asset') }}
+                        <div class="modal-body pl-2">
+                            <div class="mb-3">
+                                {{ form_label(form.assigned_to, 'Collected From') }}
+                                {{ form_widget(form.assigned_to, { 'attr': { 'tabindex': 1, 'style': 'width:100%'}}) }}
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <div class="form-floating">
+                                        {{ form_widget(form.asset_tag, { 'attr': { 'tabindex': 2, 'placeholder': 'Asset Tag' }}) }}
+                                        {{ form_label(form.asset_tag, 'Asset Tag') }}
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating" data-bs-toggle="tooltip" data-bs-title="Double click to edit.">
+                                        {{ form_widget(form.serial_number, { 'attr': { 'placeholder': 'Serial Number' }}) }}
+                                        {{ form_label(form.serial_number, 'Serial Number') }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="form-floating" data-bs-toggle="tooltip" data-bs-title="Double click to edit.">
-                                    {# todo: on double click, enable field #}
-                                    {# ondblclick="document.getElementById('asset_collection_location').disabled = false;"  #}
-                                    {{ form_widget(form.location) }}
-                                    {{ form_label(form.location, 'Location') }}
-                                </div>
+                            <div class="input-group">
+                                {# Needs Repair #}
+                                {{ form_widget(form.needs_repair, { 'attr': { 'class': 'btn-check'} }) }}
+                                <label for="asset_collection_needs_repair" class="btn btn-outline-secondary" id="needsRepairLabel">Needs Repair</label>
+                                {# Check Out #}
+                                {{ form_widget(form.check_out, { 'attr': { 'class': 'btn-check'} }) }}
+                                <label for="asset_collection_check_out" class="btn btn-outline-secondary">Check Out</label>
+                                {# Processed #}
+                                {{ form_widget(form.processed, { 'attr': { 'class': 'btn-check'} }) }}
+                                <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
                             </div>
+                            <div class="my-2" id="partsNeeded">
+                                {% for part in repairParts %}
+                                    <div class="form-check form-check-inline">
+                                        <input id="{{ part.name }}" type="checkbox" class="form-check-input" value="{{ part.value }}" name="{{ part.name }}">
+                                        <label for="{{ part.name }}" class="form-check-label">{{ part.name }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-floating mt-sm-2">
+                                {{ form_widget(form.notes, { 'attr': { 'tabindex': 4, 'rows': 3, 'style': 'height:100%;', 'placeholder': 'Notes' } }) }}
+                                {{ form_label(form.notes) }}
+                            </div>
+                            {{ form_widget(form.userId) }}
+                            {{ form_widget(form.assetId) }}
+                            {{ form_widget(form.storageId, { 'attr': { 'value': storageId } }) }}
+                            {{ form_widget(form.location) }}
                         </div>
-                        <div class="input-group">
-                            {# Needs Repair #}
-                            {{ form_widget(form.needsrepair, { 'attr': { 'class': 'btn-check'} }) }}
-                            <label for="asset_collection_needsrepair" class="btn btn-outline-secondary" id="needsRepairLabel">Needs Repair</label>
-                            {# Check Out #}
-                            {{ form_widget(form.checkout, { 'attr': { 'class': 'btn-check'} }) }}
-                            <label for="asset_collection_checkout" class="btn btn-outline-secondary">Check Out</label>
-                            {# Processed #}
-                            {{ form_widget(form.processed, { 'attr': { 'class': 'btn-check'} }) }}
-                            <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
+                        <div class="modal-footer justify-content-between">
+                            {{ form_widget(form.clearLocation, {'label': 'Clear', 'attr': { 'class': 'btn btn-outline-secondary'}}) }}
+                            {{ form_widget(form.Collect, {'label': 'Update', 'attr': { 'tabindex': 3, 'class': 'btn btn-outline-success'}}) }}
                         </div>
-                        <div class="my-2" id="partsNeeded">
-                            {% for part in repairParts %}
-                                <div class="form-check form-check-inline">
-                                    <input id="{{ part.name }}" type="checkbox" class="form-check-input" value="{{ part.value }}" name="{{ part.name }}">
-                                    <label for="{{ part.name }}" class="form-check-label">{{ part.name }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <div class="form-floating mt-sm-2">
-                            {{ form_widget(form.notes, { 'attr': { 'tabindex': 4, 'rows': 3, 'style': 'height:100%;', 'placeholder': 'Notes' } }) }}
-                            {{ form_label(form.notes) }}
-                        </div>
-                        {{ form_widget(form.userId) }}
-                        {{ form_widget(form.assetId) }}
-                        {{ form_widget(form.storageId, { 'attr': { 'value': storageId } }) }}
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        {{ form_widget(form.clearLocation, {'label': 'Clear', 'attr': { 'class': 'btn btn-outline-secondary'}}) }}
-                        {{ form_widget(form.Collect, {'label': 'Update', 'attr': { 'tabindex': 3, 'class': 'btn btn-outline-success'}}) }}
-                    </div>
                     {{ form_end(form) }}
                 </div>
             </div>
@@ -211,6 +221,7 @@
             $("#modal-checkin").on("show.bs.modal", function(e) {
                 let storageSlot = $(e.relatedTarget).attr("data-slot");
                 let asset = $(e.relatedTarget).attr("data-asset") ?? '';
+                let serialnumber = $(e.relatedTarget).attr("data-serialnumber") ?? '';
                 let assignedUserId = $(e.relatedTarget).attr("data-user") ?? null;
                 let note = $(e.relatedTarget).attr("data-note") ?? '';
                 let checkedOut = $(e.relatedTarget).attr("data-checkedout") ?? null;
@@ -220,23 +231,25 @@
                 // let locationEntity = document.getElementById('asset_collection_location');
 
                 setTimeout(function () {
-                    $("#asset_collection_user").focus();
+                    $("#asset_collection_assigned_to").focus();
                 }, 600);
 
-                document.getElementById("asset_collection_device").setAttribute("value", asset);
+                document.getElementById("asset_collection_asset_tag").setAttribute("value", asset);
+                document.getElementById("asset_collection_serial_number").setAttribute("value", serialnumber);
                 document.getElementById("asset_collection_notes").innerText = note;
-                $("#asset_collection_user").val(assignedUserId).trigger("change");
+                $("#asset_collection_assigned_to").val(assignedUserId).trigger("change");
                 document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
                 document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
+                $("#modalLocationNumber").text(storageSlot);
                 $("#clearLocation").attr("value", storageSlot);
 
-                document.getElementById("asset_collection_checkout").checked = checkedOut != null;
+                document.getElementById("asset_collection_check_out").checked = checkedOut != null;
 
                 document.getElementById("asset_collection_processed").checked = processed != null;
 
                 if (hasRepair === "true") {
                     $("#needsRepairLabel").text("Has Repair");
-                    $("#asset_collection_needsrepair").prop("disabled", true).prop("checked", true);
+                    $("#asset_collection_needs_repair").prop("disabled", true).prop("checked", true);
 
                     {#let url = "{{ path('app_repair_show', { id: 'repairId' }) }}";#}
                     {#url = url.replace("repairId", repairId);#}
@@ -245,7 +258,7 @@
                     // TODO: Add button to view repair
                 } else {
                     $("#needsRepairLabel").text("Needs Repair");
-                    $("#asset_collection_needsrepair").prop("disabled", false).prop("checked", false);
+                    $("#asset_collection_needs_repair").prop("disabled", false).prop("checked", false);
                     // $("#asset_collection_needsrepair").attr("onclick", "").unbind("click");
                 }
 
@@ -284,23 +297,23 @@
 
             $("#modal-checkin").on("hide.bs.modal", function() {
                 document.getElementById("asset_collection_userId").removeAttribute("value");
-                document.getElementById("asset_collection_user").removeAttribute("value");
-                document.getElementById("asset_collection_location").removeAttribute("value");
+                document.getElementById("asset_collection_assigned_to").removeAttribute("value");
+                document.getElementById("asset_collection_serial_number").removeAttribute("value");
                 document.getElementById("asset_collection_notes").removeAttribute("value");
-                document.getElementById("asset_collection_needsrepair").checked = false;
-                document.getElementById("asset_collection_checkout").checked = false;
+                document.getElementById("asset_collection_needs_repair").checked = false;
+                document.getElementById("asset_collection_check_out").checked = false;
                 document.getElementById("asset_collection_processed").checked = false;
                 //clear_form_elements("modal-checkin");
             });
 
             // Start select2
-            $("#asset_collection_user").select2({
+            $("#asset_collection_assigned_to").select2({
                 placeholder: 'Select a user',
                 width: 'resolve',
                 theme: 'bootstrap-5',
                 dropdownParent: $("#modal-checkin")
             });
-            $("#asset_collection_user").prop("required", true);
+            $("#asset_collection_assigned_to").prop("required", true);
 
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus();
@@ -323,16 +336,19 @@
                             }
                         }
                     }
+                    // This sets the data- attributes on the location links
                     $(this).children('a').children('span').each(function() {
                         for (i = 0; i < assignedSlotsInfo.length; ++i) {
                             if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
                                 $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
+                                $(this).attr('data-serialnumber', assignedSlotsInfo[i]['serialnumber']);
                                 $(this).attr('data-user', assignedSlotsInfo[i]['user']);
                                 $(this).attr('data-note', assignedSlotsInfo[i]['note']);
                                 $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedOut']);
                                 $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
                                 $(this).attr('data-hasrepair', assignedSlotsInfo[i]['hasRepair']);
                                 $(this).attr('data-repairId', assignedSlotsInfo[i]['repairId']);
+                                $(this).attr('data-location', assignedSlotsInfo[i]['location']);
                                 $("#href-slot-" + assignedSlotsInfo[i]['slot']).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
                             }
                         }

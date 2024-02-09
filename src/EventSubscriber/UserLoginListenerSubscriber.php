@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Service\Logger;
+use App\Service\LoggerService;
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,8 +12,8 @@ use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
 class UserLoginListenerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly Logger $logger,
-        private readonly RequestStack $requestStack) {}
+    public function __construct(private readonly LoggerService $logger,
+        private readonly RequestStack                          $requestStack) {}
 
 
     /**

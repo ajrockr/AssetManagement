@@ -77,47 +77,6 @@ class RepairController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function createRepair(Repair|array $repairData, bool $isInternalReferred = false): bool
-    {
-        $repair = $repairData;
-
-        // If a Repair entity instance was not passed
-        if (!$repairData instanceof Repair) {
-            $repair = new Repair;
-            $repair->setAssetUniqueIdentifier($repairData['asset']);
-            $repair->setIssue($repairData['issue']);
-            $repair->setAssetId($repairData['assetId']);
-            $repair->setStatus('Not Started');
-            $repair->setPartsNeeded($repairData['partsNeeded']);
-        }
-
-        if (null === ($asset = $this->assetRepository->findOneBy(['asset_tag' => $repair->getAssetUniqueIdentifier()]))) {
-            if (null === ($asset = $this->assetRepository->findOneBy(['serial_number' => $repair->getAssetUniqueIdentifier()]))) {
-                $this->addFlash('error', 'The asset could not be found.');
-
-                if ($isInternalReferred) {
-                    return false;
-                }
-            }
-        } else {
-            $repair->setAssetId($asset->getId());
-        }
-
-        $repair->setCreatedDate(new \DateTimeImmutable('now'));
-        $repair->setLastModifiedDate(new \DateTimeImmutable('now'));
-
-        try {
-            $this->repairRepository->save($repair, true);
-        } catch(\Exception $e) {
-            $this->addFlash('error', 'There was an error creating the repair.');
-            return false;
-        }
-
-        $this->addFlash('success', 'Repair created successfully.');
-        return true;
-    }
-
     #[Route('/{id}/show', name: 'app_repair_show', methods: ['GET'])]
     #[IsGranted('ROLE_ASSET_REPAIR_READ')]
     public function show(Repair $repairEntity): Response

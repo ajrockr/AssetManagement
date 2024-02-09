@@ -6,7 +6,7 @@ use App\Entity\StorageLock;
 use App\Repository\StorageLockRepository;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
-use App\Service\Logger;
+use App\Service\LoggerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,7 +16,7 @@ class StorageModerationController extends AbstractController
 {
     public function __construct(
         private readonly StorageLockRepository $storageLockRepository,
-        private readonly Logger $logger,
+        private readonly LoggerService         $logger,
     ) {}
 
     #[Route('/asset/storage/moderation/clear/{id}', name: 'app_storage_moderation_clear')]

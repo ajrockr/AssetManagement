@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\Log;
 use Doctrine\ORM\EntityManagerInterface;
 
-class Logger
+class LoggerService
 {
     // TODO I don't know what I'm doing with these constants... Figure it out later
     public const SOURCE_IMPORT_USER = 'admin_import_user';
@@ -109,16 +109,19 @@ class Logger
      * @param int|null $slotId
      * @return void
      */
-    public function assetCheckInOut(int $userId, int $assetId, string $action, string $sourcePage, ?string $person = null, ?int $slotId = null): void
+    public function assetCheckInOut(int $userId, int $assetId, string $action, string $sourcePage, ?string $storageName, ?int $slotId = null, ?string $person = null): void
     {
         $log = new Log();
         $log->setType(self::TYPE_ASSET)
             ->setAction($action)
             ->setSourcepage($sourcePage)
             ->setUserid($userId)
+            ->setDatetime(new \DateTimeImmutable('now'))
             ->setMessage([
                 'message' => 'Asset check in/out',
-                'person' => $person
+                'person' => $person,
+                'storage' => $storageName,
+                'locationId' => $slotId
             ])
         ;
         $this->entityManager->persist($log);

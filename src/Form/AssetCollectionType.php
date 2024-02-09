@@ -31,14 +31,17 @@ class AssetCollectionType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $uniqueIdentifier = $this->siteConfigRepository->findOneBy(['configName' => 'asset_unique_identifier'])->getConfigValue();
+        $assetTagRequired = $this->siteConfigRepository->findOneByName('asset_asset_tag_required') == "true";
+        $serialNumberRequired = $this->siteConfigRepository->findOneByName('asset_serial_number_required') == "true";
+
         $builder
-            ->add('device', TextType::class, [
+            ->add('asset_tag', TextType::class, [
+                'required' => $assetTagRequired,
                 'attr' => [
                     'class' => 'form-control',
                 ]
             ])
-            ->add('user', ChoiceType::class, [
+            ->add('assigned_to', ChoiceType::class, [
                 'choices' => array_combine(array_values($this->users), array_keys($this->users)),
                 'required' => true,
                 'multiple' => false,
@@ -49,13 +52,15 @@ class AssetCollectionType extends AbstractType
             ->add('userId', HiddenType::class)
             ->add('assetId', HiddenType::class)
             ->add('storageId', HiddenType::class)
-            ->add('needsrepair', CheckboxType::class, [
+            ->add('needs_repair', CheckboxType::class, [
                 'required' => false,
                 'attr' => [
                     'autocomplete' => 'off'
                 ]
             ])
-            ->add('location', TextType::class, [
+            ->add('location', HiddenType::class)
+            ->add('serial_number', TextType::class, [
+                'required' => $serialNumberRequired,
                 'attr' => [
                     'class' => 'form-control'
                 ]
@@ -66,7 +71,7 @@ class AssetCollectionType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
-            ->add('checkout', CheckboxType::class, [
+            ->add('check_out', CheckboxType::class, [
                 'required' => false,
                 'attr' => [
                     'autocomplete' => 'off'
