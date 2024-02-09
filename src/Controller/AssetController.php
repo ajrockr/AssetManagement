@@ -165,7 +165,11 @@ class AssetController extends AbstractController
 
         $storagesFormArray = [];
         foreach ($storages as $storage) {
-            $storagesFormArray[$storage->getName() . ' (' . $storage->getDescription() . ')'] = $storage->getId();
+            if ( !$storage->getDescription()) {
+                $storagesFormArray[$storage->getName()] = $storage->getId();
+            } else {
+                $storagesFormArray[$storage->getName() . ' (' . $storage->getDescription() . ')'] = $storage->getId();
+            }
         }
 
         // Form 2) Fetch all users
