@@ -125,8 +125,10 @@ class AssetStorageController extends AbstractController
             $asset = $this->assetCollectionService->createOrUpdateAsset($form->getData());
 
             if ($collected = $this->assetCollectionService->assetIsCollected($asset->getId())) {
-                $this->addFlash('assetAlreadyCollected', [$collected->getCollectionLocation(), $storage->getName(), false]);
-                return $this->redirect($request->headers->get('referer'));
+                if ($collected->getDeviceID() != $asset->getId()) {
+                    $this->addFlash('assetAlreadyCollected', [$collected->getCollectionLocation(), $storage->getName(), false]);
+                    return $this->redirect($request->headers->get('referer'));
+                }
             }
 
             $this->assetCollectionService->checkIn($form->getData(), $this->getUser()->getId());
