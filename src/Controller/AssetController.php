@@ -14,6 +14,7 @@ use App\Service\RepairService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -157,6 +158,9 @@ class AssetController extends AbstractController
         return $this->redirectToRoute('app_asset_index', [], Response::HTTP_SEE_OTHER);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     #[Route('/collection/collect', name: 'app_asset_collection_collect', methods: 'POST')]
     public function checkInForm(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
     {
@@ -197,9 +201,6 @@ class AssetController extends AbstractController
             }
         }
 
-        $assetTagRequired = $this->siteConfigRepository->findOneByName('asset_asset_tag_required') == "true";
-        $serialNumberRequired = $this->siteConfigRepository->findOneByName('asset_serial_number_required') == "true";
-
         $collectionForm = $this->createFormBuilder()
             ->setAction($this->generateUrl('app_asset_collection_collect'))
             ->add('storageId', ChoiceType::class, [
@@ -214,10 +215,10 @@ class AssetController extends AbstractController
                 ]
             ])
             ->add('asset_tag', TextType::class, [
-                'required' => $assetTagRequired
+                'required' => $this->siteConfigRepository->findOneByName('asset_asset_tag_required') == "true"
             ])
             ->add('asset_serial', TextType::class, [
-                'required' => $serialNumberRequired
+                'required' => $this->siteConfigRepository->findOneByName('asset_serial_number_required') == "true"
             ])
             ->add('requestingPath', HiddenType::class, [
                 'attr' => [
@@ -265,7 +266,6 @@ class AssetController extends AbstractController
             if ($order === 'desc') {
                 rsort($openStorageSlots);
             } else {
-                // If 'desc' is not the config value or 'asc' is defined, default to ascending
                 sort($openStorageSlots);
             }
 
@@ -276,6 +276,7 @@ class AssetController extends AbstractController
             // If the storage is full, set location to null and notify user
             if(count($openStorageSlots) == 0) {
                 $data['location'] = null;
+                $data['collectOtherLocation'] = true;
                 $this->addFlash('assetStorageIsFull', $storageEntity->getName());
             } else {
                 // TODO Is there a more programmatic way of doing this?
@@ -284,10 +285,6 @@ class AssetController extends AbstractController
 
             $this->assetCollectionService->checkIn($data, $this->getUser()->getId());
 
-            // TODO Is redirecting to referer better than this way? Test more
-//            return $this->redirectToRoute($requestingPath, [
-//                $data['requestingPathParamKey'] => $data['requestingPathParamVal'],
-//            ]);
             return $this->redirect($request->headers->get('referer'));
         }
 

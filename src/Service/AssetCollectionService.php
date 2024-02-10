@@ -12,7 +12,6 @@ use App\Repository\SiteConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 
 class AssetCollectionService
 {
@@ -27,38 +26,22 @@ class AssetCollectionService
         protected readonly RepairRepository          $repairRepository,
         protected readonly RepairService             $repairService,
     ) {}
-    public function checkIn(array|Form $data, int $userId, array $neededParts = []): void
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function checkIn(array $data, int $userId, array $neededParts = []): void
     {
         $configForceAssignUser = $this->siteConfigRepository->findOneByName('asset_assignUser_on_checkin');
-
-        // TODO Need to change this, align all the data from the various ways of checking in an asset
-        if ($data instanceof Form) {
-            $data = $data->getData();
-        }
-//        if (is_array($data)) {
-//            $data = [
-//                'asset_tag' => $form['asset_tag'],
-//                'serial_number' => $form['asset_serial'],
-//                'assigned_to' => $form['assigned_to'],
-//                'location' => $form['location'],
-//                'storageId' => $form['storage'],
-//                'checkout' => false,
-//                'processed' => false,
-//                'notes' => '',
-//                'needs_repair' => false,
-//            ];
-//        } else {
-//            $data = $form->getData();
-//        }
-
 
         $asset = $this->createOrUpdateAsset($data);
 
         // Storage Name
         $storageName = $this->assetStorageRepository->findOneBy(['id' => $data['storageId']])->getname();
 
-        if ( !($assetCollection = $this->assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']]))) {
-            // If the location is not already in use, make a new collection
+        // If the location is not already in use or collectOtherLocation is set, make a new collection
+        if ( !($assetCollection = $this->assetCollectionRepository->findOneBy(['collectionLocation' => $data['location']]))
+            || array_key_exists('collectOtherLocation', $data)) {
             $assetCollection = new AssetCollection();
         }
         $assetCollection->setCollectedDate(new \DateTimeImmutable('now'))
