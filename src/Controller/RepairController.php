@@ -105,9 +105,8 @@ class RepairController extends AbstractController
             $partsNeeded[] = $parts['id'];
         }
 
-        $status = $repairEntity->getStatus();
-
-        $form = $this->createFormBuilder()
+        // Create the editing form
+        $form = $this->createFormBuilder(options: ['disabled' => !$canRepair])
             ->add('repairId', HiddenType::class, [
                 'data' => $repairEntity->getId()
             ])
