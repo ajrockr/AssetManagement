@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\Repair;
 use App\Repository\RepairRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\AssetRepository;
 
@@ -13,18 +15,47 @@ class RepairService
         protected readonly AssetRepository $assetRepository,
         protected readonly RepairRepository $repairRepository,
     ) {}
-    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function createRepair(array $repair): void
+
+    /**
+     * @param int $uid
+     * @param string $issue
+     * @param ArrayCollection $partsNeeded
+     * @param int $submittedByUserId
+     * @return void
+     * @throws NonUniqueResultException
+     */
+    public function createOrUpdateRepair(int $uid, string $issue, ArrayCollection $partsNeeded, int $submittedByUserId): void
     {
-        $repair = new Repair;
-        $repair->setAssetUniqueIdentifier($repair['asset']);
-        $repair->setIssue($repair['issue']);
-        $repair->setAssetId($repair['assetId']);
-        $repair->setStatus('Not Started');
-        $repair->setPartsNeeded($repair['partsNeeded']);
-        $repair->setCreatedDate(new \DateTimeImmutable('now'));
-        $repair->setLastModifiedDate(new \DateTimeImmutable('now'));
+        if ( !($repair = $this->repairRepository->getRepair($uid, true))) {
+            $repair = new Repair;
+        }
+        $repair->setIssue($issue)
+            ->setAssetId($uid)
+            ->setStatus('Not Started')
+            ->setPartsNeeded($this->processPartsNeededForDb($partsNeeded))
+            ->setCreatedDate(new \DateTimeImmutable('now'))
+            ->setLastModifiedDate(new \DateTimeImmutable('now'))
+            ->setSubmittedById($submittedByUserId)
+        ;
 
         $this->repairRepository->save($repair, true);
+    }
+
+    /**
+     * @param ArrayCollection $partsNeeded
+     * @return array
+     */
+    private function processPartsNeededForDb(ArrayCollection $partsNeeded): array
+    {
+        $array = $partsNeeded->toArray();
+        $parts = [];
+        foreach ($array as $part) {
+            $parts[] = [
+                'name' => $part->getName(),
+                'id' => $part->getId(),
+            ];
+        }
+
+        return $parts;
     }
 }

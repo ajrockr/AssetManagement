@@ -54,6 +54,7 @@
             usersName: collectedAsset.usersName,
             hasRepair: collectedAsset.hasRepair,
             repairId: collectedAsset.repairId,
+            repairPartsNeeded: collectedAsset.repairPartsNeeded,
             serialnumber: collectedAsset.serial_number,
         }]) %}
     {% endfor %}
@@ -102,12 +103,8 @@
                                 <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
                             </div>
                             <div class="my-2" id="partsNeeded">
-                                {% for part in repairParts %}
-                                    <div class="form-check form-check-inline">
-                                        <input id="{{ part.name }}" type="checkbox" class="form-check-input" value="{{ part.value }}" name="{{ part.name }}">
-                                        <label for="{{ part.name }}" class="form-check-label">{{ part.name }}</label>
-                                    </div>
-                                {% endfor %}
+                                <a href="" id="viewRepairLink">View Repair</a>
+                                {{ form_widget(form.repairPartsNeeded) }}
                             </div>
                             <div class="form-floating mt-sm-2">
                                 {{ form_widget(form.notes, { 'attr': { 'tabindex': 4, 'rows': 3, 'style': 'height:100%;', 'placeholder': 'Notes' } }) }}
@@ -190,23 +187,11 @@
     <script type="text/javascript">
         $(document).ready(function() {
             // Populate cells that are assigned
-            const assignedSlots = JSON.parse($(".js-assignedSlots").attr("data-assignedSlots"));
             const assignedSlotsInfo = JSON.parse($(".js-assignedSlotsInfo").attr("data-assignedSlotsInfo"));
-
-            /**
-             * .urlParam
-             * Check for GET in uri
-             * @param name
-             * @returns {string|number}
-             */
-            $.urlParam = function(name){
-                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-                return results[1] || 0;
-            }
 
             // Parts needed hide/show
             let partsNeededDiv = $("#partsNeeded")
-            let partsNeededTrigger = $("#asset_collection_needsrepair");
+            let partsNeededTrigger = $("#asset_collection_needs_repair");
 
             partsNeededDiv.hide();
 
@@ -228,150 +213,129 @@
                 let checkedOut = $(e.relatedTarget).attr("data-checkedout") ?? null;
                 let processed = $(e.relatedTarget).attr("data-processed") ?? null;
                 let hasRepair = $(e.relatedTarget).attr("data-hasrepair") ?? null;
-                // let repairId = $(e.relatedTarget).attr("data-repairid") ?? null;
-                // let locationEntity = document.getElementById('asset_collection_location');
+                let repairId = $(e.relatedTarget).attr("data-repairid") ?? null;
+                let repairPartsNeeded = $(e.relatedTarget).attr("data-repairParts") ?? null;
+
+                if (repairPartsNeeded) {
+                    repairPartsNeeded = JSON.parse(repairPartsNeeded);
+                }
 
                 setTimeout(function () {
                     $("#asset_collection_assigned_to").focus();
                 }, 600);
 
-                document.getElementById("asset_collection_asset_tag").setAttribute("value", asset);
-                document.getElementById("asset_collection_serial_number").setAttribute("value", serialnumber);
-                document.getElementById("asset_collection_notes").innerText = note;
+                $("#asset_collection_asset_tag").val(asset);
+                $("#asset_collection_serial_number").val(serialnumber);
+                $("#asset_collection_notes").val(note);
                 $("#asset_collection_assigned_to").val(assignedUserId).trigger("change");
-                document.getElementById("asset_collection_userId").setAttribute("value", assignedUserId);
-                document.getElementById("asset_collection_location").setAttribute("value", storageSlot);
+                $("#asset_collection_userId").val(assignedUserId);
+                $("#asset_collection_location").val(storageSlot);
                 $("#modalLocationNumber").text(storageSlot);
                 $("#clearLocation").attr("value", storageSlot);
 
-                document.getElementById("asset_collection_check_out").checked = checkedOut != null;
+                if (checkedOut === "true") {
+                    $("#asset_collection_check_out").prop("checked", true);
+                }
 
-                document.getElementById("asset_collection_processed").checked = processed != null;
+                if (processed === "true") {
+                    $("#asset_collection_processed").prop("checked", true);
+                }
 
                 if (hasRepair === "true") {
+                    // Change the input:checkbox text and trigger its click event to expand
                     $("#needsRepairLabel").text("Has Repair");
-                    $("#asset_collection_needs_repair").prop("disabled", true).prop("checked", true);
+                    partsNeededTrigger.trigger('click');
 
-                    {#let url = "{{ path('app_repair_show', { id: 'repairId' }) }}";#}
-                    {#url = url.replace("repairId", repairId);#}
-                    {#window.location.replace(url);#}
+                    // Set the View Repair link href
+                    let url = "{{ app.request.getSchemeAndHttpHost() }}{{ path('app_repair_show', { id: 'repairId' }) }}";
+                    url = url.replace("repairId", repairId);
+                    $("#viewRepairLink").attr("href", url);
 
-                    // TODO: Add button to view repair
+                    // Populate checkboxes for repair items needed
+                    repairPartsNeeded.forEach(async (part) => {
+                       $("#asset_collection_repairPartsNeeded_" + part.id).prop("checked", true);
+                    });
+
                 } else {
                     $("#needsRepairLabel").text("Needs Repair");
                     $("#asset_collection_needs_repair").prop("disabled", false).prop("checked", false);
                     // $("#asset_collection_needsrepair").attr("onclick", "").unbind("click");
                 }
 
-                // When disabled, returns NULL post. no good
-                // locationEntity..css('disabled', true);
-                // $("asset_collection_location").on('blur', function() {
-                //     $("asset_collection_location").prop( "disabled", true);
-                // });
+                // TODO IDE says this conditional is unreachable, don't know why because it works
+                // Disable all form elements if storage is locked
                 if ({{ storageLocked }}) {
                     $(":input").not("[name=moderationMenu]").not("[name=closeModal]").prop("disabled", true);
                 }
             });
 
-            function clear_form_elements(class_name) {
-                jQuery("#"+class_name).find(':input').each(function() {
-                    switch(this.type) {
-                        case 'password':
-                        case 'text':
-                        case 'textarea':
-                        case 'file':
-                        case 'select-one':
-                        case 'select-multiple':
-                        case 'date':
-                        case 'number':
-                        case 'tel':
-                        case 'email':
-                            jQuery(this).val('');
-                            break;
-                        case 'checkbox':
-                        case 'radio':
-                            this.checked = false;
-                            break;
-                    }
-                });
-            }
-
+            // On modal hide, remove all values from inputs
             $("#modal-checkin").on("hide.bs.modal", function() {
-                document.getElementById("asset_collection_userId").removeAttribute("value");
-                document.getElementById("asset_collection_assigned_to").removeAttribute("value");
-                document.getElementById("asset_collection_serial_number").removeAttribute("value");
-                document.getElementById("asset_collection_notes").removeAttribute("value");
-                document.getElementById("asset_collection_needs_repair").checked = false;
-                document.getElementById("asset_collection_check_out").checked = false;
-                document.getElementById("asset_collection_processed").checked = false;
-                //clear_form_elements("modal-checkin");
+                $(this)
+                    .find("input,textarea,select")
+                        .val("").end()
+                    .find("input[type=checkbox], input[type=radio]")
+                        .prop("checked", false).end();
+
+                partsNeededDiv.hide();
             });
 
-            // Start select2
             $("#asset_collection_assigned_to").select2({
                 placeholder: 'Select a user',
                 width: 'resolve',
                 theme: 'bootstrap-5',
                 dropdownParent: $("#modal-checkin")
             });
+
+            // Set assigned_to as required, have to do it here because select2 overrides the select
             $("#asset_collection_assigned_to").prop("required", true);
 
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus();
             });
 
-            $("div[id='storageContainerRow']").children('.storageCell').each(function() {
-                if (assignedSlots.includes($(this).attr('id').replace('slot-', ''))) {
-                    $(this).addClass('cellOccupied');
-                    var i;
-                    for (i = 0; i < assignedSlotsInfo.length; ++i) {
-                        if (assignedSlotsInfo[i]['slot'] === $(this).attr('id').replace('slot-', '')) {
-                            if (assignedSlotsInfo[i]['hasRepair']) {
-                                $(this).addClass('cellHasRepair')
-                            }
-                            if (assignedSlotsInfo[i]['checkedOut']) {
-                                $(this).addClass('cellCheckedOut')
-                            }
-                            if (assignedSlotsInfo[i]['processed']) {
-                                $(this).addClass('cellProcessed')
-                            }
-                        }
-                    }
-                    // This sets the data- attributes on the location links
-                    $(this).children('a').children('span').each(function() {
-                        for (i = 0; i < assignedSlotsInfo.length; ++i) {
-                            if (assignedSlotsInfo[i]['slot'] === $(this).attr('data-slot')) {
-                                $(this).attr('data-asset', assignedSlotsInfo[i]['asset']);
-                                $(this).attr('data-serialnumber', assignedSlotsInfo[i]['serialnumber']);
-                                $(this).attr('data-user', assignedSlotsInfo[i]['user']);
-                                $(this).attr('data-note', assignedSlotsInfo[i]['note']);
-                                $(this).attr('data-checkedout', assignedSlotsInfo[i]['checkedOut']);
-                                $(this).attr('data-processed', assignedSlotsInfo[i]['processed']);
-                                $(this).attr('data-hasrepair', assignedSlotsInfo[i]['hasRepair']);
-                                $(this).attr('data-repairId', assignedSlotsInfo[i]['repairId']);
-                                $(this).attr('data-location', assignedSlotsInfo[i]['location']);
-                                $("#href-slot-" + assignedSlotsInfo[i]['slot']).attr('data-bs-title', assignedSlotsInfo[i]['slot'] + '<br />' + assignedSlotsInfo[i]['asset'] + '<br />' + assignedSlotsInfo[i]['usersName']);
-                            }
-                        }
-                    })
+            // Populate all data tags
+            assignedSlotsInfo.forEach(async (slot) => {
+                let slotId = "#slot-" + slot.slot;
+
+                $(slotId).children("a").children("span").each(function() {
+                   $("#slotNumber-" + slot.slot)
+                       .attr("data-asset", slot.asset)
+                       .attr("data-serialnumber", slot.serialnumber)
+                       .attr("data-user", slot.user)
+                       .attr("data-note", slot.note)
+                       .attr("data-checkedout", slot.checkedOut)
+                       .attr("data-processed", slot.processed)
+                       .attr("data-hasrepair", slot.hasRepair)
+                       .attr("data-repairId", slot.repairId)
+                       .attr("data-location", slot.location)
+                       .attr("data-repairParts", slot.repairPartsNeeded)
+                    ;
+
+                   // Add tooltip to a tag
+                    $("#href-slot-" + slot.slot).attr('data-bs-title', slot.slot + '<br />' + slot.asset + '<br />' + slot.userName);
+                });
+
+                // Set proper css classes for occupied and altered cells
+                $(slotId).addClass("cellOccupied");
+
+                if (slot.processed) {
+                    $(slotId).addClass("cellProcessed");
+                }
+
+                if (slot.checkedOut) {
+                    $(slotId).addClass("cellCheckedOut");
+                }
+
+                if (slot.hasRepair) {
+                    $(slotId).addClass("cellHasRepair");
                 }
             });
 
-            // // Enable Tooltips
+            // TODO Not currently working, need to look at it again
+            // Enable Tooltips
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-            // Check if 'slot' was passed in GET
-            if ($.urlParam('slot')) {
-                let slotNumber = $.urlParam('slot');
-                let slotElementId = "#slotNumber-" + slotNumber;
-
-                console.log('Opening Slot: ' + slotNumber);
-                let selector = $(slotElementId);
-
-                // Open the Modal
-                selector.click();
-            }
         });
     </script>
     {# end:custom js #}

@@ -9,6 +9,18 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: RepairRepository::class)]
 class Repair
 {
+    public const STATUS_OPEN = 'open';
+    public const STATUS_CLOSED = 'closed';
+
+    public const STATUS_WAITING_ON_PARTS = 'waiting_on_parts';
+    public const STATUS_STARTED = 'started';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_DELAYED = 'delayed';
+    public const STATUS_DEFERRED = 'deferred';
+    public const STATUS_WAITING_ON_TECHNICIAN = 'waiting_on_technician';
+    public const STATUS_WAITING_ON_USER = 'waiting_on_user';
+    public const STATUS_CUSTOM = 'custom';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -47,11 +59,14 @@ class Repair
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private array $usersFollowing = [];
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $assetUniqueIdentifier = null;
 
     #[ORM\ManyToOne]
     private ?User $techId = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $submittedById = null;
 
     public function getId(): ?int
     {
@@ -210,6 +225,18 @@ class Repair
     public function setTechId(?User $techId): self
     {
         $this->techId = $techId;
+
+        return $this;
+    }
+
+    public function getSubmittedById(): ?int
+    {
+        return $this->submittedById;
+    }
+
+    public function setSubmittedById(?int $submittedById): static
+    {
+        $this->submittedById = $submittedById;
 
         return $this;
     }

@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\RepairParts;
 use App\Entity\User;
+use App\Repository\RepairPartsRepository;
 use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -19,7 +21,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class AssetCollectionType extends AbstractType
 {
     private array $users;
-    public function __construct(private readonly SiteConfigRepository $siteConfigRepository, private readonly UserRepository $userRepository)
+
+    private array $repairParts;
+    public function __construct(
+        private readonly SiteConfigRepository $siteConfigRepository,
+        private readonly UserRepository $userRepository)
     {
         // Populate user choices
         $users = $this->userRepository->findAll();
@@ -82,6 +88,24 @@ class AssetCollectionType extends AbstractType
                 'attr' => [
                     'autocomplete' => 'off'
                 ],
+            ])
+            ->add('repairPartsNeeded', EntityType::class, [
+                'class' => RepairParts::class,
+                'expanded' => true,
+                'multiple' => true,
+                'choice_label' => 'name',
+                'choice_attr' => function ($choice, string $key, mixed $value) {
+                    return [
+                        'class' => 'form-check-input',
+                    ];
+                },
+                // TODO I can't get css to apply to the label, and when adding the form-check-inline, it bunches all the checkboxes together
+//                'attr' => [
+//                    'class' => 'form-check form-check-inline',
+//                ],
+//                'label_attr' => [
+//                    'class' => 'form-check-label'
+//                ]
             ])
             ->add('Collect', SubmitType::class)
             ->add('clearLocation', SubmitType::class)

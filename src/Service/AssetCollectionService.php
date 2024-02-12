@@ -30,7 +30,7 @@ class AssetCollectionService
     /**
      * @throws NonUniqueResultException
      */
-    public function checkIn(array $data, int $userId, array $neededParts = []): void
+    public function checkIn(array $data, int $userId): void
     {
         $configForceAssignUser = $this->siteConfigRepository->findOneByName('asset_assignUser_on_checkin');
 
@@ -65,13 +65,7 @@ class AssetCollectionService
         // Check if Repair is needed
         if (array_key_exists('needs_repair', $data)) {
             if ($data['needs_repair']) {
-                $repairData = [
-                    'asset' => $data['device'],
-                    'issue' => $data['notes'] ?? 'Issue not listed',
-                    'assetId' => $asset->getId(),
-                    'partsNeeded' => $neededParts
-                ];
-                $this->repairService->createRepair($repairData);
+                $this->repairService->createOrUpdateRepair($asset->getId(), $data['notes'] ?? 'Issue not listed', $data['repairPartsNeeded'], $userId);
             }
         }
 

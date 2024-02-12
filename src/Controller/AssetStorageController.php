@@ -84,12 +84,9 @@ class AssetStorageController extends AbstractController
             $user = $users[$asset['assetcollection_CollectedFrom']];
 
             // Check if asset has a repair associated with it
-            $repairAssets = array_column($repairs, 'asset_id');
-            $hasRepair = in_array($asset['assetcollection_id'], $repairAssets);
-
-            $repairId = null;
-            if ($hasRepair) {
-                $repairId = $repairRepository->findOneBy(['assetId' => $asset['asset_id']])->getId();
+            if ($repair = $repairRepository->getRepair($asset['assetcollection_DeviceID'], true)) {
+                $repairId = $repair->getId();
+                $repairPartsNeeded = json_encode($repair->getPartsNeeded());
             }
 
             $assets[] = [
@@ -100,8 +97,9 @@ class AssetStorageController extends AbstractController
                 'note' => $asset['assetcollection_collectionNotes'],
                 'checkedOut' => $asset['assetcollection_checkedout'],
                 'processed' => $asset['assetcollection_processed'],
-                'hasRepair' => $hasRepair,
-                'repairId' => $repairId,
+                'hasRepair' => $repair ? true : false,
+                'repairId' => $repairId ?? null,
+                'repairPartsNeeded' => $repairPartsNeeded ?? null,
                 'serial_number' => $asset['serial_number'],
             ];
         }
@@ -136,18 +134,6 @@ class AssetStorageController extends AbstractController
             return $this->redirect($request->headers->get('referer'));
         }
 
-        $repairParts = $repairPartsRepository->findAll();
-        $parts = [];
-        foreach ($repairParts as $repairPart) {
-            if (null === $repairPart) {
-                continue;
-            }
-            $parts[] = [
-                'name' => $repairPart->getName(),
-                'value' => $repairPart->getName()
-            ];
-        }
-
         $colors['cellOccupied'] = $this->config['collection_color_cell_occupied'];
         $colors['cellCheckedOut'] = $this->config['collection_color_cell_checkedout'];
         $colors['cellProcessed'] = $this->config['collection_color_cell_processed'];
@@ -157,7 +143,6 @@ class AssetStorageController extends AbstractController
             'storageId' => $id,
             'assetStorage' => $assetStorage,
             'colors' => $colors,
-            'repairParts' => $parts,
             'storageCounts' => $storageCounts,
             'storageData' => $storageData,
             'form' => $form->createView(),

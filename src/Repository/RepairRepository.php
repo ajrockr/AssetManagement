@@ -54,15 +54,20 @@ class RepairRepository extends ServiceEntityRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getRepair(int $id): ?Repair
+    public function getRepair(int $id, bool $onlyOpen = false): ?Repair
     {
-        return $this->createQueryBuilder('r')
+        $query = $this->createQueryBuilder('r')
             ->select('r')
-            ->where('r.id = :id')
-            ->setParameter('id', $id)
+            ->andWhere('r.assetId = :id');
+
+        if ($onlyOpen) {
+            $query->andWhere('r.status != :closed')
+                ->setParameter('closed', Repair::STATUS_CLOSED);
+        }
+
+        return $query->setParameter('id', $id)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
 
     public function getAllOpen(): array
