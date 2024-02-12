@@ -13,9 +13,8 @@ class Repair
     public const STATUS_CLOSED = 'closed';
 
     public const STATUS_WAITING_ON_PARTS = 'waiting_on_parts';
-    public const STATUS_STARTED = 'started';
+    public const STATUS_NOT_STARTED = 'not_started';
     public const STATUS_IN_PROGRESS = 'in_progress';
-    public const STATUS_DELAYED = 'delayed';
     public const STATUS_DEFERRED = 'deferred';
     public const STATUS_WAITING_ON_TECHNICIAN = 'waiting_on_technician';
     public const STATUS_WAITING_ON_USER = 'waiting_on_user';

@@ -98,9 +98,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
 
-    public function adminImportUsers(array $users)
+    public function findValidRepairTechnicians()
     {
-
+        return $this->createQueryBuilder('user')
+            ->where('user.roles = :repairtechnician')
+            ->orWhere('user.roles = :superadmin')
+            ->orWhere('user.roles = :repairfullcontrol')
+            ->setParameters([
+                'repairtechnician' => 'ROLE_REPAIR_TECHNICIAN',
+                'superadmin' => 'ROLE_SUPER_ADMIN',
+                'repairfullcontrol' => 'ROLE_REPAIR_FULL_CONTROL'
+            ])
+            ->getQuery()
+            ->getResult();
     }
 
     /**

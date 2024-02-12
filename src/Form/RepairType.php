@@ -33,7 +33,7 @@ class RepairType extends AbstractType
     {
         $returnArray = [];
         foreach ($this->userRepository->findAll() as $user) {
-            if (in_array('ROLE_REPAIR_TECHNICIAN', $user->getRoles())) {
+            if (in_array(['ROLE_REPAIR_TECHNICIAN', 'ROLE_SUPER_ADMIN'], $user->getRoles())) {
                 $returnArray[] = $user;
             }
         }
@@ -63,14 +63,14 @@ class RepairType extends AbstractType
             ->add('status', ChoiceType::class, [
                 // TODO: Make this based off config
                 'choices' => [
-                    'Not Started' => 'status_nostart',
-                    'Started' => 'status_started',
-                    'In Progress' => 'status_inprogress',
-                    'Delayed' => 'status_delayed',
-                    'Waiting On Parts' => 'status_waitingonparts',
-                    'Waiting On Technician' => 'status_waitingontechnician',
-                    'Waiting On Customer' => 'status_waitingoncustomer',
-                    'Resolved' => 'status_resolved'
+                    'Not Started' => Repair::STATUS_NOT_STARTED,
+                    'In Progress' => Repair::STATUS_IN_PROGRESS,
+                    'Deferred' => Repair::STATUS_DEFERRED,
+                    'Waiting On Parts' => Repair::STATUS_WAITING_ON_PARTS,
+                    'Waiting On Technician' => Repair::STATUS_WAITING_ON_TECHNICIAN,
+                    'Waiting On User' => Repair::STATUS_WAITING_ON_USER,
+                    'Resolved' => Repair::STATUS_CLOSED,
+                    'Open' => Repair::STATUS_OPEN,
                 ]
             ])
             ->add('usersFollowing')

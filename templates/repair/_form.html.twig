@@ -12,8 +12,8 @@
         {{ form_label(form.issue) }}
     </div>
     <div class="mb-3 form-floating">
-        {{ form_widget(form.partsNeeded, { 'attr': {'class': 'form-control' } }) }}
-        {{ form_label(form.partsNeeded) }}
+{#        {{ form_widget(form.partsNeeded, { 'attr': {'class': 'form-control' } }) }}#}
+{#        {{ form_label(form.partsNeeded) }}#}
     </div>
     <div class="mb-3 form-floating">
         {{ form_widget(form.actionsPerformed, { 'attr': {'class': 'form-control' } }) }}
@@ -37,4 +37,4 @@
             {% endif %}
         </div>
     </div>
-{{ form_end(form) }}
+{{ form_end(form, {'render_rest': false}) }}
