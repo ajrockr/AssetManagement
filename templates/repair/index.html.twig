@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container-fluid">
     <div class="mb-4 bg-dark rounded p-2 border">
-        <a href="{{ path('app_repair_new') }}" role="button" class="btn btn-success">Create new</a>
+{#        <a href="{{ path('app_repair_new') }}" role="button" class="btn btn-success">Create new</a>#}
         <a href="#" role="button" class="btn btn-secondary">Repair Items</a>
     </div>
     <div class="dataTables_wrapper dt-bootstrap4">
@@ -36,8 +36,8 @@
                                 <td>{{ repair.lastModifiedDate ? repair.lastModifiedDate|date('Y-m-d H:i:s') : '' }}</td>
                                 <td
                                     class="align-middle text-center">
-                                    {# <a role="button" class="btn btn-sm btn-secondary" href="{{ path('app_repair_show', {'id': repair.id}) }}">Show</a> #}
-                                    <a role="button" class="btn btn-sm btn-secondary" href="{{ path('app_repair_edit', {'id': repair.id}) }}">Edit</a>
+
+                                    <a role="button" class="btn btn-sm btn-secondary" href="{{ path('app_repair_show', {'id': repair.id}) }}">Edit</a>
                                 </td>
                             </tr>
                         {% endfor %}

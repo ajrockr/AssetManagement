@@ -33,8 +33,8 @@ class RepairController extends AbstractController
     public function __construct(
         private readonly RepairPartsRepository $repairPartsRepository,
         private readonly RepairRepository $repairRepository,
-        private readonly AssetRepository $assetRepository,
         private readonly UserService $userService,
+        private readonly UserRepository $userRepository,
     )
     {
         $this->parts = $this->repairPartsRepository->getAllParts();
@@ -46,44 +46,26 @@ class RepairController extends AbstractController
         $returnArray = [];
 
         foreach($repairs as $repair) {
+            $parts = [];
+            foreach($repair['r_partsNeeded'] as $partsNeeded) {
+                $parts[] = $partsNeeded['name'];
+            }
+
             $returnArray[] = [
                 'id' => $repair['r_id'],
                 'assetUniqueIdentifier' => $repair['r_assetUniqueIdentifier'],
                 'createdDate' => $repair['r_createdDate'],
                 'startedDate' => $repair['r_startedDate'],
-                'technicianId' => $repair['r_technicianId'],
+                'technicianId' => $this->userRepository->getFullName($repair['r_technicianId']) ?? 'Not Set',
                 'issue' => $repair['r_issue'],
-                'partsNeeded' => $this->convertPartIdsToName($repair['r_partsNeeded']),
+                'partsNeeded' => $parts,
                 'status' => $repair['r_status'],
                 'lastModifiedDate' => $repair['r_lastModifiedDate'],
             ];
-
         }
 
         return $this->render('repair/index.html.twig', [
             'repairs' => $returnArray,
-        ]);
-    }
-
-    #[Route('/new', name: 'app_repair_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function new(Request $request, RepairRepository $repairRepository, AssetRepository $assetRepository, ?array $data = null): Response
-    {
-        $repair = new Repair();
-        $form = $this->createForm(RepairType::class, $repair);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->createRepair($repair, true)) {
-                return $this->redirectToRoute('app_repair_new');
-            }
-
-            return $this->redirectToRoute('app_repair_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('repair/new.html.twig', [
-            'repair' => $repair,
-            'form' => $form->createView(),
         ]);
     }
 
@@ -175,41 +157,6 @@ class RepairController extends AbstractController
             'form' => $form->createView(),
             'canRepair' => $canRepair,
         ]);
-    }
-
-    private function prettifyRepairStatus(string $repairStatus): string
-    {
-        return ucfirst(str_replace('_', ' ', $repairStatus));
-    }
-
-    #[Route('/{id}/edit', name: 'app_repair_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function edit(Request $request, Repair $repair): Response
-    {
-        $form = $this->createForm(RepairType::class, $repair);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->repairRepository->save($repair, true);
-
-            return $this->redirectToRoute('app_repair_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('repair/edit.html.twig', [
-            'repair' => $repair,
-            'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('/{id}/delete', name: 'app_repair_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ASSET_REPAIR_MODIFY')]
-    public function delete(Request $request, Repair $repair): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$repair->getId(), $request->request->get('_token'))) {
-            $this->repairRepository->remove($repair, true);
-        }
-
-        return $this->redirectToRoute('app_repair_index', [], Response::HTTP_SEE_OTHER);
     }
 
     /**
