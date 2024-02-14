@@ -11,9 +11,10 @@ class UserService
         private readonly RoleHierarchyInterface $roleHierarchy,
     ) {}
 
-    public function hasRole(array|string $targetRoles, array $userRoles): bool
+    public function hasRole(array $targetRoles, array $userRoles): bool
     {
-        $reachableRoles = $this->roleHierarchy->getReachableRoleNames(['ROLE_REPAIR_TECHNICIAN']);
+        $reachableRoles = $this->roleHierarchy->getReachableRoleNames($targetRoles);
+        array_pop($reachableRoles);
         $reachableRoles[] = 'ROLE_SUPER_ADMIN';
 
         return !empty(array_intersect($reachableRoles, $userRoles));

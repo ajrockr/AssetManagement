@@ -4,17 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Repair;
 use App\Entity\RepairParts;
-use App\Form\RepairType;
-use App\Repository\AssetRepository;
 use App\Repository\RepairPartsRepository;
 use App\Repository\RepairRepository;
 use App\Repository\UserRepository;
+use App\Service\RepairService;
 use App\Service\UserService;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,16 +29,13 @@ class RepairController extends AbstractController
     public const STATUS_RESOLVED = 'status_resolved';
     public const STATUS_OPEN = 'status_open';
     public const STATUS_NOT_STARTED = 'status_not_started';
-    private array $parts;
+
     public function __construct(
-        private readonly RepairPartsRepository $repairPartsRepository,
         private readonly RepairRepository $repairRepository,
+        private readonly RepairService $repairService,
         private readonly UserService $userService,
         private readonly UserRepository $userRepository,
-    )
-    {
-        $this->parts = $this->repairPartsRepository->getAllParts();
-    }
+    ) { }
     #[Route('/', name: 'app_repair_index', methods: ['GET'])]
     public function index(RepairRepository $repairRepository): Response
     {
@@ -73,13 +70,25 @@ class RepairController extends AbstractController
     #[IsGranted('ROLE_ASSET_REPAIR_READ')]
     public function show(Request $request, int $id): Response
     {
-        $canRepair = $this->userService->hasRole('ROLE_REPAIR_TECHNICIAN', $this->getUser()->getRoles());
+        $canRepair = $this->userService->hasRole(['ROLE_REPAIR_TECHNICIAN'], $this->getUser()->getRoles());
 
         // Set the repairEntity, if no entity exists then redirect to list
         if ( !$repairEntity = $this->repairRepository->findOneBy(['id' => $id])) {
             $this->addFlash('error', 'Repair ID does not exist.');
             return $this->redirectToRoute('app_repair_index');
         }
+
+        $submittedBy = $this->userRepository->getFullName($repairEntity->getSubmittedById());
+
+        $assignedTechnician = (null !== $repairEntity->getTechnicianId()) ? $this->userRepository->getFullName($repairEntity->getTechnicianId()) : 'Not Assigned';
+
+        $validTechnicians = [];
+        if ( !empty($validTechs = $this->getValidTechnicians())) {
+            foreach ($validTechs as $tech) {
+                $validTechnicians[$tech->getSurname() . ', ' . $tech->getFirstname()] = $tech->getId();
+            }
+        }
+        array_unshift($validTechnicians, '');
 
         // Get parts needed for entity
         $partsNeeded = [];
@@ -98,16 +107,13 @@ class RepairController extends AbstractController
             ->add('technicianId', HiddenType::class, [
                 'data' => $repairEntity->getTechnicianId()
             ])
-            ->add('createdDate', DateTimeType::class, [
-                'data' => $repairEntity->getCreatedDate()
-            ])
-            ->add('startedDate', DateTimeType::class, [
-                'data' => $repairEntity->getStartedDate()
-            ])
-            ->add('modifiedDate', DateTimeType::class, [
-                'data' => $repairEntity->getLastModifiedDate()
-            ])
             ->add('issue', TextareaType::class, [
+                'attr' => [
+                    'class' => 'form-control'
+                ],
+                'label_attr' => [
+                    'class' => 'form-label'
+                ],
                 'data' => $repairEntity->getIssue()
             ])
             ->add('parts', EntityType::class, [
@@ -122,8 +128,23 @@ class RepairController extends AbstractController
                     ];
                 },
             ])
-            ->add('actionstaken', TextType::class)
+            ->add('actionstaken', TextType::class, [
+                'label' => 'Actions Taken',
+                'attr' => [
+                    'class' => 'form-control'
+                ],
+                'label_attr' => [
+                    'class' => 'input-group-text'
+                ],
+            ])
             ->add('status', ChoiceType::class, [
+                'label' => 'Status',
+                'attr' => [
+                    'class' => 'form-select'
+                ],
+                'label_attr' => [
+                    'class' => 'form-label'
+                ],
                 // TODO: Make this based off config
                 'choices' => [
                     'Not Started' => Repair::STATUS_NOT_STARTED,
@@ -137,9 +158,47 @@ class RepairController extends AbstractController
                 ],
                 'data' => $repairEntity->getStatus()
             ])
-            ->add('usersfollowing', TextType::class)
+            ->add('save', SubmitType::class, [
+                'label' => 'Save',
+                'attr' => [
+                    'class' => 'btn btn-primary'
+                ]
+            ])
             ->getForm()
         ;
+
+        $assignTechnicianForm = $this->createFormBuilder()
+            ->add('assignatechnician', ChoiceType::class, [
+                'choices' => $validTechnicians,
+                'data' => $repairEntity->getTechnicianId()
+            ])
+            ->add('assigntechnicianbutton', SubmitType::class, [
+                'label' => 'Assign',
+                'attr' => [
+                    'class' => 'btn btn-primary'
+                ]
+            ])
+            ->add('unassigntechnicianbutton', SubmitType::class, [
+                'label' => 'Unassign Technician',
+                'attr' => [
+                    'class' => 'btn btn-secondary',
+                    'disabled' => $repairEntity->getTechnicianId() === null
+                ],
+            ])
+            ->getForm()
+        ;
+
+        // Assign a technician
+        $assignTechnicianForm->handleRequest($request);
+        if ($assignTechnicianForm->isSubmitted() && $assignTechnicianForm->isValid()) {
+            if ($assignTechnicianForm->get('unassigntechnicianbutton')->isClicked()) {
+                $this->repairService->unassignTechnician($id);
+            } else {
+                $this->repairService->assignTechnician($id, (int)$assignTechnicianForm->get('assignatechnician')->getViewData());
+            }
+
+            return $this->redirect($request->headers->get('referer'));
+        }
 
         $form->handleRequest($request);
 
@@ -154,34 +213,29 @@ class RepairController extends AbstractController
 
         return $this->render('repair/show.html.twig', [
             'repair' => $repairEntity,
+            'submittedBy' => $submittedBy,
+            'assignedTechnician' => $assignedTechnician,
             'form' => $form->createView(),
+            'assignTechnicianForm' => $assignTechnicianForm->createView(),
             'canRepair' => $canRepair,
+            'repairTechnicians' => $this->getValidTechnicians(),
         ]);
     }
 
-    /**
-     * Convert part IDs to part names
-     *
-     * @param array $parts
-     * @return array
-     */
-    private function convertPartIdsToName(array $parts = []): array
-    {
-        $partsArray = [];
-        foreach ($this->parts as $part) {
-            foreach ($parts as $partId) {
-                if (in_array($partId, $part)) {
-                    $partsArray[] = $part['name'];
-                }
-            }
-        }
-
-        return array_values($partsArray);
-    }
-
-    public function setResolved(int $id): Response
+    private function setResolved(int $id): Response
     {
         $this->repairRepository->findOneBy(['id' => $id])->setStatus(self::STATUS_RESOLVED);
         return $this->redirectToRoute('app_repair_index');
+    }
+
+    private function getValidTechnicians(): array
+    {
+        $returnArray = [];
+        foreach ($this->userRepository->findAll() as $user) {
+            if ($this->userService->hasRole(['ROLE_REPAIR_TECHNICIAN'], $user->getRoles())) {
+                $returnArray[] = $user;
+            }
+        }
+        return $returnArray;
     }
 }

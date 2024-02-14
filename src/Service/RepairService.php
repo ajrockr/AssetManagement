@@ -41,6 +41,22 @@ class RepairService
         $this->repairRepository->save($repair, true);
     }
 
+    public function assignTechnician(int $repairId, int $userId): void
+    {
+        if ($repair = $this->repairRepository->findOneBy(['id' => $repairId])) {
+            $repair->setTechnicianId($userId);
+            $this->repairRepository->save($repair, true);
+        }
+    }
+
+    public function unassignTechnician(int $repairId): void
+    {
+        if ($repair = $this->repairRepository->findOneBy(['id' => $repairId])) {
+            $repair->setTechnicianId(null);
+            $this->repairRepository->save($repair, true);
+        }
+    }
+
     /**
      * @param ArrayCollection $partsNeeded
      * @return array
