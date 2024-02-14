@@ -39,16 +39,15 @@ class RepairController extends AbstractController
     #[Route('/', name: 'app_repair_index', methods: ['GET'])]
     public function index(RepairRepository $repairRepository): Response
     {
-        $repairs = $repairRepository->getAllOpen();
-        $returnArray = [];
+        $allRepairs = $repairRepository->getAllOpen();
 
-        foreach($repairs as $repair) {
+        foreach($allRepairs as $repair) {
             $parts = [];
             foreach($repair['r_partsNeeded'] as $partsNeeded) {
                 $parts[] = $partsNeeded['name'];
             }
 
-            $returnArray[] = [
+            $repairs[] = [
                 'id' => $repair['r_id'],
                 'assetUniqueIdentifier' => $repair['r_assetUniqueIdentifier'],
                 'createdDate' => $repair['r_createdDate'],
@@ -62,7 +61,7 @@ class RepairController extends AbstractController
         }
 
         return $this->render('repair/index.html.twig', [
-            'repairs' => $returnArray,
+            'repairs' => $repairs ?? [],
         ]);
     }
 
