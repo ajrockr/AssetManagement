@@ -47,15 +47,15 @@
                     <button id="toggleActions" type="button"  class="btn btn-secondary">Actions</button>
                 </div>
             </div>
+            <div id="partsDiv" class="row mb-3">
+                <label for="form_parts" class="form-label">Select parts:</label>
+                {{ form_widget(form.parts) }}
+            </div>
             <div id="actionsTakenDiv" class="row mb-3">
                 <div class="input-group">
                     {{ form_label(form.actionstaken) }}
                     {{ form_widget(form.actionstaken) }}
                 </div>
-            </div>
-            <div id="partsDiv" class="row mb-3">
-                <label for="form_parts" class="form-label">Select parts:</label>
-                {{ form_widget(form.parts) }}
             </div>
         </div>
         <div class="card-footer">
@@ -95,13 +95,6 @@
             width: 1000px;
             margin: 20px auto;
         }
-        .ck-editor__editable[role="textbox"] {
-            min-height: 200px;
-        }
-        .ck-content .image {
-            max-width: 80%;
-            margin: 20px auto;
-        }
     </style>
 {% endblock %}
 
@@ -123,13 +116,13 @@
             partsDiv.hide();
 
             $("#toggleParts").on("click", ()=> {
-                partsDiv.hide();
-                actionsTakenDiv.toggle();
+                partsDiv.toggle();
+                actionsTakenDiv.hide();
             })
 
             $("#toggleActions").on("click", ()=> {
-                actionsTakenDiv.hide();
-                partsDiv.toggle();
+                actionsTakenDiv.toggle();
+                partsDiv.hide();
             })
         });
     </script>

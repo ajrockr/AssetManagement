@@ -109,12 +109,6 @@ class RepairController extends AbstractController
                 'data' => $repairEntity->getTechnicianId()
             ])
             ->add('issue', CKEditorType::class, [
-//                'attr' => [
-//                    'class' => 'form-control',
-//                ],
-//                'label_attr' => [
-//                    'class' => 'form-label'
-//                ],
                 'data' => $repairEntity->getIssue()
             ])
             ->add('parts', EntityType::class, [
@@ -215,7 +209,7 @@ class RepairController extends AbstractController
 
             $data = $form->getData();
 
-            // blah blah blah
+            dd($data);
         }
 
 
