@@ -6,6 +6,7 @@ use App\Entity\Repair;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -54,18 +55,18 @@ class RepairRepository extends ServiceEntityRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getRepair(int $id, bool $onlyOpen = false): ?Repair
+    public function getRepair(int $assetId, bool $onlyOpen = false): ?Repair
     {
         $query = $this->createQueryBuilder('r')
             ->select('r')
-            ->andWhere('r.assetId = :id');
+            ->andWhere('r.assetId = :assetId');
 
         if ($onlyOpen) {
             $query->andWhere('r.status != :closed')
                 ->setParameter('closed', Repair::STATUS_CLOSED);
         }
 
-        return $query->setParameter('id', $id)
+        return $query->setParameter('assetId', $assetId)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -86,6 +87,8 @@ class RepairRepository extends ServiceEntityRepository
      * getCount
      *
      * @return int
+     * @throws NonUniqueResultException
+     * @throws NoResultException
      */
     public function getCount(): int
     {
@@ -96,6 +99,9 @@ class RepairRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array
+     */
     public function getCountAndCreatedDate(): array
     {
         return $this->createQueryBuilder('repair')

@@ -9,6 +9,7 @@ use App\Repository\RepairRepository;
 use App\Repository\UserRepository;
 use App\Service\RepairService;
 use App\Service\UserService;
+use Doctrine\ORM\NonUniqueResultException;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -64,6 +65,9 @@ class RepairController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     #[Route('/{id}', name: 'app_repair_show', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ASSET_REPAIR_READ')]
     public function show(Request $request, int $id): Response
@@ -124,6 +128,7 @@ class RepairController extends AbstractController
                 },
             ])
             ->add('actionstaken', ChoiceType::class, [
+                'required' => false,
                 'label' => 'Actions Taken',
                 'attr' => [
                     'class' => 'form-control'
@@ -202,16 +207,16 @@ class RepairController extends AbstractController
             return $this->redirect($request->headers->get('referer'));
         }
 
+        // Repair form submitted
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            if ( !$canRepair) exit;
+            // if ( !$canRepair) exit; // TODO This can probably be done better
 
             $data = $form->getData();
 
-            dd($data);
+            $this->repairService->createOrUpdateRepair((int)$data['assetId'], $data['issue'], $data['parts'], $data['status']);
+            return $this->redirect($request->headers->get('referer'));
         }
-
 
         return $this->render('repair/show.html.twig', [
             'repair' => $repairEntity,
