@@ -25,7 +25,7 @@ class RepairService
      * @return void
      * @throws NonUniqueResultException
      */
-    public function createOrUpdateRepair(int $assetId, string $issue, ArrayCollection $partsNeeded, string $status = 'not_started', ?int $submittedByUserId = null): void
+    public function createOrUpdateRepair(int $assetId, string $issue, ArrayCollection $partsNeeded, string $status = 'not_started', array $actionsTaken = [], ?int $submittedByUserId = null): void
     {
         // TODO I made the getRepair id in the repository find by assetId but updating repair from Repair seems weird now, idk...
         $repair = $this->repairRepository->getRepair($assetId, true);
@@ -41,6 +41,7 @@ class RepairService
             ->setPartsNeeded($this->processPartsNeededForDb($partsNeeded))
             ->setLastModifiedDate(new \DateTimeImmutable('now'))
             ->setSubmittedById($submittedByUserId)
+            ->setActionsPerformed($actionsTaken)
         ;
 
         $this->repairRepository->save($repair, true);

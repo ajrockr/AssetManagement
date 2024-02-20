@@ -142,7 +142,8 @@ class RepairController extends AbstractController
                     'Replaced Part' => Repair::ACTION_REPLACED_PART,
                     'Software Fixed' => Repair::ACTION_SOFTWARE_FIX,
                     'No Repair Needed' => Repair::ACTION_NO_REPAIR_NEEDED,
-                ]
+                ],
+                'data' => $repairEntity->getActionsPerformed()
             ])
             ->add('status', ChoiceType::class, [
                 'label' => 'Status',
@@ -214,7 +215,7 @@ class RepairController extends AbstractController
 
             $data = $form->getData();
 
-            $this->repairService->createOrUpdateRepair((int)$data['assetId'], $data['issue'], $data['parts'], $data['status']);
+            $this->repairService->createOrUpdateRepair((int)$data['assetId'], $data['issue'], $data['parts'], $data['status'], $data['actionstaken']);
             return $this->redirect($request->headers->get('referer'));
         }
 
