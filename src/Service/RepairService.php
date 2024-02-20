@@ -32,7 +32,8 @@ class RepairService
 
         if ( !$repair) {
             $repair = new Repair;
-            $repair->setCreatedDate(new \DateTimeImmutable('now'));
+            $repair->setCreatedDate(new \DateTimeImmutable('now'))
+                ->setSubmittedById($submittedByUserId);
         }
 
         $repair->setIssue($issue)
@@ -40,7 +41,6 @@ class RepairService
             ->setStatus($status)
             ->setPartsNeeded($this->processPartsNeededForDb($partsNeeded))
             ->setLastModifiedDate(new \DateTimeImmutable('now'))
-            ->setSubmittedById($submittedByUserId)
             ->setActionsPerformed($actionsTaken)
         ;
 

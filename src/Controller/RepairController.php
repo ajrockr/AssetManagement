@@ -122,7 +122,7 @@ class RepairController extends AbstractController
                 'choice_label' => 'name',
                 'choice_attr' => function ($choice, string $key, mixed $value) use ($partsNeeded) {
                     return [
-                        'class' => 'form-check-input',
+                        'class' => 'form-check-input mx-2',
                         'checked' => in_array($choice->getId(), $partsNeeded),
                     ];
                 },

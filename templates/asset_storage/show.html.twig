@@ -100,7 +100,7 @@
                                 <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
                             </div>
                             <div class="my-2" id="partsNeeded">
-                                <a href="" id="viewRepairLink">View Repair</a>
+                                <a href="" id="viewRepairLink" style="display:none">View Repair</a>
                                 {{ form_widget(form.repairPartsNeeded) }}
                             </div>
                             <div class="form-floating mt-sm-2">
@@ -246,7 +246,7 @@
                     // Set the View Repair link href
                     let url = "{{ app.request.getSchemeAndHttpHost() }}{{ path('app_repair_show', { id: 'repairId' }) }}";
                     url = url.replace("repairId", repairId);
-                    $("#viewRepairLink").attr("href", url);
+                    $("#viewRepairLink").attr("href", url).show();
 
                     // Populate checkboxes for repair items needed
                     repairPartsNeeded.forEach(async (part) => {
@@ -254,6 +254,7 @@
                     });
 
                 } else {
+                    $("#viewRepairLink").hide();
                     $("#needsRepairLabel").text("Needs Repair");
                     $("#asset_collection_needs_repair").prop("disabled", false).prop("checked", false);
                     // $("#asset_collection_needsrepair").attr("onclick", "").unbind("click");

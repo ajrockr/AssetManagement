@@ -65,7 +65,8 @@ class AssetCollectionService
         // Check if Repair is needed
         if (array_key_exists('needs_repair', $data)) {
             if ($data['needs_repair']) {
-                $this->repairService->createOrUpdateRepair($asset->getId(), $data['notes'] ?? 'Issue not listed', $data['repairPartsNeeded'], $userId);
+                // TODO Do I need the array_key_exists and bool conditional?
+                $this->repairService->createOrUpdateRepair($asset->getId(), $data['notes'] ?? 'Issue not listed', $data['repairPartsNeeded'], submittedByUserId:  $userId);
             }
         }
 
