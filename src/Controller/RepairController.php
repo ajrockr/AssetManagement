@@ -4,19 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Repair;
 use App\Entity\RepairParts;
-use App\Repository\RepairPartsRepository;
+use App\Repository\AssetRepository;
 use App\Repository\RepairRepository;
 use App\Repository\UserRepository;
 use App\Service\RepairService;
 use App\Service\UserService;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,6 +33,7 @@ class RepairController extends AbstractController
         private readonly RepairService $repairService,
         private readonly UserService $userService,
         private readonly UserRepository $userRepository,
+        private readonly AssetRepository $assetRepository,
     ) { }
     #[Route('/', name: 'app_repair_index', methods: ['GET'])]
     public function index(RepairRepository $repairRepository): Response
@@ -77,6 +76,9 @@ class RepairController extends AbstractController
             return $this->redirectToRoute('app_repair_index');
         }
 
+        $asset = $this->assetRepository->findOneBy(['id' => $repairEntity->getAssetId()]);
+        $assetAssignedto = $this->userRepository->findOneBy(['id' => $asset->getAssignedTo()]);
+
         $submittedBy = $this->userRepository->getFullName($repairEntity->getSubmittedById());
 
         $assignedTechnician = (null !== $repairEntity->getTechnicianId()) ? $this->userRepository->getFullName($repairEntity->getTechnicianId()) : 'Not Assigned';
@@ -106,13 +108,13 @@ class RepairController extends AbstractController
             ->add('technicianId', HiddenType::class, [
                 'data' => $repairEntity->getTechnicianId()
             ])
-            ->add('issue', TextareaType::class, [
-                'attr' => [
-                    'class' => 'form-control'
-                ],
-                'label_attr' => [
-                    'class' => 'form-label'
-                ],
+            ->add('issue', CKEditorType::class, [
+//                'attr' => [
+//                    'class' => 'form-control',
+//                ],
+//                'label_attr' => [
+//                    'class' => 'form-label'
+//                ],
                 'data' => $repairEntity->getIssue()
             ])
             ->add('parts', EntityType::class, [
@@ -127,7 +129,7 @@ class RepairController extends AbstractController
                     ];
                 },
             ])
-            ->add('actionstaken', TextType::class, [
+            ->add('actionstaken', ChoiceType::class, [
                 'label' => 'Actions Taken',
                 'attr' => [
                     'class' => 'form-control'
@@ -135,6 +137,13 @@ class RepairController extends AbstractController
                 'label_attr' => [
                     'class' => 'input-group-text'
                 ],
+                'multiple' => true,
+                'choices' => [
+                    'Diagnosed' => Repair::ACTION_DIAGNOSED,
+                    'Replaced Part' => Repair::ACTION_REPLACED_PART,
+                    'Software Fixed' => Repair::ACTION_SOFTWARE_FIX,
+                    'No Repair Needed' => Repair::ACTION_NO_REPAIR_NEEDED,
+                ]
             ])
             ->add('status', ChoiceType::class, [
                 'label' => 'Status',
@@ -218,6 +227,8 @@ class RepairController extends AbstractController
             'assignTechnicianForm' => $assignTechnicianForm->createView(),
             'canRepair' => $canRepair,
             'repairTechnicians' => $this->getValidTechnicians(),
+            'asset' => $asset,
+            'assetAssignedPerson' => $assetAssignedto,
         ]);
     }
 

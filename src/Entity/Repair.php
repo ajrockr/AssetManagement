@@ -20,6 +20,11 @@ class Repair
     public const STATUS_WAITING_ON_USER = 'waiting_on_user';
     public const STATUS_CUSTOM = 'custom';
 
+    public const ACTION_DIAGNOSED = 'diagnosed';
+    public const ACTION_REPLACED_PART = 'replaced_part';
+    public const ACTION_SOFTWARE_FIX = 'software_fix';
+    public const ACTION_NO_REPAIR_NEEDED = 'no_repair_needed';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

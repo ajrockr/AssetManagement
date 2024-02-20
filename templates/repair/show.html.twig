@@ -8,35 +8,52 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    Repair ID: {{ repair.id }}<br/>
-                    Submitted By: {{ submittedBy }}<br/>
-                    Submitted On: {{ repair.createdDate|date('Y-m-d h:i') }}<br/>
-                    Last Modified Time: {{ repair.lastModifiedDate|date('Y-m-d h:i') }}
+                    <div class="row mb-1">
+                        <div class="col">Submitted By</div>
+                        <div class="col"><a href="#path_app_user">{{ submittedBy }}</a></div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col">Submitted On</div>
+                        <div class="col">{{ repair.createdDate|date('Y-m-d h:i') }}</div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col">Last Modified Time</div>
+                        <div class="col">{{ repair.lastModifiedDate|date('Y-m-d h:i') }}</div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col">Asset Assignment</div>
+                        <div class="col"><a href="#">{{ assetAssignedPerson.surname }}, {{ assetAssignedPerson.firstname }}</a></div>
+                    </div>
                 </div>
                 <div class="col">
+                    <div class="row mb-3">
+                        <span>Assigned Technician: <a href="#" data-bs-toggle="modal" data-bs-target="#assignUserModal"><br />{{ assignedTechnician }}</a></span>
+                    </div>
                     <div class="row mb-3">
                         <div class="input-group">
                             <label for="form_status" class="input-group-text">Status</label>
                             {{ form_widget(form.status) }}
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        {# TODO Open modal to assign technician #}
-                        <span>Assigned Technician: <a href="#" data-bs-toggle="modal" data-bs-target="#assignUserModal"><br />{{ assignedTechnician }}</a></span>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="input-group">
-                            {{ form_label(form.actionstaken) }}
-                            {{ form_widget(form.actionstaken) }}
-                        </div>
-                    </div>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div id="form_issue_container" class="row mb-3">
                 {{ form_label(form.issue) }}
                 {{ form_widget(form.issue) }}
             </div>
             <div class="row mb-3">
+                <div class="btn-group" role="group">
+                    <button id="toggleParts" type="button" class="btn btn-secondary">Parts</button>
+                    <button id="toggleActions" type="button"  class="btn btn-secondary">Actions</button>
+                </div>
+            </div>
+            <div id="actionsTakenDiv" class="row mb-3">
+                <div class="input-group">
+                    {{ form_label(form.actionstaken) }}
+                    {{ form_widget(form.actionstaken) }}
+                </div>
+            </div>
+            <div id="partsDiv" class="row mb-3">
                 <label for="form_parts" class="form-label">Select parts:</label>
                 {{ form_widget(form.parts) }}
             </div>
@@ -71,6 +88,23 @@
     {{ form_end(assignTechnicianForm) }}
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #form_issue_container {
+            width: 1000px;
+            margin: 20px auto;
+        }
+        .ck-editor__editable[role="textbox"] {
+            min-height: 200px;
+        }
+        .ck-content .image {
+            max-width: 80%;
+            margin: 20px auto;
+        }
+    </style>
+{% endblock %}
+
 {% block javascripts %}
     {{ parent() }}
     {{ encore_entry_script_tags('select2') }}
@@ -81,6 +115,22 @@
                 width: 'resolve',
                 theme: 'bootstrap-5',
             });
+
+            let actionsTakenDiv = $("#actionsTakenDiv");
+            let partsDiv = $("#partsDiv");
+
+            actionsTakenDiv.hide();
+            partsDiv.hide();
+
+            $("#toggleParts").on("click", ()=> {
+                partsDiv.hide();
+                actionsTakenDiv.toggle();
+            })
+
+            $("#toggleActions").on("click", ()=> {
+                actionsTakenDiv.hide();
+                partsDiv.toggle();
+            })
         });
     </script>
 {% endblock %}

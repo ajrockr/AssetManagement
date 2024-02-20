@@ -92,13 +92,10 @@
                                 </div>
                             </div>
                             <div class="input-group">
-                                {# Needs Repair #}
                                 {{ form_widget(form.needs_repair, { 'attr': { 'class': 'btn-check'} }) }}
                                 <label for="asset_collection_needs_repair" class="btn btn-outline-secondary" id="needsRepairLabel">Needs Repair</label>
-                                {# Check Out #}
                                 {{ form_widget(form.check_out, { 'attr': { 'class': 'btn-check'} }) }}
                                 <label for="asset_collection_check_out" class="btn btn-outline-secondary">Check Out</label>
-                                {# Processed #}
                                 {{ form_widget(form.processed, { 'attr': { 'class': 'btn-check'} }) }}
                                 <label for="asset_collection_processed" class="btn btn-outline-secondary">Processed</label>
                             </div>
