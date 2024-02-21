@@ -120,7 +120,7 @@ class AssetStorageController extends AbstractController
             }
 
             // Check the asset into collection
-            $asset = $this->assetCollectionService->createOrUpdateAsset($form->getData());
+            $asset = $this->assetCollectionService->createOrUpdateAsset($data);
 
             if ($collected = $this->assetCollectionService->assetIsCollected($asset->getId())) {
                 if ($collected->getDeviceID() != $asset->getId()) {
