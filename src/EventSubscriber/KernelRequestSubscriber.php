@@ -5,7 +5,10 @@ namespace App\EventSubscriber;
 use App\Entity\SiteConfig;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Exception\RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -41,6 +44,15 @@ class KernelRequestSubscriber implements EventSubscriberInterface
 
         // Get current route
         $route = $event->getRequest()->attributes->get('_route');
+
+        $finder = new Finder();
+        $finder->files()->in(__DIR__ . '/../Controller/Install');
+
+        foreach($finder as $file) {
+            if ($file->getRelativePathname() == "InstallController.php") {
+//                throw new \RuntimeException('Install script is still present, please delete.');
+            }
+        }
 
         // If maintenance mode & notCli & not app_login route & not ROLE_ADMIN, we are in maintenance mode. Redirect to login
         if( ($isMaintenance == "1" && !$isCli && ($route != "app_login" || $route != "admin")) && !$this->security->isGranted('ROLE_USER')) {
