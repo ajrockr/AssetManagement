@@ -1,7 +1,10 @@
 <header>
     <nav class="navbar navbar-expand-md border-bottom bg-body-tertiary fixed-top" data-bs-theme="auto">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ path('app_home') }}">Asset Management</a>
+
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                <img src="{{ asset('build/images/am_logo.png') }}" class="d-inline-block align-text-top" width="30" height="25" alt="Asset Management">
+                Asset Management</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
