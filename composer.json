@@ -17,6 +17,7 @@
         "league/oauth2-google": "*",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.15",
+        "shivas/versioning-bundle": "^4.0",
         "sixlive/dotenv-editor": "^2.0",
         "stevenmaguire/oauth2-microsoft": "^2.2",
         "symfony/asset": "6.4.*",
