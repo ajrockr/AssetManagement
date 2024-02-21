@@ -30,7 +30,7 @@ class AssetCollectionService
     /**
      * @throws NonUniqueResultException
      */
-    public function checkIn(array $data, int $userId): void
+    public function checkIn(array $data, int $userId): ?int
     {
         $configForceAssignUser = $this->siteConfigRepository->findOneByName('asset_assignUser_on_checkin');
 
@@ -81,6 +81,8 @@ class AssetCollectionService
             $data['location'],
             $data['assigned_to']
         );
+
+        return $assetCollection->getId();
     }
 
     /**
