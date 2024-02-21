@@ -100,12 +100,11 @@ class InstallController extends AbstractController
     private function createAdminUser(string $username, string $email, string $password, string $firstname, string $surname): void
     {
         $this->entityManager->createQuery(
-            'DELETE FROM App\Entity\User'
+            'TRUNCATE App\Entity\User'
         )->execute();
 
         $user = new User();
         $user->setUsername($username)
-            ->setId(1)
             ->setEmail($email)
             ->setFirstname($firstname)
             ->setSurname($surname)
@@ -120,7 +119,7 @@ class InstallController extends AbstractController
     private function createUserRoles(): void
     {
         $this->entityManager->createQuery(
-            'DELETE FROM App\Entity\UserRoles'
+            'TRUNCATE App\Entity\UserRoles'
         )->execute();
 
         $userRoles = [
@@ -205,7 +204,7 @@ class InstallController extends AbstractController
     private function createConfig(string $companyName): void
     {
         $this->entityManager->createQuery(
-            'DELETE FROM App\Entity\SiteConfig'
+            'TRUNCATE App\Entity\SiteConfig'
         )->execute();
 
         $siteConfig = [
