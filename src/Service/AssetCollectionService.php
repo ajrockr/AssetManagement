@@ -4,11 +4,13 @@ namespace App\Service;
 
 use App\Entity\Asset;
 use App\Entity\AssetCollection;
+use App\Entity\User;
 use App\Repository\AssetCollectionRepository;
 use App\Repository\AssetRepository;
 use App\Repository\AssetStorageRepository;
 use App\Repository\RepairRepository;
 use App\Repository\SiteConfigRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,6 +27,7 @@ class AssetCollectionService
         protected readonly SiteConfigRepository      $siteConfigRepository,
         protected readonly RepairRepository          $repairRepository,
         protected readonly RepairService             $repairService,
+        protected readonly UserRepository            $userRepository,
     ) {}
 
     /**
@@ -117,5 +120,24 @@ class AssetCollectionService
     public function assetIsCollected(int $assetId): ?AssetCollection
     {
         return $this->assetCollectionRepository->findOneBy(['DeviceID' => $assetId]);
+    }
+
+    /**
+     * Checks that a user set in collected_from still exists in the database.
+     * 
+     * @param int $collectionId
+     * @return User|null
+     */
+    public function getCollectedFrom(int $collectionId): ?User
+    {
+        $collection = $this->assetCollectionRepository->findOneBy(['id' => $collectionId]);
+        if ($collection) {
+            if ($user = $this->userRepository->findOneBy(['id' => $collection->getCollectedFrom()])) {
+                return $user;
+            }
+
+        }
+
+        return null;
     }
 }

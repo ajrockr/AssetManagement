@@ -81,7 +81,12 @@ class AssetStorageController extends AbstractController
 
         $assets = [];
         foreach ($collectedAssets as $asset) {
-            $user = $users[$asset['assetcollection_CollectedFrom']];
+            $user = $this->assetCollectionService->getCollectedFrom($asset['assetcollection_id']);
+            if ( !$user) {
+                $this->addFlash('error', 'Something went horribly wrong. User does not exist anymore.');
+                return $this->redirect($request->headers->get('referer'));
+            }
+//            $user = $users[$asset['assetcollection_CollectedFrom']];
 
             // Check if asset has a repair associated with it
             if ($repair = $repairRepository->getRepair($asset['assetcollection_DeviceID'], true)) {
@@ -92,8 +97,8 @@ class AssetStorageController extends AbstractController
             $assets[] = [
                 'slot' => $asset['assetcollection_collectionLocation'],
                 'asset_tag' => $asset['asset_tag'],
-                'user' => $user['id'],
-                'usersName' => $user['surname'] . ', ' . $user['firstname'],
+                'user' => $user->getId(),
+                'usersName' => $user->getSurname() . ', ' . $user->getFirstname(),
                 'note' => $asset['assetcollection_collectionNotes'],
                 'checkedOut' => $asset['assetcollection_checkedout'],
                 'processed' => $asset['assetcollection_processed'],

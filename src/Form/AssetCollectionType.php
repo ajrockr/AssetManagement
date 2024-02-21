@@ -29,10 +29,14 @@ class AssetCollectionType extends AbstractType
     {
         // Populate user choices
         $users = $this->userRepository->findAll();
-        foreach ($users as $user) {
-            if ('Admin' == $user->getUserIdentifier()) continue;
-            $this->users[$user->getId()] = $user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getTitle() . ')';
+        if (count($users) > 1) {
+            foreach ($users as $user) {
+                $this->users[$user->getId()] = $user->getSurname() . ', ' . $user->getFirstname() . ' (' . $user->getTitle() . ')';
+            }
+        } else {
+            $this->users[0] = 'No Users Exists';
         }
+
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
