@@ -22,7 +22,11 @@
                     </div>
                     <div class="row mb-1">
                         <div class="col">Asset Assignment</div>
-                        <div class="col"><a href="#">{{ assetAssignedPerson.surname }}, {{ assetAssignedPerson.firstname }}</a></div>
+                        {% if assetAssignedPerson is null %}
+                            <div class="col">Orphaned</div>
+                        {% else %}
+                            <div class="col"><a href="#">{{ assetAssignedPerson.surname }}, {{ assetAssignedPerson.firstname }}</a></div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col">
