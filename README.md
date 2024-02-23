@@ -34,7 +34,10 @@ DATABASE_URL="mysql://db_user:db_pass@host:3306?db_name?serverVersion=16.6.1-mar
 ```shell
 $ composer install --no-dev --optimize-autoloader
 $ npm install
+$ npm run build
+$ php bin/console assets:install
 $ php bin/console doctrine:migrations:migrate
+$ php bin/console secret:regenerate-app-secret
 ```
 5. Now, the project needs some database records created. I started playing with an installation script, but it's not finished yet.
 > [!WARNING]
