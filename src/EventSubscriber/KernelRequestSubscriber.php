@@ -45,15 +45,6 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         // Get current route
         $route = $event->getRequest()->attributes->get('_route');
 
-        $finder = new Finder();
-        $finder->files()->in(__DIR__ . '/../Controller/Install');
-
-        foreach($finder as $file) {
-            if ($file->getRelativePathname() == "InstallController.php") {
-//                throw new \RuntimeException('Install script is still present, please delete.');
-            }
-        }
-
         // If maintenance mode & notCli & not app_login route & not ROLE_ADMIN, we are in maintenance mode. Redirect to login
         if( ($isMaintenance == "1" && !$isCli && ($route != "app_login" || $route != "admin")) && !$this->security->isGranted('ROLE_USER')) {
             $event->setResponse(new RedirectResponse(
