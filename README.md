@@ -1,6 +1,6 @@
 # Asset Management
 
-This is a tool developed for internal use. Built with the Symfony framework, this software allows you to intake assets, assign users, track repairs and store them in a virtual representation of physical storage.
+This is a tool developed for internal use. Built with the Symfony framework, this software allows you to intake assets, assign users, track repairs and store them in a virtual representation of physical storage. This project is still a work in progress but fully operational for what we need, if you choose to try it, I hope you find it useful as well. This software has streamlined our process of collection, tracking and distributing student devices.
 
 ## Installation
 > [!IMPORTANT]
