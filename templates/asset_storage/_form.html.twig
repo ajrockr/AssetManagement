@@ -1,46 +1,45 @@
-{#{{ form_start(form) }}#}
-{#    <div class="mb-3 form-floating">#}
-{#        {{ form_widget(form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Container Name' } }) }}#}
-{#        {{ form_label(form.name) }}#}
-{#    </div>#}
-{#    <div class="mb-3 form-floating">#}
-{#        {{ form_widget(form.description, { 'attr': {'class': 'form-control', 'placeholder': 'Description' } }) }}#}
-{#        {{ form_label(form.description) }}#}
-{#    </div>#}
-{#    <div class="mb-3 form-floating">#}
-{#        {{ form_widget(form.location, { 'attr': {'class': 'form-control', 'placeholder': 'Location' } }) }}#}
-{#        {{ form_label(form.location) }}#}
-{#    </div>#}
-{#    <div class="mb-3 form-floating">#}
-{#        <ul class="nav nav-tabs" id="myTab" role="tablist">#}
-{#            <li class="nav-item" role="presentation">#}
-{#                <button class="nav-link active" id="previewTab" data-bs-toggle="tab" data-bs-target="#previewTabPane" type="button" role="tab" aria-controls="previewTabPane" aria-selected="true">Preview</button>#}
-{#            </li>#}
-{#            <li class="nav-item" role="presentation">#}
-{#                <button class="nav-link" id="jsonDataTab" data-bs-toggle="tab" data-bs-target="#jsonDataPane" type="button" role="tab" aria-controls="jsonDataPane" aria-selected="true">JSON</button>#}
-{#            </li>#}
-{#        </ul>#}
-{#        <div class="tab-content" id="myTabContent">#}
-{#            <div class="tab-pane fade show active" id="previewTabPane" role="tabpanel" aria-labelledby="previewTab" tabindex="0">#}
-{#                Preview#}
-{#            </div>#}
-{#            <div class="tab-pane fade" id="jsonDataPane" role="tabpanel" aria-labelledby="jsonDataTab" tabindex="0">#}
-{#                {{ form_widget(form.storageData, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;', 'placeholder': 'Storage JSON String' } }) }}#}
-{#                {{ form_label(form.storageData) }}#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{#    <div class="row" role="button">#}
-{#        <div class="col text-start">#}
-{#            <button class="btn btn-success">{{ button_label|default('Save') }}</button>#}
-{#        </div>#}
-{#        <div class="col text-end">#}
-{#            {% if app.request.attributes.get('_route') == 'app_asset_storage_edit' %}#}
-{#                {% include 'asset_storage/_delete_form.html.twig' %}#}
-{#            {% endif %}#}
-{#        </div>#}
-{#    </div>#}
-{#<input type="file" id="fileUpload" name="fileUpload" />#}
+{{ form_start(form) }}
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Container Name' } }) }}
+        {{ form_label(form.name) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.description, { 'attr': {'class': 'form-control', 'placeholder': 'Description' } }) }}
+        {{ form_label(form.description) }}
+    </div>
+    <div class="mb-3 form-floating">
+        {{ form_widget(form.location, { 'attr': {'class': 'form-control', 'placeholder': 'Location' } }) }}
+        {{ form_label(form.location) }}
+    </div>
+    <div class="mb-3 form-floating">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="previewTab" data-bs-toggle="tab" data-bs-target="#previewTabPane" type="button" role="tab" aria-controls="previewTabPane" aria-selected="true">Preview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="jsonDataTab" data-bs-toggle="tab" data-bs-target="#jsonDataPane" type="button" role="tab" aria-controls="jsonDataPane" aria-selected="true">JSON</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="previewTabPane" role="tabpanel" aria-labelledby="previewTab" tabindex="0">
+                Preview
+            </div>
+            <div class="tab-pane fade" id="jsonDataPane" role="tabpanel" aria-labelledby="jsonDataTab" tabindex="0">
+                {{ form_widget(form.storageData, { 'attr': {'class': 'form-control', 'rows': 10, 'style': 'height:100%;', 'placeholder': 'Storage JSON String' } }) }}
+                {{ form_label(form.storageData) }}
+            </div>
+        </div>
+    </div>
+    <div class="row" role="button">
+        <div class="col text-start">
+            <button class="btn btn-success">{{ button_label|default('Save') }}</button>
+        </div>
+        <div class="col text-end">
+            {% if app.request.attributes.get('_route') == 'app_asset_storage_edit' %}
+                {% include 'asset_storage/_delete_form.html.twig' %}
+            {% endif %}
+        </div>
+    </div>
 {#<input type="button" id="upload" value="Upload" name="upload"/>#}
-{#{{ form_end(form) }}#}
-{{ form(form) }}
+{#<input type="file" id="fileUpload" name="fileUpload" />#}
+{{ form_end(form) }}

@@ -79,7 +79,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                     $this->entityManager->persist($user);
                     $this->entityManager->flush();
                 } else {
-                    if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('user_allowRegistration')->getConfigValue() == "1") {
+                    if ($this->entityManager->getRepository(SiteConfig::class)->findOneByName('user_allowRegistration') == "1") {
                         $user = new User();
                         $user->setEmail($email)
                             ->setUsername($email)
