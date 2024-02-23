@@ -340,6 +340,18 @@ class InstallController extends AbstractController
                 'description' => 'The cell color to represent when occupied asset has a repair associated with it.',
                 'default_value' => '#ff9c9c'
             ],
+            [
+                'name' => 'asset_asset_tag_required',
+                'value' => 'true',
+                'description' => 'Set the Asset Tag to be a required field.',
+                'default_value' => 'true'
+            ],
+            [
+                'name' => 'asset_serial_number_required',
+                'value' => 'false',
+                'description' => 'Set the Serial Number to be a required field.',
+                'default_value' => 'false'
+            ],
         ];
 
         foreach ($siteConfig as $configItem) {

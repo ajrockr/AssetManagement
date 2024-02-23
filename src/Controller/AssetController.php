@@ -16,6 +16,7 @@ use App\Repository\AssetStorageRepository;
 use App\Repository\AssetCollectionRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -162,7 +163,7 @@ class AssetController extends AbstractController
      * @throws NonUniqueResultException
      */
     #[Route('/collection/collect', name: 'app_asset_collection_collect', methods: 'POST')]
-    public function checkInForm(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository, ?string $requestingPath = null, $requestingPathParams = []): Response|array
+    public function checkInForm(Request $request, AssetStorageRepository $assetStorageRepository, UserRepository $userRepository, AssetCollectionRepository $assetCollectionRepository): Response|array
     {
         // Form 1) Select which cart
         $storages = $assetStorageRepository->findAll();
@@ -191,16 +192,6 @@ class AssetController extends AbstractController
         }
         array_unshift($usersFormArray, '');
 
-        // These are any extras in the URI to properly redirect
-        $pathParamKey = null;
-        $pathParamVal = null;
-        if (is_countable($requestingPathParams) && count($requestingPathParams) > 0) {
-            foreach ($requestingPathParams as $key=>$val) {
-                $pathParamKey = $key;
-                $pathParamVal = $val;
-            }
-        }
-
         $collectionForm = $this->createFormBuilder()
             ->setAction($this->generateUrl('app_asset_collection_collect'))
             ->add('storageId', ChoiceType::class, [
@@ -209,7 +200,6 @@ class AssetController extends AbstractController
             ->add('assigned_to', ChoiceType::class, [
                 'choices' => $usersFormArray,
                 'multiple' => false,
-                'required' => true,
                 'attr' => [
                     'class' => 'form-control js-example-basic-single',
                 ]
@@ -220,19 +210,9 @@ class AssetController extends AbstractController
             ->add('asset_serial', TextType::class, [
                 'required' => $this->siteConfigRepository->findOneByName('asset_serial_number_required') == "true"
             ])
-            ->add('requestingPath', HiddenType::class, [
+            ->add('Collect', SubmitType::class, [
                 'attr' => [
-                    'value' => $requestingPath
-                ]
-            ])
-            ->add('requestingPathParamKey', HiddenType::class, [
-                'attr' => [
-                    'value' => $pathParamKey
-                ]
-            ])
-            ->add('requestingPathParamVal', HiddenType::class, [
-                'attr' => [
-                    'value' => $pathParamVal
+                    'class' => 'btn btn-primary'
                 ]
             ])
             ->getForm()
@@ -242,9 +222,6 @@ class AssetController extends AbstractController
 
         if ($collectionForm->isSubmitted() && $collectionForm->isValid()) {
             $data = $collectionForm->getData();
-
-            $requestingPath = $data['requestingPath'];
-            $requestingPathParams[$data['requestingPathParamKey']] = $data['requestingPathParamVal'];
 
             $storageEntity = $this->assetStorageRepository->findOneBy(['id' => $data['storageId']]);
             $storageData = $this->assetStorageRepository->getStorageData($storageEntity->getId());
