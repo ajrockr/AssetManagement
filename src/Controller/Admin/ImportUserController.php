@@ -31,7 +31,7 @@ class ImportUserController extends AbstractController
         }
 
         return $this->render('admin/import_user/index.html.twig', [
-            'importUserForm' => $form
+            'importUserForm' => $form->createView()
         ]);
     }
 
