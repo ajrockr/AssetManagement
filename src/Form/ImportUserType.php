@@ -22,8 +22,8 @@ class ImportUserType extends AbstractType
                 'label_attr' => [
                     'class' => 'form-label display-6'
                 ],
-                'help' => 
-                    '(Get-ADUser -SearchBase "OU=Students,OU=Accounts,DC=WESTEX,DC=ORG" -Filter {Mail -Like \'*\'} -Properties Description,SamAccountName,Mail,GivenName,Surname,wWWHomepage | Select Description,SamAccountName,Mail,GivenName,Surname,wWWHomepage | Export-Csv C:/choose/a/path/file.csv -NoTypeInformation -NoClobber) Also add user Type as last column.',
+                'help' =>
+                    '(Get-ADUser -SearchBase "OU=Students,OU=Accounts,DC=foobar,DC=com" -Filter {Mail -Like \'*\'} -Properties Description,SamAccountName,Mail,GivenName,Surname,wWWHomepage | Select Description,SamAccountName,Mail,GivenName,Surname,wWWHomepage | Export-Csv C:/choose/a/path/file.csv -NoTypeInformation -NoClobber) Also add user Type as last column.',
                 'help_attr' => [
                     'class' => 'form-text text-muted',
                 ],
