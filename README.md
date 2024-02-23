@@ -3,6 +3,9 @@
 This is a tool developed for internal use. Built with the Symfony framework, this software allows you to intake assets, assign users, track repairs and store them in a virtual representation of physical storage.
 
 ## Installation
+> [!IMPORTANT]
+> I hope to streamline the installation process in the future. Right now, it's a pretty lengthy process.
+
 I run our instance off of an ubuntu 22.04 server with NGINX and MariaDB. If you want to do the same, the supplied install.sh file will install all necessary packages and enable NGINX and MariaDB[^1].
 
 > [!WARNING]
