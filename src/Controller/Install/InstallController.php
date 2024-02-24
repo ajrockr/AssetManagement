@@ -8,12 +8,17 @@ use App\Entity\UserRoles;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,10 +31,77 @@ class InstallController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
     ) { }
 
+    /**
+     * @throws \Exception
+     */
     #[Route('/install', name: 'app_install')]
-    public function index(Request $request): Response
+    public function index(Request $request, KernelInterface $kernel): Response
     {
-        $form = $this->createFormBuilder()
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        // Generate App Secret
+        $cmdAppSecretGen = $this->cmdGenerateAppSecret($application);
+
+        // Install Assets
+        $cmdAssetInstall = $this->cmdAssetInstall($application);
+
+        $form = $this->generateInstallForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+//            $this->createAdminUser($data['admin_username'], $data['admin_email'], $data['admin_password'], $data['admin_firstname'], $data['admin_surname']);
+//            $this->createConfig($data['company_name']);
+//            $this->createUserRoles();
+
+            // Next delete self
+//            $this->deleteSelf();
+        }
+
+        // https://symfony.com/doc/6.4/console/command_in_controller.html
+        return $this->render('install/index.html.twig', [
+            'install_form' => $form->createView(),
+            'secretGenOutput' => $cmdAppSecretGen,
+            'assetInstallOutput' => $cmdAssetInstall,
+        ]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function cmdGenerateAppSecret(Application $app): string
+    {
+        $input = new ArrayInput([
+            'command' => 'secret:regenerate-app-secret',
+            'envfile' => '.env'
+        ]);
+
+        $output = new BufferedOutput();
+        $app->run($input, $output);
+
+        return $output->fetch();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function cmdAssetInstall(Application $app): string
+    {
+        $input = new ArrayInput([
+            'command' => 'asset:install'
+        ]);
+
+        $output = new BufferedOutput();
+        $app->run($input, $output);
+
+        return $output->fetch();
+    }
+
+    private function generateInstallForm(): FormInterface
+    {
+        return $this->createFormBuilder()
             ->add('company_name', TextType::class, [
                 'required' => true,
                 'attr' => [
@@ -79,22 +151,6 @@ class InstallController extends AbstractController
             ])
             ->getForm()
         ;
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            $this->createAdminUser($data['admin_username'], $data['admin_email'], $data['admin_password'], $data['admin_firstname'], $data['admin_surname']);
-            $this->createConfig($data['company_name']);
-            $this->createUserRoles();
-
-            // Next delete self
-        }
-
-        return $this->render('install/index.html.twig', [
-            'install_form' => $form->createView(),
-        ]);
     }
 
     private function createAdminUser(string $username, string $email, string $password, string $firstname, string $surname): void
