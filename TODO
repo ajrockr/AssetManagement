@@ -1,0 +1,4 @@
+1. Currently Asset Tag and/or Serial Number is set to be required by configuration
+    Set this so that checkin doesn't care which one was filled in, one of them just has to be filled in
+
+2. Checkbox on CheckIn forms, is this asset a loaner?

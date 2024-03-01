@@ -93,18 +93,18 @@
             /**
              * Select2 Configuration
              */
-            // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
-            // $('#form_assigned_to').select2({
-            //     dropdownParent: $('#assetCheckinSelectUsersModal'),
-            //     placeholder: 'Select a user',
-            //     theme: 'bootstrap-5',
-            // });
+            $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+            $('#form_assigned_to').select2({
+                dropdownParent: $('#assetCheckinSelectUsersModal'),
+                placeholder: 'Select a user',
+                theme: 'bootstrap-5',
+            });
 
-            // $('#assetCheckinSelectUsersModal').on('shown.bs.modal', () => {
-            //     $('#form_assigned_to').on('change', function() {
-            //         $('#btnSelectAssetModal').removeAttr("disabled");
-            //     });
-            // });
+            $('#assetCheckinSelectUsersModal').on('shown.bs.modal', () => {
+                $('#form_assigned_to').on('change', function() {
+                    $('#btnSelectAssetModal').removeAttr("disabled");
+                });
+            });
         });
     </script>
 {% endblock %}
