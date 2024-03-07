@@ -12,7 +12,6 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.14",
         "easycorp/easyadmin-bundle": "^4.5",
-        "friendsofsymfony/ckeditor-bundle": "^2.5",
         "knpuniversity/oauth2-client-bundle": "^2.11",
         "league/oauth2-google": "*",
         "phpdocumentor/reflection-docblock": "^5.3",
@@ -83,8 +82,7 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "requirements-checker": "script",
-            "ckeditor:install": "symfony-cmd"
+            "requirements-checker": "script"
         },
         "post-install-cmd": [
             "@auto-scripts"

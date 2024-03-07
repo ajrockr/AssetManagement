@@ -3,11 +3,9 @@
 namespace App\EventSubscriber;
 
 use App\Service\LoggerService;
-use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
 class UserLoginListenerSubscriber implements EventSubscriberInterface

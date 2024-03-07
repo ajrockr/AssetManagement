@@ -60,7 +60,6 @@ class InstallController extends AbstractController
 //            $this->deleteSelf();
         }
 
-        // https://symfony.com/doc/6.4/console/command_in_controller.html
         return $this->render('install/index.html.twig', [
             'install_form' => $form->createView(),
             'secretGenOutput' => $cmdAppSecretGen,

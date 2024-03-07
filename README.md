@@ -40,7 +40,7 @@ $ npm install
 $ npm run build
 $ php bin/console assets:install
 $ php bin/console doctrine:migrations:migrate
-$ php bin/console secret:regenerate-app-secret
+$ php bin/console secrets:generate-keys
 ```
 5. Now, the project needs some database records created. I started playing with an installation script, but it's not finished yet.
 > [!WARNING]
