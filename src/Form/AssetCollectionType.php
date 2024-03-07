@@ -9,6 +9,7 @@ use App\Repository\SiteConfigRepository;
 use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -16,6 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AssetCollectionType extends AbstractType
@@ -41,19 +44,32 @@ class AssetCollectionType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $assetTagRequired = $this->siteConfigRepository->findOneByName('asset_asset_tag_required') == "true";
-        $serialNumberRequired = $this->siteConfigRepository->findOneByName('asset_serial_number_required') == "true";
+        // Will not longer be config. Now, just one of them has to be filled in
+        // $assetTagRequired = $this->siteConfigRepository->findOneByName('asset_asset_tag_required') == "true";
+        // $serialNumberRequired = $this->siteConfigRepository->findOneByName('asset_serial_number_required') == "true";
+
+        $listener = function (FormEvent $event): void {
+            $data = $event->getData();
+            if (empty($data['asset_tag']) && empty($data['serial_number'])) {
+                throw new TransformationFailedException(
+                    'Asset Tag and/or Serial Number are required fields.',
+                    0,
+                    null,
+                    'Either Asset Tag or Serial Number must be filled in.',
+                );
+            }
+        };
 
         $builder
             ->add('asset_tag', TextType::class, [
-                'required' => $assetTagRequired,
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control',
                 ]
             ])
             ->add('assigned_to', ChoiceType::class, [
                 'choices' => array_combine(array_values($this->users), array_keys($this->users)),
-                'required' => true,
+                'required' => false,
                 'multiple' => false,
                 'attr' => [
                     'class' => 'form-control js-example-basic-single',
@@ -70,7 +86,7 @@ class AssetCollectionType extends AbstractType
             ])
             ->add('location', HiddenType::class)
             ->add('serial_number', TextType::class, [
-                'required' => $serialNumberRequired,
+                'required' => false,
                 'attr' => [
                     'class' => 'form-control'
                 ]
@@ -103,16 +119,10 @@ class AssetCollectionType extends AbstractType
                         'class' => 'form-check-input',
                     ];
                 },
-                // TODO I can't get css to apply to the label, and when adding the form-check-inline, it bunches all the checkboxes together
-//                'attr' => [
-//                    'class' => 'form-check form-check-inline',
-//                ],
-//                'label_attr' => [
-//                    'class' => 'form-check-label'
-//                ]
             ])
             ->add('Collect', SubmitType::class)
             ->add('clearLocation', SubmitType::class)
+            ->addEventListener(FormEvents::PRE_SUBMIT, $listener)
         ;
     }
 

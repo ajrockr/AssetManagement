@@ -285,7 +285,7 @@
             });
 
             // Set assigned_to as required, have to do it here because select2 overrides the select
-            $("#asset_collection_assigned_to").prop("required", true);
+            // $("#asset_collection_assigned_to").prop("required", true);
 
             $(document).on('select2:open', () => {
                 document.querySelector('.select2-search__field').focus();

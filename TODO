@@ -2,3 +2,10 @@
     Set this so that checkin doesn't care which one was filled in, one of them just has to be filled in
 
 2. Checkbox on CheckIn forms, is this asset a loaner?
+
+3. Add a view to select all flagged as loaner
+
+4. Person view
+    List of users, are they assigned to an asset? any other stats?
+
+5. Asset checkin, user should not be required
